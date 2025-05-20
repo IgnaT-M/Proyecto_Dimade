@@ -2,7 +2,7 @@ import { createTheme } from "@mui/material";
 
 const theme = createTheme({
   typography: {
-    fontFamily: '"Playpen Sans Thai", "Arial","Montserrat", Arial, sans-serif',
+    fontFamily: '"Montserrat", Arial, sans-serif',
   },
   palette: {
     primary: {
@@ -22,6 +22,9 @@ const theme = createTheme({
     },
     background: {
       default: "#f6f4f2",
+    },
+    color1: {
+      main: "#00fc17",
     },
   },
 });
