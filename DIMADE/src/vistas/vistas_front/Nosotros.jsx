@@ -13,7 +13,7 @@ const Us = () => {
       <Header titulo="Nosotros" subtitulo="Hola" imagenFondo={img1} />
       imagen texto
       <br />
-      texto imagen
+      texto imagenes
       <Footer />
     </>
   );
