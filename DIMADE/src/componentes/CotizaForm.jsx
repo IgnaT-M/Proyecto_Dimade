@@ -193,7 +193,9 @@ const CotizaForm = () => {
               label="Detalles adicionales"
               value={formData.mensaje}
               onChange={handleChange}
+
               sx={{ width: "100%" }}
+
             />
             <Button
               type="submit"

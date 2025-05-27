@@ -5,7 +5,12 @@ import Banner from "../../componentes/Banner.jsx";
 import ContactForm from "../../componentes/ContactForm.jsx";
 import { Box, Grid, Typography, Paper } from "@mui/material";
 import Header from "../../componentes/Header.jsx";
+
+import ContactoSection from "../../componentes/ContactSection.jsx";
+
+
 import img1 from "../../../public/imagenes/img1.jpg";
+
 const Contact = () => {
   return (
     <>
@@ -39,11 +44,13 @@ const Contact = () => {
               src="public/imagenes/img1.jpg"
               alt="Imagen DIMADE"
               sx={{
+
                 display: { xs: "none", md: "block" },
                 width: {
                   xs: "100%",
                   md: "30vw",
                 },
+
                 height: { xs: "auto", md: "64vh" },
                 objectFit: "cover",
               }}
@@ -53,6 +60,10 @@ const Contact = () => {
           </Box>
         </Paper>
       </Box>
+
+      <ContactoSection />
+
+
 
       <Footer />
     </>
