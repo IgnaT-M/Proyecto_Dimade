@@ -34,16 +34,13 @@ const Home = () => {
           Categorías de Productos
         </Typography>
         <Grid container spacing={4} justifyContent="center">
-          {categorias.map((cat, index) => (
+          {categorias.slice(0, 4).map((cat, index) => (
             <Grid
               item
-              xs={12} // 1 columna en pantallas chicas
-              sm={6} // 2 columnas en pantallas medianas (≥600px)
-              md={6} // 2 columnas en pantallas grandes (≥900px)
-              lg={6}
-              xl={6}
+              xs={12}
+              sm={6}
+              md={6}
               key={index}
-              display="flex"
               justifyContent="center"
             >
               <CategoryCard

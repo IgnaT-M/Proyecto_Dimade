@@ -8,10 +8,7 @@ const CustomCard = ({ titulo, imagen, onClick }) => {
       elevation={1}
       sx={{
         width: "100%",
-        maxWidth: 360,
-
-        overflow: "hidden",
-        mx: "auto",
+        height: "100%", // Opcional
         transition: "transform 0.3s ease",
         "&:hover": {
           transform: "scale(1.03)",
