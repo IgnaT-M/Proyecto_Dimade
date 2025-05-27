@@ -164,7 +164,7 @@ const CotizaForm = () => {
               label="Detalles adicionales"
               value={formData.mensaje}
               onChange={handleChange}
-              sx={{ width: "51.5vw" }} // Asegura el 100%
+              sx={{ width: "51.5vw" }}
             />
           </Grid>
         </Grid>

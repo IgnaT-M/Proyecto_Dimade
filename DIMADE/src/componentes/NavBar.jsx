@@ -24,6 +24,9 @@ const Navbar = () => {
           <Button color="inherit" component={RouterLink} to="/cotizador">
             Cotizar
           </Button>
+          <Button color="inherit" component={RouterLink} to="/Productos">
+            Productos
+          </Button>
         </Stack>
       </Toolbar>
     </AppBar>

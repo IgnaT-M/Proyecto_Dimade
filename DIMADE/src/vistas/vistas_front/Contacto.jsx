@@ -6,6 +6,7 @@ import ContactForm from "../../componentes/ContactForm.jsx";
 import { Box, Grid, Typography, Paper } from "@mui/material";
 import img1 from "../../assets/imagenes/img1.jpg";
 import Header from "../../componentes/Header.jsx";
+import ContactoSection from "../../componentes/ContactSection.jsx";
 
 const Contact = () => {
   return (
@@ -41,7 +42,7 @@ const Contact = () => {
               src="src/assets/imagenes/img1.jpg"
               alt="Imagen DIMADE"
               sx={{
-                width: { xs: "100%", md: "30vw" },
+                width: { xs: "100%", md: "30vw", xl: "25vw" },
                 height: { xs: "auto", md: "64vh" },
                 objectFit: "cover",
               }}
@@ -53,6 +54,7 @@ const Contact = () => {
         </Paper>
       </Box>
       cards rrss,wasap,correo
+      <ContactoSection />
       <Footer />
     </>
   );
