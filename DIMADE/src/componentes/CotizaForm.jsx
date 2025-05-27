@@ -15,6 +15,7 @@ import PersonIcon from "@mui/icons-material/Person";
 import EmailIcon from "@mui/icons-material/Email";
 import PhoneIcon from "@mui/icons-material/Phone";
 import ListAltIcon from "@mui/icons-material/ListAlt";
+import AddBoxIcon from "@mui/icons-material/AddBox";
 
 const CotizaForm = () => {
   const [formData, setFormData] = useState({
@@ -35,6 +36,12 @@ const CotizaForm = () => {
 
   const handleSubmit = (e) => {
     e.preventDefault();
+
+    if (!formData.tipoProducto) {
+      alert("Por favor selecciona un producto válido.");
+      return;
+    }
+
     console.log("Datos enviados:", formData);
     setOpen(true);
     setFormData({
@@ -57,7 +64,18 @@ const CotizaForm = () => {
   ];
 
   return (
-    <Paper elevation={0} sx={{ p: 4, maxWidth: 900, mx: "auto" }}>
+    <Paper
+      elevation={0}
+      sx={{
+        p: 4,
+        maxWidth: 900,
+        mx: "auto",
+        display: "flex",
+        flexDirection: "column",
+        alignItems: "center",
+        justifyContent: "center",
+      }}
+    >
       <Typography
         variant="h4"
         textAlign="center"
@@ -66,9 +84,9 @@ const CotizaForm = () => {
       >
         Solicita tu cotización
       </Typography>
-      <Box component="form" onSubmit={handleSubmit}>
+      <Box component="form" onSubmit={handleSubmit} sx={{ width: "100%" }}>
         <Grid container spacing={2}>
-          <Grid item xs={12} sm={6}>
+          <Grid item xs={12} lg={6}>
             <TextField
               fullWidth
               required
@@ -81,7 +99,7 @@ const CotizaForm = () => {
               }}
             />
           </Grid>
-          <Grid item xs={12} sm={6}>
+          <Grid item xs={12} lg={6}>
             <TextField
               fullWidth
               name="empresa"
@@ -93,7 +111,7 @@ const CotizaForm = () => {
               }}
             />
           </Grid>
-          <Grid item xs={12} sm={6}>
+          <Grid item xs={12} lg={6}>
             <TextField
               fullWidth
               required
@@ -107,7 +125,7 @@ const CotizaForm = () => {
               }}
             />
           </Grid>
-          <Grid item xs={12} sm={6}>
+          <Grid item xs={12} lg={6}>
             <TextField
               fullWidth
               required
@@ -121,7 +139,7 @@ const CotizaForm = () => {
               }}
             />
           </Grid>
-          <Grid item xs={12} sm={6}>
+          <Grid item xs={12} lg={6}>
             <TextField
               fullWidth
               required
@@ -131,23 +149,34 @@ const CotizaForm = () => {
               value={formData.cantidad}
               onChange={handleChange}
               InputProps={{
-                startAdornment: <PhoneIcon sx={{ mr: 1 }} />,
+                startAdornment: <AddBoxIcon sx={{ mr: 1 }} />,
               }}
             />
           </Grid>
-          <Grid item xs={12} sm={6}>
+          <Grid item xs={12} lg={6}>
             <TextField
               select
               fullWidth
               required
               name="tipoProducto"
-              label="Tipo de producto"
               value={formData.tipoProducto}
               onChange={handleChange}
               InputProps={{
                 startAdornment: <ListAltIcon sx={{ mr: 1 }} />,
               }}
+              SelectProps={{
+                displayEmpty: true,
+                renderValue: (value) =>
+                  value ? (
+                    value
+                  ) : (
+                    <span style={{ opacity: 0.5 }}>Selecciona tu producto</span>
+                  ),
+              }}
             >
+              {/* <MenuItem value="" disabled sx={{ display: "none" }}>
+                Selecciona tu producto
+              </MenuItem> */}
               {productos.map((prod) => (
                 <MenuItem key={prod} value={prod}>
                   {prod}
@@ -155,7 +184,7 @@ const CotizaForm = () => {
               ))}
             </TextField>
           </Grid>
-          <Grid item xs={12}>
+          <Grid item xs={12} sx={{ width: "100%" }}>
             <TextField
               fullWidth
               multiline
@@ -164,22 +193,20 @@ const CotizaForm = () => {
               label="Detalles adicionales"
               value={formData.mensaje}
               onChange={handleChange}
-              sx={{ width: "51.5vw" }} // Asegura el 100%
+              sx={{ width: "100%" }}
             />
+            <Button
+              type="submit"
+              variant="contained"
+              color="primary"
+              fullWidth
+              sx={{ mt: 3, fontWeight: "bold", borderRadius: 0 }}
+            >
+              Enviar solicitud
+            </Button>
           </Grid>
         </Grid>
-
-        <Button
-          type="submit"
-          variant="contained"
-          color="primary"
-          fullWidth
-          sx={{ mt: 3, fontWeight: "bold", borderRadius: 0 }}
-        >
-          Enviar solicitud
-        </Button>
       </Box>
-
       <Snackbar
         open={open}
         autoHideDuration={4000}

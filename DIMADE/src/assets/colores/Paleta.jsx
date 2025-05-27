@@ -6,25 +6,22 @@ const theme = createTheme({
   },
   palette: {
     primary: {
-      main: "#00789A",
+      main: "#10567E",
     },
     secondary: {
-      main: "#43B4D2",
+      main: "#D95830",
     },
-    accent: {
-      main: "#E6402C",
+    terciary: {
+      main: "#30749C",
+    },
+    background: {
+      main: "#DBDFE6",
     },
     darkText: {
       main: "#2d222d",
     },
     lightText: {
       main: "#ffffff",
-    },
-    background: {
-      default: "#f6f4f2",
-    },
-    color1: {
-      main: "#00fc17",
     },
   },
 });
