@@ -1,34 +1,32 @@
 import React from "react";
 import Slider from "react-slick";
 import { Box, Typography, Card, CardMedia, CardContent } from "@mui/material";
-import img1 from "../assets/imagenes/img1.jpg";
+import cerecita from "../../public/imagenes/marcas/cerecita.png";
+import kolor from "../../public/imagenes/marcas/kolor.png";
+import sherwin from "../../public/imagenes/marcas/sherwin.jpg";
+import sipa from "../../public/imagenes/marcas/sipa.png";
 
-// Ejemplo de datos de proveedores
+// Datos de proveedores
 const proveedores = [
   {
-    nombre: "Proveedora Norte",
-    descripcion: "Materiales de alta resistencia.",
-    imagen: "DIMADE/src/assets/imagenes/img1.jpg",
+    nombre: "Cerecita",
+    descripcion: "Cerecita",
+    imagen: cerecita,
   },
   {
-    nombre: "Construmat Sur",
-    descripcion: "Especialistas en cemento y áridos.",
-    imagen: { img1 },
+    nombre: "Kölor",
+    descripcion: "Kölor",
+    imagen: kolor,
   },
   {
-    nombre: "Ferretería Central",
-    descripcion: "Todo para tu proyecto.",
-    imagen: { img1 },
+    nombre: "Sherwin-Williams",
+    descripcion: "Sherwin-Williams",
+    imagen: sherwin,
   },
   {
-    nombre: "EcoMateriales",
-    descripcion: "Soluciones sostenibles.",
-    imagen: { img1 },
-  },
-  {
-    nombre: "9",
-    descripcion: "32.",
-    imagen: { img1 },
+    nombre: "Sipa",
+    descripcion: "Sipa",
+    imagen: sipa,
   },
 ];
 
@@ -36,7 +34,7 @@ const settings = {
   dots: true,
   infinite: true,
   speed: 600,
-  slidesToShow: 3,
+  slidesToShow: 4,
   slidesToScroll: 1,
   autoplay: true,
   autoplaySpeed: 4000,
@@ -61,26 +59,39 @@ const ProveedorSlider = () => {
         textAlign="center"
         gutterBottom
       >
-        Nuestros Proveedores
+        Algunas de nuestras marcas
       </Typography>
       <Slider {...settings}>
         {proveedores.map((prov, index) => (
-          <Box key={index} px={2}>
-            <Card sx={{ borderRadius: 2, overflow: "hidden" }}>
+          <Box key={index} px={2} display="flex" justifyContent="center">
+            <Card
+              sx={{
+                width: 200,
+                height: 200,
+                borderRadius: "50%",
+                overflow: "hidden",
+                display: "flex",
+                flexDirection: "column",
+                alignItems: "center",
+                justifyContent: "center",
+                textAlign: "center",
+                boxShadow: 3,
+              }}
+            >
               <CardMedia
                 component="img"
+<<<<<<< HEAD
                 height="180vw"
+=======
+>>>>>>> 7d551ecd7740484ee72b2cfadc1edab227172751
                 image={prov.imagen}
                 alt={prov.nombre}
+                sx={{
+                  width: "100%",
+                  height: "100%",
+                  objectFit: "contain",
+                }}
               />
-              <CardContent>
-                <Typography variant="h6" fontWeight="bold">
-                  {prov.nombre}
-                </Typography>
-                <Typography variant="body2" color="text.secondary">
-                  {prov.descripcion}
-                </Typography>
-              </CardContent>
             </Card>
           </Box>
         ))}

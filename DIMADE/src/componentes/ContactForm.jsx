@@ -60,15 +60,31 @@ const ContactForm = () => {
   ];
 
   return (
+<<<<<<< HEAD
     <Paper sx={{ p: 4, pt: 0, maxWidth:"100%", boxShadow: "none" }}>
       <Typography variant="h4" gutterBottom textAlign="start">
+=======
+    <Paper
+      sx={{
+        p: 4,
+        maxWidth: "600vw",
+        mx: "auto",
+        boxShadow: "none",
+      }}
+    >
+      <Typography variant="h3" gutterBottom textAlign="start">
+>>>>>>> 7d551ecd7740484ee72b2cfadc1edab227172751
         CONTACTANOS
       </Typography>
 
       {/* Este Box controla el ancho total del formulario */}
       <Box sx={{ maxWidth:"100%", mx: "auto" }} component="form" onSubmit={handleSubmit}>
         <Grid container spacing={2}>
+<<<<<<< HEAD
           <Grid item xs={12} md={6}>
+=======
+          <Grid item xs={12} md={6} lg={6}>
+>>>>>>> 7d551ecd7740484ee72b2cfadc1edab227172751
             <TextField
               fullWidth
               required
@@ -85,7 +101,11 @@ const ContactForm = () => {
               }}
             />
           </Grid>
+<<<<<<< HEAD
           <Grid item xs={12} md={6}>
+=======
+          <Grid Grid item xs={12} md={6} lg={6}>
+>>>>>>> 7d551ecd7740484ee72b2cfadc1edab227172751
             <TextField
               fullWidth
               required
@@ -103,7 +123,11 @@ const ContactForm = () => {
               }}
             />
           </Grid>
+<<<<<<< HEAD
           <Grid item xs={12} md={6}>
+=======
+          <Grid Grid item xs={12} md={6} lg={6}>
+>>>>>>> 7d551ecd7740484ee72b2cfadc1edab227172751
             <TextField
               fullWidth
               required
@@ -120,7 +144,11 @@ const ContactForm = () => {
               }}
             />
           </Grid>
+<<<<<<< HEAD
           <Grid item xs={12} md={6}>
+=======
+          <Grid Grid item xs={12} md={6} lg={6}>
+>>>>>>> 7d551ecd7740484ee72b2cfadc1edab227172751
             <TextField
               fullWidth
               required
@@ -137,7 +165,11 @@ const ContactForm = () => {
               }}
             />
           </Grid>
+<<<<<<< HEAD
           <Grid item xs={12} md={6}>
+=======
+          <Grid Grid item xs={12} md={6} lg={6}>
+>>>>>>> 7d551ecd7740484ee72b2cfadc1edab227172751
             <TextField
               fullWidth
               required
@@ -154,7 +186,11 @@ const ContactForm = () => {
               }}
             />
           </Grid>
+<<<<<<< HEAD
           <Grid item xs={12} md={6}>
+=======
+          <Grid Grid item xs={12} md={6} lg={6}>
+>>>>>>> 7d551ecd7740484ee72b2cfadc1edab227172751
             <TextField
               select
               fullWidth
@@ -170,6 +206,17 @@ const ContactForm = () => {
                   </InputAdornment>
                 ),
               }}
+              SelectProps={{
+                displayEmpty: true,
+                renderValue: (value) =>
+                  value ? (
+                    value
+                  ) : (
+                    <span style={{ opacity: 0.5 }}>
+                      Selecciona una opcion ...
+                    </span>
+                  ),
+              }}
             >
               {asuntos.map((option, index) => (
                 <MenuItem key={index} value={option}>
@@ -178,7 +225,7 @@ const ContactForm = () => {
               ))}
             </TextField>
           </Grid>
-          <Grid item xs={12}>
+          <Grid Grid item xs={12} md={12} lg={12} sx={{ width: "100%" }}>
             <TextField
               fullWidth
               required
@@ -196,8 +243,18 @@ const ContactForm = () => {
                 ),
               }}
             />
+            <Button
+              type="submit"
+              variant="contained"
+              color="primary"
+              fullWidth
+              sx={{ mt: 3, fontWeight: "bold", borderRadius: 1 }}
+            >
+              Enviar mensaje
+            </Button>
           </Grid>
         </Grid>
+<<<<<<< HEAD
 
         <Button
           type="submit"
@@ -208,6 +265,8 @@ const ContactForm = () => {
         >
           Enviar mensaje
         </Button>
+=======
+>>>>>>> 7d551ecd7740484ee72b2cfadc1edab227172751
       </Box>
 
       <Snackbar

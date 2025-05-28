@@ -7,13 +7,18 @@ import {
   Link,
   IconButton,
   Stack,
+  Button,
 } from "@mui/material";
 import FacebookIcon from "@mui/icons-material/Facebook";
 import InstagramIcon from "@mui/icons-material/Instagram";
 import TwitterIcon from "@mui/icons-material/Twitter";
 import EmailIcon from "@mui/icons-material/Email";
 import PhoneIcon from "@mui/icons-material/Phone";
-import logoDimade from "../assets/imagenes/logo_dimade.png";
+
+import LogoutIcon from "@mui/icons-material/Logout";
+
+
+import logoDimade from "../../public/imagenes/logo_dimade.png"; // Asegúrate de que la ruta sea correcta
 import { Link as RouterLink } from "react-router-dom";
 import theme from "../assets/colores/Paleta";
 import { StayPrimaryLandscape } from "@mui/icons-material";
@@ -26,13 +31,12 @@ const Footer = () => {
       component="footer"
       sx={{
         width: "100%",
-        backgroundColor: theme.palette.primary.main,
-        color: theme.palette.lightText.main, 
+        backgroundColor: "#f6f4f2",
+        color: "#2d222d",
         pt: 6,
         pb: 3,
         mt: "auto",
         textAlign: "start",
-        
       }}
     >
       <Container maxWidth={false} disableGutters>
@@ -53,54 +57,34 @@ const Footer = () => {
                   transition: "0.3s",
                   transform: "scale(1.04)",
                 },
-                // Margen derecho
                 display: { xs: "none", sm: "block" },
               }}
             />
           </Grid>
+
+          {/* Descripción */}
           <Grid item xs={12} md={4}>
             <Typography variant="h6" gutterBottom>
               DIMADE
             </Typography>
-            <Stack
-              direction="row"
-              justifyContent="center"
-              alignItems="center"
-              spacing={1}
-            >
+            <Stack direction="row" justifyContent="center" spacing={1}>
               <Typography variant="body2">Distribucion Integral</Typography>
             </Stack>
-            <Stack
-              direction="row"
-              justifyContent="start"
-              alignItems="start"
-              spacing={1}
-              mt={1}
-            >
+            <Stack direction="row" justifyContent="start" spacing={1} mt={1}>
               <Typography variant="body2">Lorem ipsum</Typography>
             </Stack>
           </Grid>
+
           {/* Contacto */}
           <Grid item xs={12} md={4}>
             <Typography variant="h6" gutterBottom>
               Contacto
             </Typography>
-            <Stack
-              direction="row"
-              justifyContent="start"
-              alignItems="start"
-              spacing={1}
-            >
+            <Stack direction="row" spacing={1}>
               <PhoneIcon fontSize="small" />
               <Typography variant="body2">+56 9 1234 5678</Typography>
             </Stack>
-            <Stack
-              direction="row"
-              justifyContent="start"
-              alignItems="start"
-              spacing={1}
-              mt={1}
-            >
+            <Stack direction="row" spacing={1} mt={1}>
               <EmailIcon fontSize="small" />
               <Typography variant="body2">contacto@dimade.cl</Typography>
             </Stack>
@@ -179,11 +163,30 @@ const Footer = () => {
         </Grid>
 
         {/* Línea divisoria y derechos */}
+
         <Box mt={4} borderTop={1} borderColor="#333" pt={2}>
-          <Typography variant="body2" align="center" color="ffffff">
+          <Typography variant="body2" align="center" color="gray">
             © {new Date().getFullYear()} dimade.cl – Todos los derechos
             reservados.
           </Typography>
+
+          {/* Botón salir abajo a la derecha */}
+          <Box
+            sx={{
+              position: "absolute",
+              bottom: 0,
+              right: 16,
+            }}
+          >
+            <Button
+              variant="contained"
+              color="background"
+              startIcon={<LogoutIcon />}
+              component={RouterLink}
+              to="/login"
+              sx={{ mt: 2 }}
+            ></Button>
+          </Box>
         </Box>
       </Container>
     </Box>
