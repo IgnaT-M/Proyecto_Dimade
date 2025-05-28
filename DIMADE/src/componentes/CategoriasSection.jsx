@@ -7,7 +7,7 @@ import {
   CardMedia,
   CardContent,
 } from "@mui/material";
-import img1 from "../assets/imagenes/img1.jpg";
+import img1 from "DIMADE/public/imagenes/img1.jpg";
 
 const categorias = [
   {

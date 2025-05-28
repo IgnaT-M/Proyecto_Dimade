@@ -60,13 +60,20 @@ const ContactForm = () => {
   ];
 
   return (
-    <Paper sx={{ p: 4, pt: 0, maxWidth: 600, mx: "auto", boxShadow: "none" }}>
-      <Typography variant="h4" gutterBottom textAlign="start">
+    <Paper
+      sx={{
+        p: 4,
+        maxWidth: "600vw",
+        mx: "auto",
+        boxShadow: "none",
+      }}
+    >
+      <Typography variant="h3" gutterBottom textAlign="start">
         CONTACTANOS
       </Typography>
       <Box component="form" onSubmit={handleSubmit}>
         <Grid container spacing={2}>
-          <Grid item xs={12}>
+          <Grid item xs={12} md={6} lg={6}>
             <TextField
               fullWidth
               required
@@ -83,7 +90,7 @@ const ContactForm = () => {
               }}
             />
           </Grid>
-          <Grid item xs={12}>
+          <Grid Grid item xs={12} md={6} lg={6}>
             <TextField
               fullWidth
               required
@@ -101,7 +108,7 @@ const ContactForm = () => {
               }}
             />
           </Grid>
-          <Grid item xs={12}>
+          <Grid Grid item xs={12} md={6} lg={6}>
             <TextField
               fullWidth
               required
@@ -118,7 +125,7 @@ const ContactForm = () => {
               }}
             />
           </Grid>
-          <Grid item xs={12}>
+          <Grid Grid item xs={12} md={6} lg={6}>
             <TextField
               fullWidth
               required
@@ -135,7 +142,7 @@ const ContactForm = () => {
               }}
             />
           </Grid>
-          <Grid item xs={12}>
+          <Grid Grid item xs={12} md={6} lg={6}>
             <TextField
               fullWidth
               required
@@ -152,7 +159,7 @@ const ContactForm = () => {
               }}
             />
           </Grid>
-          <Grid item xs={12}>
+          <Grid Grid item xs={12} md={6} lg={6}>
             <TextField
               select
               fullWidth
@@ -168,6 +175,17 @@ const ContactForm = () => {
                   </InputAdornment>
                 ),
               }}
+              SelectProps={{
+                displayEmpty: true,
+                renderValue: (value) =>
+                  value ? (
+                    value
+                  ) : (
+                    <span style={{ opacity: 0.5 }}>
+                      Selecciona una opcion ...
+                    </span>
+                  ),
+              }}
             >
               {asuntos.map((option, index) => (
                 <MenuItem key={index} value={option}>
@@ -176,7 +194,7 @@ const ContactForm = () => {
               ))}
             </TextField>
           </Grid>
-          <Grid item xs={12}>
+          <Grid Grid item xs={12} md={12} lg={12} sx={{ width: "100%" }}>
             <TextField
               fullWidth
               required
@@ -194,17 +212,17 @@ const ContactForm = () => {
                 ),
               }}
             />
+            <Button
+              type="submit"
+              variant="contained"
+              color="primary"
+              fullWidth
+              sx={{ mt: 3, fontWeight: "bold", borderRadius: 1 }}
+            >
+              Enviar mensaje
+            </Button>
           </Grid>
         </Grid>
-        <Button
-          type="submit"
-          variant="contained"
-          color="primary"
-          fullWidth
-          sx={{ mt: 3, fontWeight: "bold", borderRadius: 0 }}
-        >
-          Enviar mensaje
-        </Button>
       </Box>
 
       <Snackbar

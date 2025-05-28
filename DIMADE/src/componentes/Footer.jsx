@@ -14,8 +14,11 @@ import InstagramIcon from "@mui/icons-material/Instagram";
 import TwitterIcon from "@mui/icons-material/Twitter";
 import EmailIcon from "@mui/icons-material/Email";
 import PhoneIcon from "@mui/icons-material/Phone";
+
 import LogoutIcon from "@mui/icons-material/Logout";
-import logoDimade from "../assets/imagenes/logo_dimade.png";
+
+
+import logoDimade from "../../public/imagenes/logo_dimade.png"; // Asegúrate de que la ruta sea correcta
 import { Link as RouterLink } from "react-router-dom";
 
 const Footer = () => {
@@ -24,8 +27,8 @@ const Footer = () => {
       component="footer"
       sx={{
         width: "100%",
-        backgroundColor: "#f6f4f2",
-        color: "#2d222d",
+        background: "linear-gradient(0deg, #10567E 10%, #30749C 60%)",
+        color: "#ffffff",
         pt: 6,
         pb: 3,
         mt: "auto",
@@ -157,8 +160,10 @@ const Footer = () => {
         </Grid>
 
         {/* Línea divisoria y derechos */}
-        <Box mt={4} borderTop={1} borderColor="#333" pt={2} position="relative">
-          <Typography variant="body2" align="center" color="gray">
+
+        <Box mt={4} borderTop={1} borderColor="#333" pt={2}>
+          <Typography variant="body2" align="center" color="white">
+
             © {new Date().getFullYear()} dimade.cl – Todos los derechos
             reservados.
           </Typography>

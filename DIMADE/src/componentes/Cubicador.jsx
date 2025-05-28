@@ -12,10 +12,10 @@ import {
 } from "@mui/material";
 
 const materiales = [
-  { tipo: "Hormigón", factor: 2400 }, // kg/m3
+  { tipo: "Hormigón", factor: 2400 },
   { tipo: "Arena", factor: 1600 },
   { tipo: "Grava", factor: 1500 },
-  { tipo: "Ladrillos", factor: 500 }, // unidades por m3 (aproximado)
+  { tipo: "Ladrillos", factor: 500 },
   { tipo: "Yeso", factor: 875 },
 ];
 
@@ -26,19 +26,31 @@ const Cubicador = () => {
     alto: "",
     material: "",
   });
-
+  const [errors, setErrors] = useState({});
   const [resultado, setResultado] = useState(null);
   const [open, setOpen] = useState(false);
 
   const handleChange = (e) => {
     setDatos((prev) => ({ ...prev, [e.target.name]: e.target.value }));
+    setErrors((prev) => ({ ...prev, [e.target.name]: false }));
   };
 
   const calcular = (e) => {
     e.preventDefault();
     const { largo, ancho, alto, material } = datos;
-    const vol = parseFloat(largo) * parseFloat(ancho) * parseFloat(alto);
+    const newErrors = {
+      largo: !largo,
+      ancho: !ancho,
+      alto: !alto,
+      material: !material,
+    };
 
+    if (Object.values(newErrors).some(Boolean)) {
+      setErrors(newErrors);
+      return;
+    }
+
+    const vol = parseFloat(largo) * parseFloat(ancho) * parseFloat(alto);
     const mat = materiales.find((m) => m.tipo === material);
     const total = vol * mat.factor;
 
@@ -51,55 +63,64 @@ const Cubicador = () => {
   };
 
   return (
-    <Paper elevation={0} sx={{ p: 4, maxWidth: 700, mx: "auto", mt: 4 }}>
+    <Paper
+      elevation={0}
+      sx={{
+        p: 4,
+        width: { xs: "80vw", md: "60vw" },
+        height: { xs: "55vw", md: "60vh" },
+        margin: "0 auto",
+        display: "flex",
+        flexDirection: "column",
+        justifyContent: "center",
+        alignItems: "center",
+        borderRadius: "15px",
+      }}
+    >
       <Typography variant="h4" fontWeight="bold" gutterBottom>
         Cubicador de Materiales
       </Typography>
-      <Box component="form" onSubmit={calcular}>
-        <Grid container spacing={2}>
-          <Grid item xs={12} sm={4}>
-            <TextField
-              fullWidth
-              required
-              label="Largo (m)"
-              name="largo"
-              type="number"
-              value={datos.largo}
-              onChange={handleChange}
-            />
-          </Grid>
-          <Grid item xs={12} sm={4}>
-            <TextField
-              fullWidth
-              required
-              label="Ancho (m)"
-              name="ancho"
-              type="number"
-              value={datos.ancho}
-              onChange={handleChange}
-            />
-          </Grid>
-          <Grid item xs={12} sm={4}>
-            <TextField
-              fullWidth
-              required
-              label="Alto (m)"
-              name="alto"
-              type="number"
-              value={datos.alto}
-              onChange={handleChange}
-            />
-          </Grid>
+      <Box component="form" onSubmit={calcular} sx={{ width: "100%" }}>
+        <Grid container spacing={2} sx={{ maxWidth: 600, margin: "0 auto" }}>
+          {["largo", "ancho", "alto"].map((field) => (
+            <Grid item xs={12} sm={4} key={field}>
+              <TextField
+                color="primary"
+                fullWidth
+                required
+                type="number"
+                label={field.charAt(0).toUpperCase() + field.slice(1) + " (m)"}
+                name={field}
+                value={datos[field]}
+                onChange={handleChange}
+                error={errors[field]}
+                helperText={errors[field] ? "Este campo es obligatorio" : ""}
+              />
+            </Grid>
+          ))}
           <Grid item xs={12}>
             <TextField
+              color="primary"
               select
               fullWidth
               required
-              label="Material"
               name="material"
+              label="Material"
               value={datos.material}
               onChange={handleChange}
+              error={errors.material}
+              helperText={errors.material ? "Selecciona un material" : ""}
+              SelectProps={{
+                displayEmpty: true,
+                renderValue: (value) =>
+                  value || (
+                    <span style={{ opacity: 0.5 }}>Selecciona tu material</span>
+                  ),
+              }}
             >
+              <MenuItem value="" disabled>
+                Selecciona tu material
+              </MenuItem>
               {materiales.map((m) => (
                 <MenuItem key={m.tipo} value={m.tipo}>
                   {m.tipo}
@@ -111,6 +132,7 @@ const Cubicador = () => {
         <Button
           type="submit"
           variant="contained"
+          color="primary"
           fullWidth
           sx={{ mt: 3, fontWeight: "bold", borderRadius: 0 }}
         >

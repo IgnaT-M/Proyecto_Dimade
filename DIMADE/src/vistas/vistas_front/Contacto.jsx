@@ -4,16 +4,18 @@ import Footer from "../../componentes/Footer.jsx";
 import Banner from "../../componentes/Banner.jsx";
 import ContactForm from "../../componentes/ContactForm.jsx";
 import { Box, Grid, Typography, Paper } from "@mui/material";
-import img1 from "../../assets/imagenes/img1.jpg";
 import Header from "../../componentes/Header.jsx";
+
 import ContactoSection from "../../componentes/ContactSection.jsx";
+
+
+import img1 from "../../../public/imagenes/img1.jpg";
 
 const Contact = () => {
   return (
     <>
       <Navbar />
-      <Header titulo="Contacto" subtitulo="si" imagenFondo={img1} />
-      <br />
+      <Header titulo="" subtitulo="" imagenFondo={img1} />
       <Box
         sx={{
           width: "100%",
@@ -39,22 +41,30 @@ const Contact = () => {
           >
             <Box
               component="img"
-              src="src/assets/imagenes/img1.jpg"
+              src="public/imagenes/img1.jpg"
               alt="Imagen DIMADE"
               sx={{
-                width: { xs: "100%", md: "30vw", xl: "25vw" },
+
+                display: { xs: "none", md: "block" },
+                width: {
+                  xs: "100%",
+                  md: "30vw",
+                },
+
                 height: { xs: "auto", md: "64vh" },
                 objectFit: "cover",
               }}
             />
-            <Box sx={{ flex: 1, textAlign: "justify" }}>
-              <ContactForm />
-            </Box>
+
+            <ContactForm />
           </Box>
         </Paper>
       </Box>
-      cards rrss,wasap,correo
+
       <ContactoSection />
+
+
+
       <Footer />
     </>
   );
