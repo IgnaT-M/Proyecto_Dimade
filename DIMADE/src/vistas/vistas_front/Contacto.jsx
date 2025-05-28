@@ -44,9 +44,6 @@ const Contact = () => {
               src="public/imagenes/img1.jpg"
               alt="Imagen DIMADE"
               sx={{
-<<<<<<< HEAD
-                width: { xs: "100%", md: "30vw" , xl:"25vw" },
-=======
 
                 display: { xs: "none", md: "block" },
                 width: {
@@ -54,7 +51,6 @@ const Contact = () => {
                   md: "30vw",
                 },
 
->>>>>>> 7d551ecd7740484ee72b2cfadc1edab227172751
                 height: { xs: "auto", md: "64vh" },
                 objectFit: "cover",
               }}

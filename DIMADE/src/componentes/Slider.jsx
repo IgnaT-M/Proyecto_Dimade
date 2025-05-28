@@ -80,10 +80,7 @@ const ProveedorSlider = () => {
             >
               <CardMedia
                 component="img"
-<<<<<<< HEAD
                 height="180vw"
-=======
->>>>>>> 7d551ecd7740484ee72b2cfadc1edab227172751
                 image={prov.imagen}
                 alt={prov.nombre}
                 sx={{
