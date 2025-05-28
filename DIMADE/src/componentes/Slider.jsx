@@ -69,7 +69,7 @@ const ProveedorSlider = () => {
             <Card sx={{ borderRadius: 2, overflow: "hidden" }}>
               <CardMedia
                 component="img"
-                height="180"
+                height="180vw"
                 image={prov.imagen}
                 alt={prov.nombre}
               />

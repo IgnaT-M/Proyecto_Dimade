@@ -60,13 +60,15 @@ const ContactForm = () => {
   ];
 
   return (
-    <Paper sx={{ p: 4, pt: 0, maxWidth: 600, mx: "auto", boxShadow: "none" }}>
+    <Paper sx={{ p: 4, pt: 0, maxWidth:"100%", boxShadow: "none" }}>
       <Typography variant="h4" gutterBottom textAlign="start">
         CONTACTANOS
       </Typography>
-      <Box component="form" onSubmit={handleSubmit}>
+
+      {/* Este Box controla el ancho total del formulario */}
+      <Box sx={{ maxWidth:"100%", mx: "auto" }} component="form" onSubmit={handleSubmit}>
         <Grid container spacing={2}>
-          <Grid item xs={12}>
+          <Grid item xs={12} md={6}>
             <TextField
               fullWidth
               required
@@ -83,7 +85,7 @@ const ContactForm = () => {
               }}
             />
           </Grid>
-          <Grid item xs={12}>
+          <Grid item xs={12} md={6}>
             <TextField
               fullWidth
               required
@@ -101,7 +103,7 @@ const ContactForm = () => {
               }}
             />
           </Grid>
-          <Grid item xs={12}>
+          <Grid item xs={12} md={6}>
             <TextField
               fullWidth
               required
@@ -118,7 +120,7 @@ const ContactForm = () => {
               }}
             />
           </Grid>
-          <Grid item xs={12}>
+          <Grid item xs={12} md={6}>
             <TextField
               fullWidth
               required
@@ -135,7 +137,7 @@ const ContactForm = () => {
               }}
             />
           </Grid>
-          <Grid item xs={12}>
+          <Grid item xs={12} md={6}>
             <TextField
               fullWidth
               required
@@ -152,7 +154,7 @@ const ContactForm = () => {
               }}
             />
           </Grid>
-          <Grid item xs={12}>
+          <Grid item xs={12} md={6}>
             <TextField
               select
               fullWidth
@@ -196,6 +198,7 @@ const ContactForm = () => {
             />
           </Grid>
         </Grid>
+
         <Button
           type="submit"
           variant="contained"

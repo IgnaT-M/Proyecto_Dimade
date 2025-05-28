@@ -15,6 +15,10 @@ import EmailIcon from "@mui/icons-material/Email";
 import PhoneIcon from "@mui/icons-material/Phone";
 import logoDimade from "../assets/imagenes/logo_dimade.png";
 import { Link as RouterLink } from "react-router-dom";
+import theme from "../assets/colores/Paleta";
+import { StayPrimaryLandscape } from "@mui/icons-material";
+
+
 
 const Footer = () => {
   return (
@@ -22,12 +26,13 @@ const Footer = () => {
       component="footer"
       sx={{
         width: "100%",
-        backgroundColor: "#f6f4f2",
-        color: "#2d222d",
+        backgroundColor: theme.palette.primary.main,
+        color: theme.palette.lightText.main, 
         pt: 6,
         pb: 3,
         mt: "auto",
         textAlign: "start",
+        
       }}
     >
       <Container maxWidth={false} disableGutters>
@@ -175,7 +180,7 @@ const Footer = () => {
 
         {/* Línea divisoria y derechos */}
         <Box mt={4} borderTop={1} borderColor="#333" pt={2}>
-          <Typography variant="body2" align="center" color="gray">
+          <Typography variant="body2" align="center" color="ffffff">
             © {new Date().getFullYear()} dimade.cl – Todos los derechos
             reservados.
           </Typography>
