@@ -57,7 +57,7 @@ const Banner = () => {
         sx={{
           flex: 1,
           display: { xs: "none", md: "block" },
-          width: "100%",
+          width: "50%",
           height: { xs: "30vh", md: "auto" },
           objectFit: "cover",
           mb: { xs: 2, md: 2 },
