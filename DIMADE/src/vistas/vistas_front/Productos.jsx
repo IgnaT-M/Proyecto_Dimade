@@ -5,7 +5,7 @@ import Banner from "../../componentes/Banner.jsx";
 import ProveedorSlider from "../../componentes/Slider.jsx";
 import CategoriasSection from "../../componentes/CategoriasSection.jsx";
 import Header from "../../componentes/Header.jsx";
-import img1 from "../../assets/imagenes/img1.jpg";
+import img1 from "public/imagenes/img1.jpg";
 
 const Productos = () => {
   return (
