@@ -68,19 +68,22 @@ const Cubicador = () => {
       sx={{
         p: 4,
         width: { xs: "80vw", md: "60vw" },
-        height: { xs: "55vw", md: "60vh" },
-        margin: "0 auto",
+        height: { xs: "120vw", md: "80vh" },
+
         display: "flex",
         flexDirection: "column",
         justifyContent: "center",
         alignItems: "center",
-        borderRadius: "15px",
       }}
     >
       <Typography variant="h4" fontWeight="bold" gutterBottom>
         Cubicador de Materiales
       </Typography>
-      <Box component="form" onSubmit={calcular} sx={{ width: "100%" }}>
+      <Box
+        component="form"
+        onSubmit={calcular}
+        sx={{ width: "100%", mt: 2, display: "flex", flexDirection: "column" }}
+      >
         <Grid container spacing={2} sx={{ maxWidth: 600, margin: "0 auto" }}>
           {["largo", "ancho", "alto"].map((field) => (
             <Grid item xs={12} sm={4} key={field}>
@@ -98,14 +101,12 @@ const Cubicador = () => {
               />
             </Grid>
           ))}
-          <Grid item xs={12}>
+          <Grid item xs={12} sm={6}>
             <TextField
               color="primary"
               select
-              fullWidth
               required
               name="material"
-              label="Material"
               value={datos.material}
               onChange={handleChange}
               error={errors.material}
@@ -133,8 +134,20 @@ const Cubicador = () => {
           type="submit"
           variant="contained"
           color="primary"
-          fullWidth
-          sx={{ mt: 3, fontWeight: "bold", borderRadius: 0 }}
+          sx={{
+            display: "flex",
+            width: { xs: "100%", md: "50%", lg: "50%" },
+            bgcolor: "#10567E",
+            color: "#fff",
+            "&:hover": {
+              bgcolor: "#D95830",
+            },
+            mt: 3,
+            fontWeight: "bold",
+            borderRadius: 1,
+            boxShadow: 3,
+            alignSelf: "center",
+          }}
         >
           Calcular
         </Button>

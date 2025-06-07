@@ -16,8 +16,8 @@ const Topbar = ({ usuario, onLogout }) => {
       position="fixed"
       sx={{
         zIndex: (theme) => theme.zIndex.drawer + 1,
-        backgroundColor: "#1e1e2f",
-        width: "84vw",
+        backgroundColor: "#10567E",
+        width: "auto",
       }}
     >
       <Toolbar sx={{ justifyContent: "space-between" }}>

@@ -113,7 +113,7 @@ const Backoffice = () => {
       case "usuarios":
       case "proveedores":
       case "ordenes1":
-      case "ordenes2":
+      case "ordenes2": {
         const sectionData = data[selectedSection];
         const fields =
           sectionData.length > 0
@@ -141,6 +141,7 @@ const Backoffice = () => {
             />
           </>
         );
+      }
       case "inicio":
       default:
         return <Box p={4}>Bienvenido al Panel de Administración</Box>;

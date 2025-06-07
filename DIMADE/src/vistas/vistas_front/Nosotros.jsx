@@ -4,14 +4,15 @@ import Footer from "../../componentes/Footer.jsx";
 import Banner from "../../componentes/Banner.jsx";
 import { Box, Container, Grid, Typography, Stack } from "@mui/material";
 import Header from "../../componentes/Header.jsx";
-import img1 from "../../../public/imagenes/img1.jpg";
+import banner_nosotros from "../../../public/imagenes/banner_nosotros.jpg";
 import Paper from "@mui/material/Paper";
 
 const Us = () => {
   return (
     <>
       <Navbar />
-      <Header titulo="" subtitulo="" imagenFondo={img1} />
+
+      <Header titulo="" subtitulo="" imagenFondo={banner_nosotros} />
       <Box sx={{ py: 3, width: "100vw", marginLeft: "calc(-50vw + 50%)" }}>
         <Paper
           elevation={0}

@@ -52,7 +52,8 @@ const LoginForm = () => {
     <Box
       sx={{
         minHeight: "100vh",
-        background: "linear-gradient(to right, #1565c0, #512da8)",
+        background:
+          "linear-gradient(to right, #10567E,rgb(43, 108, 143),rgb(53, 127, 171))",
         display: "flex",
         alignItems: "center",
         justifyContent: "center",
@@ -134,10 +135,12 @@ const LoginForm = () => {
               fontWeight: "bold",
               borderRadius: 2,
               py: 1.5,
-              background: "linear-gradient(to right, #1976d2, #7b1fa2)",
+              background:
+                "linear-gradient(to right, #10567E,rgb(43, 108, 143),rgb(53, 127, 171))",
               color: "white",
               "&:hover": {
-                background: "linear-gradient(to right, #0d47a1, #4a148c)",
+                background:
+                  "linear-gradient(to right, #D95830, #E97B54, #F5A17A)",
               },
             }}
           >
