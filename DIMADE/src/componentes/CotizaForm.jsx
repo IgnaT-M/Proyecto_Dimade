@@ -9,6 +9,9 @@ import {
   Snackbar,
   Alert,
   MenuItem,
+  Modal,
+  Fade,
+  Backdrop,
 } from "@mui/material";
 import BusinessIcon from "@mui/icons-material/Business";
 import PersonIcon from "@mui/icons-material/Person";
@@ -16,6 +19,7 @@ import EmailIcon from "@mui/icons-material/Email";
 import PhoneIcon from "@mui/icons-material/Phone";
 import ListAltIcon from "@mui/icons-material/ListAlt";
 import AddBoxIcon from "@mui/icons-material/AddBox";
+import ModalCubitaje from "./ModalCubicador";
 
 const CotizaForm = () => {
   const [formData, setFormData] = useState({
@@ -37,10 +41,7 @@ const CotizaForm = () => {
   const handleSubmit = (e) => {
     e.preventDefault();
 
-    if (!formData.tipoProducto) {
-      alert("Por favor selecciona un producto válido.");
-      return;
-    }
+    
 
     console.log("Datos enviados:", formData);
     setOpen(true);
@@ -67,22 +68,22 @@ const CotizaForm = () => {
     <Paper
       elevation={0}
       sx={{
-        p: 4,
+        
         maxWidth: 900,
         mx: "auto",
         display: "flex",
         flexDirection: "column",
-        alignItems: "center",
-        justifyContent: "center",
+        alignItems: "left",
+      
       }}
     >
       <Typography
-        variant="h4"
-        textAlign="center"
-        gutterBottom
-        sx={{ mt: 0, mb: 2 }}
-      >
-        Solicita tu cotización
+                variant="h4"
+                textAlign="left"
+                gutterBottom
+                sx={{ mt: 0, mb: 2 }}
+              >
+                Solicita tu cotización
       </Typography>
       <Box component="form" onSubmit={handleSubmit} sx={{ width: "100%" }}>
         <Grid container spacing={2}>
@@ -193,19 +194,27 @@ const CotizaForm = () => {
               label="Detalles adicionales"
               value={formData.mensaje}
               onChange={handleChange}
-
               sx={{ width: "100%" }}
-
             />
             <Button
               type="submit"
               variant="contained"
               color="primary"
               fullWidth
-              sx={{ mt: 3, fontWeight: "bold", borderRadius: 0 }}
+              sx={{
+                bgcolor: "#10567E",
+                color: "#fff",
+                "&:hover": {
+                  bgcolor: "#D95830",
+                },
+                mt: 3,
+                fontWeight: "bold",
+                borderRadius: 1,
+              }}
             >
               Enviar solicitud
             </Button>
+            <ModalCubitaje />
           </Grid>
         </Grid>
       </Box>
@@ -227,4 +236,4 @@ const CotizaForm = () => {
   );
 };
 
-export default CotizaForm;
+export default CotizaForm;
