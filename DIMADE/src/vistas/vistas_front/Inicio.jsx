@@ -10,6 +10,10 @@ import CategoryCard from "../../componentes/CustomCard.jsx";
 import { Grid, Box, Typography } from "@mui/material";
 // import img1 from "../../../public/imagenes/img1.jpg"; // Asegúrate de que la ruta sea correcta
 import Carousel from "../../componentes/carusel.jsx";
+import CategoriasSection from "../../componentes/CategoriasSection.jsx";
+import MiniBannerNosotros from "../../componentes/MiniBannerNosotros.jsx";
+import HeroSplit from "../../componentes/HeroSplit.jsx";
+import ContactoSection from "../../componentes/ContactSection.jsx";
 
 // const categorias = [
 //   { titulo: "Construccion", imagen: img1 },
@@ -22,9 +26,14 @@ const Home = () => {
   return (
     <>
       <Navbar />
-      <Banner />
       <Carousel />
+      {/* <Banner /> */}
+      <CategoriasSection />
+      <HeroSplit />
       <ProveedorSlider />
+
+      <MiniBannerNosotros />
+
       <Footer />
     </>
   );

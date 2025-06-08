@@ -2,29 +2,24 @@ import React from "react";
 import Navbar from "../../componentes/NavBar.jsx";
 import Footer from "../../componentes/Footer.jsx";
 import Banner from "../../componentes/Banner.jsx";
-import { Box, Container, Grid, Typography, Stack } from "@mui/material";
+import { Box, Container, Grid, Typography, Stack, Paper } from "@mui/material";
 import Header from "../../componentes/Header.jsx";
-import img1 from "../../../public/imagenes/img1.jpg";
-import Paper from "@mui/material/Paper";
+import bannerNosotros from "/public/banner_nosotros.jpg";
+
 
 const Us = () => {
   return (
     <>
       <Navbar />
-<<<<<<< HEAD
-      <Header titulo="Nosotros" subtitulo="Hola" imagenFondo={img1} />
-      imagen texto
-      <br />
-      texto imagenes
-=======
-      <Header titulo="" subtitulo="" imagenFondo={img1} />
+
+      <Header titulo="" subtitulo="" imagenFondo={bannerNosotros} />
       <Box sx={{ py: 3, width: "100vw", marginLeft: "calc(-50vw + 50%)" }}>
         <Paper
           elevation={0}
           sx={{
             py: 3,
             px: { xs: 2, md: 4 },
-            backgroundColor: "#f6f4f2",
+            backgroundColor: "#ffffff",
             width: "100%",
           }}
         >
@@ -41,7 +36,7 @@ const Us = () => {
             {/* Imagen izquierda */}
             <Box
               component="img"
-              src="public/imagenes/img5.jpg"
+              src="public/nosotros.jpg"
               alt="Imagen 1"
               sx={{ width: { xs: "100%", md: "50%" }, objectFit: "cover" }}
             />
@@ -86,7 +81,7 @@ const Us = () => {
       <Box sx={{ py: 1, width: "100vw", marginLeft: "calc(-50vw + 50%)" }}>
         <Paper
           elevation={0}
-          sx={{ py: 1, px: { xs: 2, md: 4 }, width: "100%" }}
+          sx={{ py: 4, px: { xs: 2, md: 4 }, width: "100%" , backgroundColor: "#f0eeee",}}
         >
           <Box
             sx={{
@@ -122,7 +117,7 @@ const Us = () => {
             {/* Imagen derecha */}
             <Box
               component="img"
-              src="public/imagenes/imagen2.jpg"
+              src="public/nosotros1.jpg"
               alt="Imagen 2"
               sx={{ width: { xs: "100%", md: "50%" }, objectFit: "cover" }}
             />
@@ -136,7 +131,7 @@ const Us = () => {
           sx={{
             py: 1,
             px: { xs: 2, md: 4 },
-            backgroundColor: "#f6f4f2",
+            backgroundColor: "#ffffff",
             width: "100%",
           }}
         >
@@ -153,7 +148,7 @@ const Us = () => {
             {/* Imagen derecha (row-reverse invierte orden en pantallas grandes) */}
             <Box
               component="img"
-              src="public/imagenes/img1.jpg"
+              src="public/nosotros2.jpg"
               alt="Imagen 3"
               sx={{ width: { xs: "100%", md: "50%" }, objectFit: "cover" }}
             />
@@ -182,7 +177,6 @@ const Us = () => {
         </Paper>
       </Box>
 
->>>>>>> 5ce379c9ca6d71a6f59177f2bdc9ab2b5444f903
       <Footer />
     </>
   );

@@ -23,11 +23,11 @@ const CustomCard = ({ titulo, imagen, onClick }) => {
         sx={{ objectFit: "cover" }}
       />
       <CardContent>
-        <Typography variant="h5" fontWeight="bold" gutterBottom>
+        <Typography variant="h5" gutterBottom>
           {titulo}
         </Typography>
         <Box mt={2}>
-          <CoolButton text="Ver productos" onClick={onClick} />
+          <CoolButton text="Ver mas" onClick={onClick} />
         </Box>
       </CardContent>
     </Card>
