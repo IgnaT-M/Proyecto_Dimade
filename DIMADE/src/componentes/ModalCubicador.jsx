@@ -8,8 +8,7 @@ const style = {
   top: "50%",
   left: "50%",
   transform: "translate(-50%, -50%)",
-  width: { xs: "80vw", md: "50vw", lg: "50vw" },
-  maxWidth: "700px",
+  width: { xs: "80vw", md: "50vw" },
   height: { xs: "80vh", md: "65vh" },
   // bgcolor: "rgba(25, 130, 210, 0.08)",//color dimade
   borderRadius: "10px",

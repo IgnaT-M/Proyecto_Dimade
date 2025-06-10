@@ -4,7 +4,7 @@ const Header = ({ titulo, subtitulo, imagenFondo }) => {
   return (
     <Box
       sx={{
-        height: "30vh",
+        height: "25vh",
         backgroundImage: `url(${imagenFondo})`,
         backgroundSize: "cover",
         backgroundPosition: "center",

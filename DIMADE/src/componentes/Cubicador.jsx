@@ -68,7 +68,7 @@ const Cubicador = () => {
       sx={{
         p: 4,
         width: { xs: "80vw", md: "60vw" },
-        height: { xs: "120vw", md: "80vh" },
+        height: { xs: "120vh", md: "80vh", lg: "50vh" },
 
         display: "flex",
         flexDirection: "column",
@@ -134,9 +134,8 @@ const Cubicador = () => {
           type="submit"
           variant="contained"
           color="primary"
+          width="50%"
           sx={{
-            display: "flex",
-            width: { xs: "100%", md: "50%", lg: "50%" },
             bgcolor: "#10567E",
             color: "#fff",
             "&:hover": {
@@ -146,7 +145,7 @@ const Cubicador = () => {
             fontWeight: "bold",
             borderRadius: 1,
             boxShadow: 3,
-            alignSelf: "center",
+            width: "100%",
           }}
         >
           Calcular

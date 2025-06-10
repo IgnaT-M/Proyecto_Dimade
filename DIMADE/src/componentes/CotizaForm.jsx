@@ -41,10 +41,7 @@ const CotizaForm = () => {
   const handleSubmit = (e) => {
     e.preventDefault();
 
-    if (!formData.tipoProducto) {
-      alert("Por favor selecciona un producto válido.");
-      return;
-    }
+    
 
     console.log("Datos enviados:", formData);
     setOpen(true);
@@ -71,22 +68,22 @@ const CotizaForm = () => {
     <Paper
       elevation={0}
       sx={{
-        p: 4,
+        
         maxWidth: 900,
         mx: "auto",
         display: "flex",
         flexDirection: "column",
-        alignItems: "center",
-        justifyContent: "center",
+        alignItems: "left",
+      
       }}
     >
       <Typography
-        variant="h4"
-        textAlign="center"
-        gutterBottom
-        sx={{ mt: 0, mb: 2 }}
-      >
-        Solicita tu cotización
+                variant="h4"
+                textAlign="left"
+                gutterBottom
+                sx={{ mt: 0, mb: 2 }}
+              >
+                Solicita tu cotización
       </Typography>
       <Box component="form" onSubmit={handleSubmit} sx={{ width: "100%" }}>
         <Grid container spacing={2}>
@@ -239,4 +236,4 @@ const CotizaForm = () => {
   );
 };
 
-export default CotizaForm;
+export default CotizaForm;

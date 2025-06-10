@@ -4,11 +4,13 @@ import "slick-carousel/slick/slick.css";
 import "slick-carousel/slick/slick-theme.css";
 import { ArrowBackIos, ArrowForwardIos } from "@mui/icons-material";
 import IconButton from "@mui/material/IconButton";
+import { Link } from "react-router-dom";
 
 const slides = [
-  { title: "", url: "/imagenes/imagen2.jpg" },
-  { title: "", url: "public/imagenes/img4.jpg" },
-  { title: "", url: "public/imagenes/img5.jpg" },
+  { title: "", url: "/inicio_construccion.jpg" },
+  { title: "", url: "/inicio_pinturas.jpg" },
+  { title: "", url: "/inicio_ferreteria.jpg" },
+  { title: "", url: "/inicio_herramientas.jpg" },
 ];
 
 // Flecha izquierda
@@ -71,48 +73,55 @@ export default function Carousel() {
     <Box
       sx={{
         width: "100%",
+        margin: "0 auto",
         height: "70vh",
-        overflow: "hidden",
+        overflow: "auto",
         position: "relative",
+        py: 6,
       }}
     >
       <Slider {...settings}>
         {slides.map((slide, index) => (
-          <Box
+          <Link
+            to="/productos"
             key={index}
-            sx={{
-              width: "100vw",
-              height: "70vh",
-              display: "flex",
-              alignItems: "center",
-              justifyContent: "center",
-              position: "relative",
-            }}
+            style={{ textDecoration: "none" }}
+            component="div"
           >
-            <Card sx={{ boxShadow: "none", width: "100%", height: "100%" }}>
-              <CardMedia
-                component="img"
-                image={slide.url}
-                alt={slide.title}
-                sx={{
-                  objectFit: "cover",
-                  width: "100%",
-                  height: "100%",
-                }}
-              />
-            </Card>
-            <Typography
-              variant="h4"
+            <Box
+              key={index}
               sx={{
-                position: "absolute",
-                bottom: 30,
-                color: "#fff",
-                textShadow: "0 0 6px black",
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "center",
+                position: "relative",
               }}
             >
-              {slide.title}
-            </Typography>
-          </Box>
+              <Card sx={{ boxShadow: "none", width: "100%", height: "100%" }}>
+                <CardMedia
+                  component="img"
+                  image={slide.url}
+                  alt={slide.title}
+                  sx={{
+                    objectFit: "cover",
+                    width: "100%",
+                    height: "60vh",
+                  }}
+                />
+              </Card>
+              <Typography
+                variant="h4"
+                sx={{
+                  position: "absolute",
+                  bottom: 30,
+                  color: "#fff",
+                  textShadow: "0 0 6px black",
+                }}
+              >
+                {slide.title}
+              </Typography>
+            </Box>
+          </Link>
         ))}
       </Slider>
     </Box>

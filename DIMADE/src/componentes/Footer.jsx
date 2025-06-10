@@ -17,7 +17,7 @@ import PhoneIcon from "@mui/icons-material/Phone";
 
 import LogoutIcon from "@mui/icons-material/Logout";
 
-import logoDimade from "../../public/imagenes/logo_dimade.png"; // Asegúrate de que la ruta sea correcta
+import logoDimade from "/imagenes/logo_dimade_nav2.png"; // Asegúrate de que la ruta sea correcta
 import { Link as RouterLink } from "react-router-dom";
 
 const Footer = () => {
@@ -78,7 +78,7 @@ const Footer = () => {
             </Typography>
             <Stack direction="row" spacing={1}>
               <PhoneIcon fontSize="small" />
-              <Typography variant="body2">+56 9 6721 6646</Typography>
+              <Typography variant="body2">+56 9 9999 9999</Typography>
             </Stack>
             <Stack direction="row" spacing={1} mt={1}>
               <EmailIcon fontSize="small" />

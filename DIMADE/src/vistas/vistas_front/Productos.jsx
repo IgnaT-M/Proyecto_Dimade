@@ -5,17 +5,17 @@ import Banner from "../../componentes/Banner.jsx";
 import ProveedorSlider from "../../componentes/Slider.jsx";
 import CategoriasSection from "../../componentes/CategoriasSection.jsx";
 import Header from "../../componentes/Header.jsx";
-import img1 from "DIMADE/public/imagenes/img1.jpg";
+import banner_productos from "/public/banner_productos.jpg";
 
 const Productos = () => {
   return (
     <>
       <Navbar />
-      <Header titulo="Productos" subtitulo="Hola1" imagenFondo={img1} />
-      card categorias
+      <Header  imagenFondo={banner_productos} />
+     
       <CategoriasSection />
       <br />
-      slider proveedores
+      
       <ProveedorSlider />
       <Footer />
     </>

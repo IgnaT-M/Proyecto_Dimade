@@ -32,8 +32,8 @@ const ContactoSection = () => {
           left: 0,
           width: "100%",
           height: "100%",
-          backgroundImage: "url('/img1.jpg')",
-          backgroundSize: "cover",
+          backgroundImage: "url('/banner_redes.jpg')",
+          backgroundSize:"cover",
           backgroundPosition: "center",
           zIndex: 0,
         }}
@@ -45,7 +45,7 @@ const ContactoSection = () => {
           left: 0,
           width: "100%",
           height: "100%",
-          backgroundColor: "rgba(0,0,0,0.5)",
+          backgroundColor: "rgba(255, 255, 255, 0.7)",
           zIndex: 1,
         }}
       />
@@ -55,7 +55,7 @@ const ContactoSection = () => {
           variant="h4"
           textAlign="center"
           gutterBottom
-          sx={{ color: "white" }}
+          sx={{ color: "black" }}
         >
           Contáctanos
         </Typography>

@@ -1,130 +1,243 @@
 import React, { useState } from "react";
 import {
   Box,
-  Grid,
   Typography,
-  Card,
+  List,
+  ListItemButton,
+  ListItemText,
+  Divider,
   CardMedia,
-  CardContent,
-  Pagination,
+  Paper,
+  Button,
+  useTheme,
+  useMediaQuery,
 } from "@mui/material";
-import { motion, AnimatePresence } from "framer-motion";
-import img1 from "DIMADE/public/imagenes/img1.jpg"; // Asegura que esta ruta se resuelve bien
 
 const categorias = [
   {
     titulo: "Construcción",
-    descripcion: "Materiales y soluciones estructurales...",
-    imagen: img1,
+    descripcion: "Todo lo necesario para construir con solidez y eficiencia.",
+    imagen: "/construccion.jpg",
+  },
+  {
+    titulo: "Pinturas, Adhesivos y Aditivos",
+    descripcion: "Colores, fijación y protección para cada superficie.",
+    imagen: "/pinturas.jpg",
+  },
+  {
+    titulo: "Herramientas y Maquinaria",
+    descripcion: "Maquinaria y herramientas listas para cualquier desafío.",
+    imagen: "/herramientas.jpg",
   },
   {
     titulo: "Ferretería",
-    descripcion: "Pernos, tuercas, clavos...",
-    imagen: img1,
+    descripcion: "Todo en fijaciones, herrajes y accesorios para tu proyecto.",
+    imagen: "/ferreteria.jpg",
   },
   {
-    titulo: "Herramientas",
-    descripcion: "Martillos, taladros, sierras...",
-    imagen: img1,
+    titulo: "Maderas y Tableros",
+    descripcion: "Variedad en maderas para estructuras y terminaciones.",
+    imagen: "/madera.jpg",
   },
   {
-    titulo: "Electricidad",
-    descripcion: "Cables, enchufes, focos...",
-    imagen: img1,
+    titulo: "Pisos y Revestimientos",
+    descripcion: "Revestimientos que transforman tus espacios.",
+    imagen: "/pisos.jpg",
   },
   {
-    titulo: "Pinturas",
-    descripcion: "Esmaltes, accesorios...",
-    imagen: img1,
+    titulo: "Electricidad e Iluminación",
+    descripcion: "Soluciones eléctricas seguras y modernas.",
+    imagen: "/electricidad.jpg",
   },
   {
-    titulo: "Jardinería",
-    descripcion: "Palas, regaderas, fertilizantes...",
-    imagen: img1,
+    titulo: "Puertas y Ventanas",
+    descripcion: "Accesos y terminaciones que combinan seguridad y diseño.",
+    imagen: "/puertasyventanas.jpg",
   },
   {
-    titulo: "Plomería",
-    descripcion: "Tubos, llaves, conexiones...",
-    imagen: img1,
+    titulo: "Electrohogar",
+    descripcion: "Tecnología eficiente para facilitar tu vida en el hogar.",
+    imagen: "/electrohogar.jpg",
   },
   {
-    titulo: "Seguridad",
-    descripcion: "Cascos, guantes, protección...",
-    imagen: img1,
+    titulo: "Aseo",
+    descripcion:
+      "Productos que garantizan limpieza, frescura y bienestar en cada rincón.",
+    imagen: "/aseo.jpg",
+  },
+  {
+    titulo: "Baño y Cocina",
+    descripcion:
+      "Funcionalidad y estilo para los espacios más usados de tu hogar.",
+    imagen: "/bañoycocina.jpg",
+  },
+  {
+    titulo: "Gasfitería",
+    descripcion: "Soluciones seguras y duraderas para tu red de agua y gas.",
+    imagen: "/gasfiteria.jpg",
+  },
+  {
+    titulo: "Muebles y Organización",
+    descripcion:
+      "Diseño inteligente para ordenar, decorar y optimizar cada espacio.",
+    imagen: "/muebles.jpg",
+  },
+  {
+    titulo: "Decoración y Menaje",
+    descripcion:
+      "Detalles que transforman tu casa en un hogar acogedor y con estilo.",
+    imagen: "/decoracion.jpg",
+  },
+  {
+    titulo: "Climatización",
+    descripcion:
+      "Confort en cualquier estación con sistemas eficientes de temperatura.",
+    imagen: "/climatizacion.jpg",
+  },
+  {
+    titulo: "Aire Libre",
+    descripcion:
+      "Disfruta del exterior con productos ideales para patios, terrazas y jardines.",
+    imagen: "/airelibre.jpg",
   },
 ];
 
 const CategoriasSection = () => {
-  const itemsPorPagina = 4;
-  const [paginaActual, setPaginaActual] = useState(1);
-  const totalPaginas = Math.ceil(categorias.length / itemsPorPagina);
+  const [categoriaSeleccionada, setCategoriaSeleccionada] = useState(
+    categorias[0]
+  );
+  const theme = useTheme();
+  const isMobile = useMediaQuery(theme.breakpoints.down("md"));
 
-  const handleCambioPagina = (event, nuevaPagina) => {
-    setPaginaActual(nuevaPagina);
-  };
-
-  const categoriasMostradas = categorias.slice(
-    (paginaActual - 1) * itemsPorPagina,
-    paginaActual * itemsPorPagina
+  const renderMenu = (categoriasMenu) => (
+    <Box
+      sx={{
+        width: isMobile ? "100%" : "20%",
+        backgroundColor: "#10567E",
+        display: "flex",
+        flexDirection: "column",
+        overflow: "hidden",
+        maxHeight: isMobile ? "auto" : 600,
+      }}
+    >
+      <Typography
+        variant="h6"
+        sx={{
+          color: "#fff",
+          px: 2,
+          py: 2,
+          fontWeight: "bold",
+          borderBottom: "1px solid rgba(255,255,255,0.2)",
+        }}
+      >
+        Categorías
+      </Typography>
+      <List
+        disablePadding
+        sx={{
+          overflowY: categoriasMenu.length > 8 ? "auto" : "visible",
+        }}
+      >
+        {categoriasMenu.map((cat, index) => {
+          const selected = categoriaSeleccionada.titulo === cat.titulo;
+          return (
+            <React.Fragment key={index}>
+              <ListItemButton
+                onClick={() => setCategoriaSeleccionada(cat)}
+                sx={{
+                  py: 0,
+                  backgroundColor: selected ? "#30749C" : "transparent",
+                  color: selected ? "#fff" : "#fff",
+                  fontWeight: selected ? "bold" : "normal",
+                  "&:hover": {
+                    backgroundColor: selected ? "#30749C" : "#30749C",
+                  },
+                }}
+              >
+                <ListItemText primary={cat.titulo} />
+              </ListItemButton>
+              <Divider sx={{ borderColor: "rgba(255,255,255,0.2)" }} />
+            </React.Fragment>
+          );
+        })}
+      </List>
+    </Box>
   );
 
   return (
-    <Box sx={{ px: 4, py: 6, backgroundColor: "#f9f9f9" }}>
-      <AnimatePresence mode="wait">
-        <motion.div
-          key={paginaActual}
-          initial={{ opacity: 0, x: 100 }} // Empieza 20px a la derecha, opacidad 0.9
-          animate={{ opacity: 1, x: 0 }} // Llega a posición natural y opacidad 1
-          exit={{ opacity: 0, x: -100 }} // Al salir, opacidad vuelve a 0.9 y se va a la izquierda 20px
-          transition={{
-            duration: 0.5,
-            ease: "easeInOut",
-          }}
-          style={{ width: "100%", display: "block" }}
-        >
-          <Grid container spacing={2} justifyContent="center">
-            {categoriasMostradas.map((cat, index) => (
-              <Grid item xs={12} sm={6} md={6} lg={6} xl={6} key={index}>
-                <Card
-                  elevation={0}
-                  sx={{
-                    height: "100%",
-                    width: "40vw",
-                    transition: "transform 0.3s ease",
-                    "&:hover": {
-                      transform: "scale(1.03)",
-                    },
-                  }}
-                >
-                  <CardMedia
-                    component="img"
-                    height="180"
-                    image={cat.imagen}
-                    alt={cat.titulo}
-                  />
-                  <CardContent>
-                    <Typography variant="h6" fontWeight="bold" gutterBottom>
-                      {cat.titulo}
-                    </Typography>
-                    <Typography variant="body2" color="text.secondary">
-                      {cat.descripcion}
-                    </Typography>
-                  </CardContent>
-                </Card>
-              </Grid>
-            ))}
-          </Grid>
-        </motion.div>
-      </AnimatePresence>
+    <Box
+      sx={{
+        px: 2,
+        py: 4,
+        backgroundColor: "#fff",
 
-      <Box mt={6} display="flex" justifyContent="center">
-        <Pagination
-          count={totalPaginas}
-          page={paginaActual}
-          onChange={handleCambioPagina}
-          color="primary"
+        display: "flex",
+        justifyContent: "center",
+      }}
+    >
+      <Paper
+        elevation={0}
+        sx={{
+          width: "100%",
+          maxWidth: "1400px",
+          display: "flex",
+
+          flexDirection: isMobile ? "column" : "row",
+
+          overflow: "hidden",
+        }}
+      >
+        {renderMenu(categorias)}
+
+        <Box
+          sx={{
+            flexGrow: 1,
+            backgroundColor: "#fff",
+            p: 4,
+            display: "flex",
+            flexDirection: isMobile ? "column" : "row",
+            gap: 4,
+            justifyContent: "space-between",
+          }}
+        >
+          <Box
+            sx={{
+              flex: 1,
+              display: "flex",
+              flexDirection: "column",
+              justifyContent: "space-between",
+            }}
+          >
+            <Box>
+              <Typography variant="h4" fontWeight="bold" gutterBottom>
+                {categoriaSeleccionada.titulo}
+              </Typography>
+              <Typography variant="body1" mb={2}>
+                {categoriaSeleccionada.descripcion}
+              </Typography>
+              <Typography variant="body2" color="text.secondary">
+                Productos destacados próximamente...
+              </Typography>
+            </Box>
+            <Box textAlign="right" mt={4}>
+              <Button variant="contained" size="large" color="primary">
+                Cotizar ahora
+              </Button>
+            </Box>
+          </Box>
+        </Box>
+        <CardMedia
+          component="img"
+          image={categoriaSeleccionada.imagen}
+          alt={categoriaSeleccionada.titulo}
+          sx={{
+            width: isMobile ? "100%" : "45%",
+            objectFit: "cover",
+            maxHeight: 600,
+            maxWidth: 400,
+          }}
         />
-      </Box>
+      </Paper>
     </Box>
   );
 };
