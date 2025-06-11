@@ -61,16 +61,25 @@ const ContactForm = () => {
 
   return (
     <Paper
-      sx={{
-        p: 4,
-        maxWidth: "600vw",
-        mx: "auto",
-        boxShadow: "none",
-      }}
-    >
-      <Typography variant="h3" gutterBottom textAlign="start">
-        CONTACTANOS
-      </Typography>
+          elevation={0}
+            sx={{
+              
+              maxWidth: 900,
+              mx: "auto",
+              display: "flex",
+              flexDirection: "column",
+              alignItems: "left",
+            
+            }}
+          >
+            <Typography
+                      variant="h4"
+                      textAlign="left"
+                      gutterBottom
+                      sx={{ mt: 0, mb: 2 }}
+                    >
+                      Déjanos tu mensaje
+            </Typography>
       <Box component="form" onSubmit={handleSubmit}>
         <Grid container spacing={2}>
           <Grid item xs={12} md={6} lg={6}>

@@ -4,11 +4,13 @@ import "slick-carousel/slick/slick.css";
 import "slick-carousel/slick/slick-theme.css";
 import { ArrowBackIos, ArrowForwardIos } from "@mui/icons-material";
 import IconButton from "@mui/material/IconButton";
+import { Link } from "react-router-dom";
 
 const slides = [
-  { title: "", url: "/imagenes/imagen2.jpg" },
-  { title: "", url: "public/imagenes/img4.jpg" },
-  { title: "", url: "public/imagenes/img5.jpg" },
+  { title: "", url: "/inicio_construccion.jpg" },
+  { title: "", url: "/inicio_pinturas.jpg" },
+  { title: "", url: "/inicio_ferreteria.jpg" },
+  { title: "", url: "/inicio_herramientas.jpg" },
 ];
 
 // Flecha izquierda
@@ -70,23 +72,29 @@ export default function Carousel() {
   return (
     <Box
       sx={{
-        width: "100%",
+        width: "100%",           // 70% del ancho de la pantalla
+        margin: "0 auto",
         height: "70vh",
         overflow: "hidden",
         position: "relative",
+        py: 6,
+        
       }}
     >
       <Slider {...settings}>
         {slides.map((slide, index) => (
+          <Link to="/productos" key={index} style={{ textDecoration: "none" }} 
+          component="div">
           <Box
             key={index}
             sx={{
-              width: "100vw",
-              height: "70vh",
+             
               display: "flex",
               alignItems: "center",
               justifyContent: "center",
               position: "relative",
+              mt:"4",
+              
             }}
           >
             <Card sx={{ boxShadow: "none", width: "100%", height: "100%" }}>
@@ -95,9 +103,11 @@ export default function Carousel() {
                 image={slide.url}
                 alt={slide.title}
                 sx={{
-                  objectFit: "cover",
-                  width: "100%",
-                  height: "100%",
+                 
+                  objectFit:"contain",
+                 width: "100%",
+              height: "60vh",
+                 
                 }}
               />
             </Card>
@@ -113,6 +123,7 @@ export default function Carousel() {
               {slide.title}
             </Typography>
           </Box>
+          </Link>
         ))}
       </Slider>
     </Box>

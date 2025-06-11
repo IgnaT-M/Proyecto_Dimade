@@ -20,10 +20,6 @@ import LogoutIcon from "@mui/icons-material/Logout";
 
 import logoDimade from "../../public/imagenes/logo_dimade.png"; // Asegúrate de que la ruta sea correcta
 import { Link as RouterLink } from "react-router-dom";
-import theme from "../assets/colores/Paleta";
-import { StayPrimaryLandscape } from "@mui/icons-material";
-
-
 
 const Footer = () => {
   return (
@@ -31,12 +27,13 @@ const Footer = () => {
       component="footer"
       sx={{
         width: "100%",
-        backgroundColor: "#f6f4f2",
-        color: "#2d222d",
-        pt: 6,
+        background: "linear-gradient(0deg, #10567E 10%, #30749C 60%)",
+        color: "#ffffff",
+        pt: 4,
         pb: 3,
         mt: "auto",
         textAlign: "start",
+        position: "relative",
       }}
     >
       <Container maxWidth={false} disableGutters>
@@ -165,7 +162,8 @@ const Footer = () => {
         {/* Línea divisoria y derechos */}
 
         <Box mt={4} borderTop={1} borderColor="#333" pt={2}>
-          <Typography variant="body2" align="center" color="gray">
+          <Typography variant="body2" align="center" color="white">
+
             © {new Date().getFullYear()} dimade.cl – Todos los derechos
             reservados.
           </Typography>
@@ -193,4 +191,4 @@ const Footer = () => {
   );
 };
 
-export default Footer;
+export default Footer;

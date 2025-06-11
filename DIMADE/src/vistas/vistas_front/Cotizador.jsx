@@ -5,7 +5,7 @@ import Banner from "../../componentes/Banner.jsx";
 import CotizaForm from "../../componentes/CotizaForm.jsx";
 import Cubicador from "../../componentes/Cubicador.jsx";
 import Header from "../../componentes/Header.jsx";
-import img1 from "../../../public/imagenes/img1.jpg"; // Asegúrate de que la ruta sea correcta
+import banner_cotizar from "/public/banner_cotizar.jpg";
 import {
   Box,
   Grid,
@@ -43,7 +43,7 @@ const Cotizar = () => {
   return (
     <>
       <Navbar />
-      <Header titulo="Cotizador" subtitulo="Hola" imagenFondo={img1} />
+      <Header imagenFondo={banner_cotizar} />
       <Box>
         <Paper
           elevation={0}
@@ -64,7 +64,7 @@ const Cotizar = () => {
           >
             <Box
               component="img"
-              src="src/assets/imagenes/img1.jpg"
+              src="public/cotiza.jpg"
               alt="Imagen DIMADE"
               sx={{
                 display: { xs: "none", md: "block" },
@@ -72,7 +72,7 @@ const Cotizar = () => {
                   xs: "100%",
                   md: "30vw",
                 },
-                height: { xs: "auto", md: "64vh" },
+                height: { xs: "auto", md: "55vh" },
                 objectFit: "cover",
               }}
             />

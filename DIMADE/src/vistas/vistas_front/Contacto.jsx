@@ -9,13 +9,14 @@ import Header from "../../componentes/Header.jsx";
 import ContactoSection from "../../componentes/ContactSection.jsx";
 
 
-import img1 from "../../../public/imagenes/img1.jpg";
+
+import banner_contacto from "/public/banner_contacto.jpg";
 
 const Contact = () => {
   return (
     <>
       <Navbar />
-      <Header titulo="" subtitulo="" imagenFondo={img1} />
+      <Header titulo="" subtitulo="" imagenFondo={banner_contacto} />
       <Box
         sx={{
           width: "100%",
@@ -41,17 +42,16 @@ const Contact = () => {
           >
             <Box
               component="img"
-              src="public/imagenes/img1.jpg"
+              src="public/contacto.jpg"
               alt="Imagen DIMADE"
               sx={{
 
                 display: { xs: "none", md: "block" },
                 width: {
                   xs: "100%",
-                  md: "30vw",
+                  md: "100vw",
                 },
-
-                height: { xs: "auto", md: "64vh" },
+                height: { xs: "auto", md: "48.4vh" },
                 objectFit: "cover",
               }}
             />
