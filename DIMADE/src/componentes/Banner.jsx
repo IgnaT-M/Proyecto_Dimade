@@ -6,6 +6,7 @@ const Banner = () => {
   return (
     <Box
       sx={{
+<<<<<<< HEAD
         width: "100vw",           // 70% del ancho de la pantalla
         margin: "0 auto",
         height: "40vh",          // Alto automático o según contexto
@@ -13,6 +14,14 @@ const Banner = () => {
         display: { xs: "none", md: "block" },
 
             }}
+=======
+        width: "100%", // 70% del ancho de la pantalla
+        margin: "0 auto",
+        height: "40vh", // Alto automático o según contexto
+        overflow: "hidden",
+        display: { xs: "none", md: "block" },
+      }}
+>>>>>>> origin/main
     >
       <Box
         component="img"

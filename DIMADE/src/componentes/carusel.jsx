@@ -72,17 +72,25 @@ export default function Carousel() {
   return (
     <Box
       sx={{
+<<<<<<< HEAD
         width: "100%",           // 70% del ancho de la pantalla
+=======
+        width: "100%",
+>>>>>>> origin/main
         margin: "0 auto",
         height: "70vh",
-        overflow: "hidden",
+        overflow: "auto",
         position: "relative",
         py: 6,
+<<<<<<< HEAD
         
+=======
+>>>>>>> origin/main
       }}
     >
       <Slider {...settings}>
         {slides.map((slide, index) => (
+<<<<<<< HEAD
           <Link to="/productos" key={index} style={{ textDecoration: "none" }} 
           component="div">
           <Box
@@ -113,16 +121,53 @@ export default function Carousel() {
             </Card>
             <Typography
               variant="h4"
+=======
+          <Link
+            to="/productos"
+            key={index}
+            style={{ textDecoration: "none" }}
+            component="div"
+          >
+            <Box
+              key={index}
+>>>>>>> origin/main
               sx={{
-                position: "absolute",
-                bottom: 30,
-                color: "#fff",
-                textShadow: "0 0 6px black",
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "center",
+                position: "relative",
               }}
             >
+<<<<<<< HEAD
               {slide.title}
             </Typography>
           </Box>
+=======
+              <Card sx={{ boxShadow: "none", width: "100%", height: "100%" }}>
+                <CardMedia
+                  component="img"
+                  image={slide.url}
+                  alt={slide.title}
+                  sx={{
+                    objectFit: "cover",
+                    width: "100%",
+                    height: "60vh",
+                  }}
+                />
+              </Card>
+              <Typography
+                variant="h4"
+                sx={{
+                  position: "absolute",
+                  bottom: 30,
+                  color: "#fff",
+                  textShadow: "0 0 6px black",
+                }}
+              >
+                {slide.title}
+              </Typography>
+            </Box>
+>>>>>>> origin/main
           </Link>
         ))}
       </Slider>

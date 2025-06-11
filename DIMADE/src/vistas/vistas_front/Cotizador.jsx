@@ -72,7 +72,11 @@ const Cotizar = () => {
                   xs: "100%",
                   md: "30vw",
                 },
+<<<<<<< HEAD
                 height: { xs: "auto", md: "55vh" },
+=======
+                height: { xs: "auto", md: "73vh" },
+>>>>>>> origin/main
                 objectFit: "cover",
               }}
             />
@@ -80,33 +84,6 @@ const Cotizar = () => {
           </Box>
         </Paper>
       </Box>
-      <div>
-        <Button onClick={handleOpen}>Cubicador</Button>
-        <Modal
-          aria-labelledby="transition-modal-title"
-          aria-describedby="transition-modal-description"
-          open={open}
-          onClose={handleClose}
-          closeAfterTransition
-          slots={{ backdrop: Backdrop }}
-          slotProps={{
-            backdrop: {
-              timeout: 500,
-            },
-          }}
-        >
-          <Fade in={open}>
-            <Box sx={style}>
-              <Cubicador />
-              <Typography
-                id="transition-modal-title"
-                variant="h6"
-                component="h2"
-              ></Typography>
-            </Box>
-          </Fade>
-        </Modal>
-      </div>
 
       <Footer />
     </>
