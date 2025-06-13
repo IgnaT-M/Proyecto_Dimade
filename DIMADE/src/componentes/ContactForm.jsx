@@ -22,7 +22,7 @@ import SubjectIcon from "@mui/icons-material/Subject";
 const ContactForm = () => {
   const [formData, setFormData] = useState({
     nombre: "",
-    email: "",
+    correo: "",
     direccion: "",
     telefono: "",
     rut: "",
@@ -31,24 +31,43 @@ const ContactForm = () => {
   });
 
   const [open, setOpen] = useState(false);
+  const [error, setError] = useState(false);
 
   const handleChange = (e) => {
     setFormData((prev) => ({ ...prev, [e.target.name]: e.target.value }));
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    console.log(formData);
-    setOpen(true);
-    setFormData({
-      nombre: "",
-      email: "",
-      direccion: "",
-      telefono: "",
-      rut: "",
-      asunto: "",
-      mensaje: "",
-    });
+
+    try {
+      const response = await fetch(
+        "http://localhost:8080/api/solicitudes-contacto",
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify(formData),
+        }
+      );
+
+      if (!response.ok) throw new Error("Error en el envío");
+
+      setOpen(true);
+      setFormData({
+        nombre: "",
+        correo: "",
+        direccion: "",
+        telefono: "",
+        rut: "",
+        asunto: "",
+        mensaje: "",
+      });
+    } catch (err) {
+      console.error(err);
+      setError(true);
+    }
   };
 
   const asuntos = [
@@ -61,28 +80,26 @@ const ContactForm = () => {
 
   return (
     <Paper
-          elevation={0}
-            sx={{
-              
-              maxWidth: 900,
-              mx: "auto",
-              display: "flex",
-              flexDirection: "column",
-              alignItems: "left",
-            
-            }}
-          >
-            <Typography
-                      variant="h4"
-                      textAlign="left"
-                      gutterBottom
-                      sx={{ mt: 0, mb: 2 }}
-                    >
-                      Déjanos tu mensaje
-            </Typography>
+      elevation={0}
+      sx={{
+        maxWidth: 900,
+        mx: "auto",
+        display: "flex",
+        flexDirection: "column",
+        alignItems: "left",
+      }}
+    >
+      <Typography
+        variant="h4"
+        textAlign="left"
+        gutterBottom
+        sx={{ mt: 0, mb: 2 }}
+      >
+        Déjanos tu mensaje
+      </Typography>
       <Box component="form" onSubmit={handleSubmit}>
         <Grid container spacing={2}>
-          <Grid item xs={12} md={6} lg={6}>
+          <Grid item xs={12} md={6}>
             <TextField
               fullWidth
               required
@@ -99,14 +116,14 @@ const ContactForm = () => {
               }}
             />
           </Grid>
-          <Grid Grid item xs={12} md={6} lg={6}>
+          <Grid item xs={12} md={6}>
             <TextField
               fullWidth
               required
               label="Correo electrónico"
-              name="email"
+              name="correo"
               type="email"
-              value={formData.email}
+              value={formData.correo}
               onChange={handleChange}
               InputProps={{
                 startAdornment: (
@@ -117,7 +134,7 @@ const ContactForm = () => {
               }}
             />
           </Grid>
-          <Grid Grid item xs={12} md={6} lg={6}>
+          <Grid item xs={12} md={6}>
             <TextField
               fullWidth
               required
@@ -134,7 +151,7 @@ const ContactForm = () => {
               }}
             />
           </Grid>
-          <Grid Grid item xs={12} md={6} lg={6}>
+          <Grid item xs={12} md={6}>
             <TextField
               fullWidth
               required
@@ -151,7 +168,7 @@ const ContactForm = () => {
               }}
             />
           </Grid>
-          <Grid Grid item xs={12} md={6} lg={6}>
+          <Grid item xs={12} md={6}>
             <TextField
               fullWidth
               required
@@ -168,7 +185,7 @@ const ContactForm = () => {
               }}
             />
           </Grid>
-          <Grid Grid item xs={12} md={6} lg={6}>
+          <Grid item xs={12} md={6}>
             <TextField
               select
               fullWidth
@@ -191,7 +208,7 @@ const ContactForm = () => {
                     value
                   ) : (
                     <span style={{ opacity: 0.5 }}>
-                      Selecciona una opcion ...
+                      Selecciona una opción ...
                     </span>
                   ),
               }}
@@ -203,7 +220,7 @@ const ContactForm = () => {
               ))}
             </TextField>
           </Grid>
-          <Grid Grid item xs={12} md={12} lg={12} sx={{ width: "100%" }}>
+          <Grid item xs={12}>
             <TextField
               fullWidth
               required
@@ -248,8 +265,23 @@ const ContactForm = () => {
           ¡Mensaje enviado con éxito!
         </Alert>
       </Snackbar>
+
+      <Snackbar
+        open={error}
+        autoHideDuration={4000}
+        onClose={() => setError(false)}
+        anchorOrigin={{ vertical: "bottom", horizontal: "center" }}
+      >
+        <Alert
+          onClose={() => setError(false)}
+          severity="error"
+          sx={{ width: "100%" }}
+        >
+          Error al enviar el mensaje.
+        </Alert>
+      </Snackbar>
     </Paper>
   );
 };
 
-export default ContactForm;
+export default ContactForm;

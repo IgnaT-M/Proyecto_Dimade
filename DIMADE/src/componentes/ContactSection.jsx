@@ -34,7 +34,7 @@ const ContactoSection = () => {
           width: "100%",
           height: "100%",
           backgroundImage: "url('/banner_redes.jpg')",
-          backgroundSize:"cover",
+          backgroundSize: "cover",
           backgroundPosition: "center",
           zIndex: 0,
         }}
