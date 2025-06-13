@@ -26,6 +26,7 @@ const Home = () => {
   return (
     <>
       <Navbar />
+      <Banner />
       <Carousel />
       {/* <Banner /> */}
       <CategoriasSection />
