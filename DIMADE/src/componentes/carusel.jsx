@@ -77,7 +77,6 @@ export default function Carousel() {
         height: "70vh",
         overflow: "auto",
         position: "relative",
-        py: 6,
       }}
     >
       <Slider {...settings}>
@@ -95,13 +94,14 @@ export default function Carousel() {
                 alignItems: "center",
                 justifyContent: "center",
                 position: "relative",
+                pt: 2,
               }}
             >
               <Card sx={{ boxShadow: "none", width: "100%", height: "100%" }}>
                 <CardMedia
                   component="img"
                   image={slide.url}
-                  alt={slide.title}
+                  alt={slide.title || "imagen de productos Dimade"}
                   sx={{
                     objectFit: "cover",
                     width: "100%",
@@ -113,11 +113,16 @@ export default function Carousel() {
                 variant="h4"
                 sx={{
                   position: "absolute",
-                  bottom: 30,
-                  color: "#fff",
-                  textShadow: "0 0 6px black",
+                  bottom: 20,
+                  left: 20,
+                  color: "white",
+                  textShadow: "2px 2px 4px rgba(0, 0, 0, 0.7)",
+                  backgroundColor: "rgba(29, 109, 159, 0.5)",
+                  padding: "10px",
+                  borderRadius: "8px",
                 }}
               >
+                En dimade tenemos todo para tu hogar y tu negocio
                 {slide.title}
               </Typography>
             </Box>

@@ -118,8 +118,7 @@ const Navbar = () => {
               },
             }}
           >
-
-            Productos
+            Ver Categorias
           </Button>
         </Stack>
       </Toolbar>

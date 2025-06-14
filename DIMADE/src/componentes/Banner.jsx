@@ -11,6 +11,7 @@ const Banner = () => {
         height: "40vh", // Alto automático o según contexto
         overflow: "hidden",
         display: { xs: "none", md: "block" },
+        loading: "lazy",
       }}
     >
       <Box
