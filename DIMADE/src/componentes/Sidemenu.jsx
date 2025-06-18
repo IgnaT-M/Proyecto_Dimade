@@ -18,13 +18,18 @@ import BusinessIcon from "@mui/icons-material/Business";
 const menuItems = [
   { key: "inicio", label: "Inicio", icon: <DashboardIcon /> },
   {
-    key: "ordenes1",
-    label: "Órdenes de compra(Clientes)",
+    key: "OrdenesCompra",
+    label: "Órdenes de compra",
     icon: <ShoppingCartIcon />,
   },
   {
-    key: "ordenes2",
-    label: "Órdenes de compra(Proveedores)",
+    key: "SolicitudesCotizacion",
+    label: "solicitudes de cotizacion",
+    icon: <ShoppingCartIcon />,
+  },
+  {
+    key: "SolicitudesContacto",
+    label: "solicitudes de contacto",
     icon: <ShoppingCartIcon />,
   },
   { key: "clientes", label: "Clientes", icon: <PeopleIcon /> },

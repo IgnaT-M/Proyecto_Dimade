@@ -1,13 +1,24 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import SideMenu from "../../componentes/Sidemenu";
 import DataList from "../../componentes/DataList";
 import AddItemModal from "../../componentes/AddItemModal";
 import { Box } from "@mui/material";
-import Topbar from "../../componentes/Topbar"; // importamos Topbar desde Toolbar (puedes renombrar el archivo luego si quieres)
+import Topbar from "../../componentes/Topbar";
+
+const sectionTitles = {
+  clientes: "Clientes",
+  usuarios: "Usuarios",
+  proveedores: "Proveedores",
+  OrdenesCompra: "Órdenes de Compra",
+  SolicitudesCotizacion: "Solicitudes de Cotización",
+  SolicitudesContacto: "Solicitudes de Contacto",
+};
 
 const Backoffice = () => {
   const [selectedSection, setSelectedSection] = useState("clientes");
   const [openModal, setOpenModal] = useState(false);
+  const [data, setData] = useState({});
+  const [loading, setLoading] = useState(true);
 
   const usuarioLogeado = {
     nombre: "Administrador",
@@ -16,70 +27,63 @@ const Backoffice = () => {
 
   const handleLogout = () => {
     console.log("Cerrar sesión");
-    // Aquí podrías limpiar sesión y redirigir
+    localStorage.removeItem("jwtToken");
+    window.location.href = "/";
   };
 
-  const [data, setData] = useState({
-    clientes: [
-      {
-        id: 1,
-        nombre: "Juan",
-        empresa: "ACME S.A.",
-        email: "juan@acme.com",
-        activo: true,
-      },
-      {
-        id: 2,
-        nombre: "Ana",
-        empresa: "Beta Ltda.",
-        email: "ana@beta.com",
-        activo: false,
-      },
-    ],
-    usuarios: [
-      {
-        id: 1,
-        nombre: "Admin",
-        rol: "Administrador",
-        email: "admin@mail.com",
-        activo: true,
-      },
-      {
-        id: 2,
-        nombre: "Usuario",
-        rol: "Vendedor",
-        email: "user@mail.com",
-        activo: true,
-      },
-    ],
-    proveedores: [
-      {
-        id: 1,
-        nombre: "Sodimac",
-        contacto: "sodimac@mail.com",
-        telefono: "123456",
-        activo: true,
-      },
-    ],
-    ordenes1: [
-      {
-        id: 101,
-        cliente: "ACME S.A.",
-        fecha: "2024-05-01",
-        total: "$100.000",
-        activo: true,
-      },
-    ],
-    ordenes2: [
-      {
-        id: 101,
-        cliente: "ACME S.A.",
-        fecha: "2024-05-01",
-        total: "$100.000",
-        activo: true,
-      },
-    ],
-  });
+  useEffect(() => {
+    fetchData(selectedSection);
+  }, [selectedSection]);
+
+  const fetchData = async (section) => {
+    setLoading(true);
+    try {
+      const token = localStorage.getItem("jwtToken");
+      let endpoint = "";
+
+      switch (section) {
+        case "clientes":
+          endpoint = "/api/clientes";
+          break;
+        case "usuarios":
+          endpoint = "/api/usuarios";
+          break;
+        case "proveedores":
+          endpoint = "/api/proveedores";
+          break;
+        case "OrdenesCompra":
+          endpoint = "/api/ordenes";
+          break;
+        case "SolicitudesCotizacion":
+          endpoint = "/api/solicitudes-cotizacion";
+          break;
+        case "SolicitudesContacto":
+          endpoint = "/api/solicitudes-contacto";
+          break;
+        default:
+          setData((prev) => ({ ...prev, [section]: [] }));
+          setLoading(false);
+          return;
+      }
+
+      const response = await fetch(`http://localhost:8080${endpoint}`, {
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
+        },
+      });
+
+      if (!response.ok) throw new Error("Error al cargar datos");
+
+      const result = await response.json();
+      setData((prev) => ({ ...prev, [section]: result }));
+    } catch (err) {
+      console.error("Error cargando sección", section, err);
+      setData((prev) => ({ ...prev, [section]: [] }));
+    } finally {
+      setLoading(false);
+    }
+  };
 
   const handleEdit = (item) => console.log("Editar", item);
   const handleDelete = (item) => {
@@ -103,48 +107,42 @@ const Backoffice = () => {
   const handleSaveNewItem = (newItem) => {
     setData((prev) => ({
       ...prev,
-      [selectedSection]: [...prev[selectedSection], newItem],
+      [selectedSection]: [...(prev[selectedSection] || []), newItem],
     }));
   };
 
   const renderSection = () => {
-    switch (selectedSection) {
-      case "clientes":
-      case "usuarios":
-      case "proveedores":
-      case "ordenes1":
-      case "ordenes2":
-        const sectionData = data[selectedSection];
-        const fields =
-          sectionData.length > 0
-            ? Object.keys(sectionData[0]).filter(
-                (k) => k !== "id" && k !== "activo"
-              )
-            : [];
+    if (!data[selectedSection]) return null;
 
-        return (
-          <>
-            <DataList
-              title={`Lista de ${selectedSection}`}
-              data={sectionData}
-              onEdit={handleEdit}
-              onDelete={handleDelete}
-              onToggle={handleToggle}
-              onView={handleView}
-              onAdd={handleAdd}
-            />
-            <AddItemModal
-              open={openModal}
-              onClose={() => setOpenModal(false)}
-              onSave={handleSaveNewItem}
-              fields={fields}
-            />
-          </>
-        );
-      case "inicio":
-      default:
-        return <Box p={4}>Bienvenido al Panel de Administración</Box>;
-    }
+    const sectionData = data[selectedSection];
+    const fields =
+      sectionData.length > 0
+        ? Object.keys(sectionData[0]).filter(
+            (k) => k !== "id" && k !== "activo"
+          )
+        : [];
+
+    return (
+      <>
+        <DataList
+          title={`Lista de ${
+            sectionTitles[selectedSection] || selectedSection
+          }`}
+          data={sectionData}
+          onEdit={handleEdit}
+          onDelete={handleDelete}
+          onToggle={handleToggle}
+          onView={handleView}
+          onAdd={handleAdd}
+        />
+        <AddItemModal
+          open={openModal}
+          onClose={() => setOpenModal(false)}
+          onSave={handleSaveNewItem}
+          fields={fields}
+        />
+      </>
+    );
   };
 
   return (
@@ -152,7 +150,9 @@ const Backoffice = () => {
       <Topbar usuario={usuarioLogeado} onLogout={handleLogout} />
       <Box sx={{ display: "flex", pt: 8 }}>
         <SideMenu onSelect={setSelectedSection} />
-        <Box sx={{ flexGrow: 1, p: 4 }}>{renderSection()}</Box>
+        <Box sx={{ flexGrow: 1, p: 4 }}>
+          {loading ? "Cargando..." : renderSection()}
+        </Box>
       </Box>
     </>
   );

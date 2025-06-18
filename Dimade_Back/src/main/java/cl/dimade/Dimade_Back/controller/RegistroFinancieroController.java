@@ -22,7 +22,7 @@ import cl.dimade.Dimade_Back.service.RegistroFinancieroService;
 
 @RestController
 @RequestMapping("/api/registros-financieros")
-@CrossOrigin(origins = "*")
+@CrossOrigin(origins = "http://localhost:5173")
 public class RegistroFinancieroController {
 
     @Autowired

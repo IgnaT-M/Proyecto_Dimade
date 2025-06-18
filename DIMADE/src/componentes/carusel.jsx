@@ -77,7 +77,6 @@ export default function Carousel() {
         height: "70vh",
         overflow: "auto",
         position: "relative",
-        py: 6,
       }}
     >
       <Slider {...settings}>

@@ -54,7 +54,7 @@ const Navbar = () => {
           <Button
             color="inherit"
             component={RouterLink}
-            to="/Nosotros"
+            to="/Productos"
             sx={{
               borderRadius: "9px",
               backgroundColor: "rgba(59, 106, 164, 0.07)",
@@ -66,7 +66,7 @@ const Navbar = () => {
               },
             }}
           >
-            Nosotros
+            Productos
           </Button>
           <Button
             color="inherit"
@@ -101,25 +101,6 @@ const Navbar = () => {
             }}
           >
             Cotizar
-          </Button>
-
-          <Button
-            color="inherit"
-            component={RouterLink}
-            to="/Productos"
-            sx={{
-              borderRadius: "9px",
-              backgroundColor: "rgba(59, 106, 164, 0.07)",
-              "&:hover": {
-                backgroundColor: "rgba(59, 106, 164, 0.57)",
-                backdropFilter: "blur(5px)",
-                WebkitBackdropFilter: "blur(5px)",
-                borderRadius: "10px",
-              },
-            }}
-          >
-
-            Productos
           </Button>
         </Stack>
       </Toolbar>

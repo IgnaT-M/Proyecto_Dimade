@@ -9,26 +9,21 @@ import {
   Snackbar,
   Alert,
   MenuItem,
-  Modal,
-  Fade,
-  Backdrop,
 } from "@mui/material";
-import BusinessIcon from "@mui/icons-material/Business";
+import BadgeIcon from "@mui/icons-material/Badge";
 import PersonIcon from "@mui/icons-material/Person";
 import EmailIcon from "@mui/icons-material/Email";
 import PhoneIcon from "@mui/icons-material/Phone";
 import ListAltIcon from "@mui/icons-material/ListAlt";
-import AddBoxIcon from "@mui/icons-material/AddBox";
 import ModalCubitaje from "./ModalCubicador";
 
 const CotizaForm = () => {
   const [formData, setFormData] = useState({
+    rut: "",
     nombre: "",
-    empresa: "",
     email: "",
     telefono: "",
     tipoProducto: "",
-    cantidad: "",
     mensaje: "",
   });
 
@@ -38,22 +33,46 @@ const CotizaForm = () => {
     setFormData((prev) => ({ ...prev, [e.target.name]: e.target.value }));
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
 
-    
+    const payload = {
+      rutSolicitante: formData.rut,
+      nombreSolicitante: formData.nombre,
+      correo: formData.email,
+      telefono: formData.telefono,
+      fechaSolicitud: new Date(),
+      productosSolicitados: [formData.tipoProducto],
+      estado: "Pendiente",
+      detalle: formData.mensaje,
+    };
 
-    console.log("Datos enviados:", formData);
-    setOpen(true);
-    setFormData({
-      nombre: "",
-      empresa: "",
-      email: "",
-      telefono: "",
-      tipoProducto: "",
-      cantidad: "",
-      mensaje: "",
-    });
+    try {
+      const response = await fetch(
+        "http://localhost:8080/api/solicitudes-cotizacion",
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify(payload),
+        }
+      );
+
+      if (!response.ok) throw new Error("Error al enviar la solicitud");
+
+      setOpen(true);
+      setFormData({
+        rut: "",
+        nombre: "",
+        email: "",
+        telefono: "",
+        tipoProducto: "",
+        mensaje: "",
+      });
+    } catch (error) {
+      console.error("Error al enviar solicitud:", error);
+    }
   };
 
   const productos = [
@@ -68,25 +87,36 @@ const CotizaForm = () => {
     <Paper
       elevation={0}
       sx={{
-        
         maxWidth: 900,
         mx: "auto",
         display: "flex",
         flexDirection: "column",
         alignItems: "left",
-      
       }}
     >
       <Typography
-                variant="h4"
-                textAlign="left"
-                gutterBottom
-                sx={{ mt: 0, mb: 2 }}
-              >
-                Solicita tu cotización
+        variant="h4"
+        textAlign="left"
+        gutterBottom
+        sx={{ mt: 0, mb: 2 }}
+      >
+        Solicita tu cotización
       </Typography>
       <Box component="form" onSubmit={handleSubmit} sx={{ width: "100%" }}>
         <Grid container spacing={2}>
+          <Grid item xs={12} lg={6}>
+            <TextField
+              fullWidth
+              required
+              name="rut"
+              label="RUT"
+              value={formData.rut}
+              onChange={handleChange}
+              InputProps={{
+                startAdornment: <BadgeIcon sx={{ mr: 1 }} />,
+              }}
+            />
+          </Grid>
           <Grid item xs={12} lg={6}>
             <TextField
               fullWidth
@@ -97,18 +127,6 @@ const CotizaForm = () => {
               onChange={handleChange}
               InputProps={{
                 startAdornment: <PersonIcon sx={{ mr: 1 }} />,
-              }}
-            />
-          </Grid>
-          <Grid item xs={12} lg={6}>
-            <TextField
-              fullWidth
-              name="empresa"
-              label="Empresa"
-              value={formData.empresa}
-              onChange={handleChange}
-              InputProps={{
-                startAdornment: <BusinessIcon sx={{ mr: 1 }} />,
               }}
             />
           </Grid>
@@ -142,20 +160,6 @@ const CotizaForm = () => {
           </Grid>
           <Grid item xs={12} lg={6}>
             <TextField
-              fullWidth
-              required
-              name="cantidad"
-              label="Cantidad estimada"
-              type="number"
-              value={formData.cantidad}
-              onChange={handleChange}
-              InputProps={{
-                startAdornment: <AddBoxIcon sx={{ mr: 1 }} />,
-              }}
-            />
-          </Grid>
-          <Grid item xs={12} lg={6}>
-            <TextField
               select
               fullWidth
               required
@@ -175,9 +179,6 @@ const CotizaForm = () => {
                   ),
               }}
             >
-              {/* <MenuItem value="" disabled sx={{ display: "none" }}>
-                Selecciona tu producto
-              </MenuItem> */}
               {productos.map((prod) => (
                 <MenuItem key={prod} value={prod}>
                   {prod}
@@ -185,7 +186,7 @@ const CotizaForm = () => {
               ))}
             </TextField>
           </Grid>
-          <Grid item xs={12} sx={{ width: "100%" }}>
+          <Grid item xs={12}>
             <TextField
               fullWidth
               multiline
@@ -194,7 +195,6 @@ const CotizaForm = () => {
               label="Detalles adicionales"
               value={formData.mensaje}
               onChange={handleChange}
-              sx={{ width: "100%" }}
             />
             <Button
               type="submit"
@@ -236,4 +236,4 @@ const CotizaForm = () => {
   );
 };
 
-export default CotizaForm;
+export default CotizaForm;
