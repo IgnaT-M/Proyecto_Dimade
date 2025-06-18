@@ -22,7 +22,7 @@ import cl.dimade.Dimade_Back.service.SolicitudContactoService;
 
 @RestController
 @RequestMapping("/api/solicitudes-contacto")
-@CrossOrigin(origins = "*")
+@CrossOrigin(origins = "http://localhost:5173")
 public class SolicitudContactoController {
 
     @Autowired

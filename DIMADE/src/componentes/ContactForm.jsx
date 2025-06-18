@@ -40,6 +40,16 @@ const ContactForm = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
 
+    const payload = {
+      nombre: formData.nombre,
+      correo: formData.correo,
+      direccion: formData.direccion,
+      telefono: formData.telefono,
+      rut: formData.rut,
+      asunto: formData.asunto,
+      mensaje: formData.mensaje,
+    };
+
     try {
       const response = await fetch(
         "http://localhost:8080/api/solicitudes-contacto",
@@ -48,7 +58,7 @@ const ContactForm = () => {
           headers: {
             "Content-Type": "application/json",
           },
-          body: JSON.stringify(formData),
+          body: JSON.stringify(payload),
         }
       );
 

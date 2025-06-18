@@ -16,11 +16,13 @@ import LockIcon from "@mui/icons-material/Lock";
 import Visibility from "@mui/icons-material/Visibility";
 import VisibilityOff from "@mui/icons-material/VisibilityOff";
 import { useNavigate } from "react-router-dom";
+import { jwtDecode } from "jwt-decode";
 
 const LoginForm = () => {
   const [form, setForm] = useState({ email: "", password: "" });
   const [showPassword, setShowPassword] = useState(false);
   const [openSnackbar, setOpenSnackbar] = useState(false);
+  const [errorMessage, setErrorMessage] = useState("");
   const navigate = useNavigate();
 
   const handleChange = (e) =>
@@ -30,22 +32,45 @@ const LoginForm = () => {
     e.preventDefault();
 
     if (!form.email || !form.password) {
+      setErrorMessage("Por favor completa todos los campos");
       setOpenSnackbar(true);
       return;
     }
 
-    // Simulación de autenticación con backend
-    console.log("Enviando datos:", form);
+    try {
+      const response = await fetch("http://localhost:8080/api/auth/login", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          email: form.email,
+          password: form.password,
+        }),
+      });
 
-    // Simula un delay de backend
-    setTimeout(() => {
-      // Aquí iría un fetch/axios real
-      if (form.email === "admin@admin.com" && form.password === "123456") {
-        navigate("/backoffice"); // redirección al dashboard
-      } else {
-        alert("Credenciales incorrectas");
+      if (!response.ok) {
+        if (response.status === 401) {
+          setErrorMessage("Credenciales incorrectas");
+        } else {
+          setErrorMessage("Error al conectar con el servidor");
+        }
+        setOpenSnackbar(true);
+        return;
       }
-    }, 1000);
+
+      const data = await response.json();
+      const token = data.token;
+
+      localStorage.setItem("jwtToken", token);
+
+      // Redirige directamente sin importar el rol
+      navigate("/backoffice");
+    } catch (err) {
+      console.error("Error en login:", err);
+      setErrorMessage("No se pudo conectar al servidor");
+      setOpenSnackbar(true);
+    }
   };
 
   return (
@@ -152,7 +177,7 @@ const LoginForm = () => {
           anchorOrigin={{ vertical: "bottom", horizontal: "center" }}
         >
           <Alert severity="error" sx={{ width: "100%" }}>
-            Por favor completa todos los campos
+            {errorMessage}
           </Alert>
         </Snackbar>
       </Paper>

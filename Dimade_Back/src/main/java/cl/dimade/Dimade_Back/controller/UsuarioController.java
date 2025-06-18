@@ -20,7 +20,7 @@ import cl.dimade.Dimade_Back.service.UsuarioService;
 
 @RestController
 @RequestMapping("/api/usuarios")
-@CrossOrigin(origins = "*")
+@CrossOrigin(origins = "http://localhost:5173")
 public class UsuarioController {
 
     @Autowired
@@ -33,12 +33,13 @@ public class UsuarioController {
 
     @PostMapping
     public ResponseEntity<Usuario> crear(@RequestBody Usuario usuario) {
-        return new ResponseEntity<>(usuarioService.guardar(usuario), HttpStatus.CREATED);
+        Usuario usuarioGuardado = usuarioService.guardar(usuario);
+        return new ResponseEntity<>(usuarioGuardado, HttpStatus.CREATED);
     }
 
-    @GetMapping("/{correo}")
-    public ResponseEntity<Usuario> buscarPorCorreo(@PathVariable String correo) {
-        Optional<Usuario> usuario = usuarioService.buscarPorCorreo(correo);
+    @GetMapping("/{email}")
+    public ResponseEntity<Usuario> buscarPorEmail(@PathVariable String email) {
+        Optional<Usuario> usuario = usuarioService.buscarPorEmail(email);
         return usuario.map(ResponseEntity::ok).orElseGet(() -> ResponseEntity.notFound().build());
     }
 

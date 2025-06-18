@@ -20,7 +20,7 @@ import cl.dimade.Dimade_Back.service.ProveedorService;
 
 @RestController
 @RequestMapping("/api/proveedores")
-@CrossOrigin(origins = "*")
+@CrossOrigin(origins = "http://localhost:5173")
 public class ProveedorController {
 
     @Autowired
