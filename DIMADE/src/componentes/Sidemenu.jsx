@@ -14,6 +14,9 @@ import ShoppingCartIcon from "@mui/icons-material/ShoppingCart";
 import PeopleIcon from "@mui/icons-material/People";
 import GroupIcon from "@mui/icons-material/Group";
 import BusinessIcon from "@mui/icons-material/Business";
+import SupportAgentIcon from "@mui/icons-material/SupportAgent";
+import RequestQuoteIcon from "@mui/icons-material/RequestQuote";
+import ReceiptLongIcon from "@mui/icons-material/ReceiptLong";
 
 const menuItems = [
   { key: "inicio", label: "Inicio", icon: <DashboardIcon /> },
@@ -24,17 +27,22 @@ const menuItems = [
   },
   {
     key: "SolicitudesCotizacion",
-    label: "solicitudes de cotizacion",
-    icon: <ShoppingCartIcon />,
+    label: "Solicitudes de cotización",
+    icon: <RequestQuoteIcon />,
   },
   {
     key: "SolicitudesContacto",
-    label: "solicitudes de contacto",
-    icon: <ShoppingCartIcon />,
+    label: "Solicitudes de contacto",
+    icon: <SupportAgentIcon />,
   },
   { key: "clientes", label: "Clientes", icon: <PeopleIcon /> },
   { key: "usuarios", label: "Usuarios", icon: <GroupIcon /> },
   { key: "proveedores", label: "Proveedores", icon: <BusinessIcon /> },
+  {
+    key: "registrosFinancieros",
+    label: "Registros Financieros",
+    icon: <ReceiptLongIcon />,
+  },
 ];
 
 const drawerWidth = 240;

@@ -22,6 +22,15 @@ public class ClienteService {
     public Optional<Cliente> obtenerPorRut(String rut) {
         return repository.findByRut(rut);
     }
+    public Optional<Cliente> actualizar(String id, Cliente clienteActualizado) {
+    return repository.findById(id).map(clienteExistente -> {
+        clienteActualizado.setId(id);
+        return repository.save(clienteActualizado);
+    });
+}
+
+
+
 
     public Cliente guardar(Cliente cliente) {
         return repository.save(cliente);

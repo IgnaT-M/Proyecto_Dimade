@@ -22,4 +22,5 @@ public class Cliente {
     private String correo;
     private String empresa;
     private String rutEmpresa;
+    private Boolean activo;
 }
