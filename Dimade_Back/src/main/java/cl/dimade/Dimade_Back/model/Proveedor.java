@@ -21,4 +21,5 @@ public class Proveedor {
     private String telefono;
     private String correo;
     private String giro;
+    private Boolean activo;
 }

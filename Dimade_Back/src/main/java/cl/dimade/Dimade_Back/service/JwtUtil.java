@@ -1,31 +1,39 @@
 package cl.dimade.Dimade_Back.service;
 
+import java.nio.charset.StandardCharsets;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 
 import javax.crypto.SecretKey;
 
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.JwtException;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.security.Keys;
-
+import jakarta.annotation.PostConstruct;
 
 @Service
 public class JwtUtil {
 
-    private final SecretKey secretKey = Keys.hmacShaKeyFor(
-        "ddec5e92f83a4f72fbfdc6321bc906e1893120133632639f458959b2dbc3adf8".getBytes()
-    );
+    @Value("${jwt.secret}") // Se leerá desde application.properties
+    private String secret;
 
-    private final long EXPIRATION_TIME = 86400000; // 24h
+    private SecretKey secretKey;
+
+    private final long EXPIRATION_TIME = 86400000; // 24 horas
+
+    @PostConstruct
+    public void init() {
+        this.secretKey = Keys.hmacShaKeyFor(secret.getBytes(StandardCharsets.UTF_8));
+    }
 
     public String generateToken(String email, String rol) {
         Map<String, Object> claims = new HashMap<>();
-        claims.put("rol", rol);
+        claims.put("rol", "ROLE_" + rol); // ✅ Prefijo obligatorio para Spring Security
 
         return Jwts.builder()
                 .setClaims(claims)

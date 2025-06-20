@@ -27,6 +27,21 @@ public class UsuarioService {
         usuario.setPassword(passwordEncoder.encode(usuario.getPassword()));
         return usuarioRepository.save(usuario);
     }
+    public Optional<Usuario> actualizar(String id, Usuario usuarioActualizado) {
+    return usuarioRepository.findById(id).map(usuarioExistente -> {
+        usuarioActualizado.setId(id);
+
+        // Si viene una contraseña nueva, hashearla
+        if (usuarioActualizado.getPassword() != null && !usuarioActualizado.getPassword().isEmpty()) {
+            usuarioActualizado.setPassword(passwordEncoder.encode(usuarioActualizado.getPassword()));
+        } else {
+            usuarioActualizado.setPassword(usuarioExistente.getPassword()); // mantiene la actual
+        }
+
+        return usuarioRepository.save(usuarioActualizado);
+    });
+}
+
 
     public Optional<Usuario> buscarPorEmail(String email) {
         return usuarioRepository.findByEmail(email);
