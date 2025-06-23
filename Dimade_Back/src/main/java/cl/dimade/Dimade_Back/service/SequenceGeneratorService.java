@@ -1,0 +1,33 @@
+package cl.dimade.Dimade_Back.service;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.mongodb.core.FindAndModifyOptions;
+import org.springframework.data.mongodb.core.MongoOperations;
+import org.springframework.data.mongodb.core.query.Criteria;
+import org.springframework.data.mongodb.core.query.Query;
+import org.springframework.data.mongodb.core.query.Update;
+import org.springframework.stereotype.Service;
+
+import cl.dimade.Dimade_Back.model.DatabaseSequence;
+
+@Service
+public class SequenceGeneratorService {
+
+    @Autowired
+    private MongoOperations mongoOperations;
+
+    // Devuelve un número simple
+    public long generateSequence(String seqName) {
+        DatabaseSequence counter = mongoOperations.findAndModify(Query.query(Criteria.where("_id").is(seqName)),
+                new Update().inc("seq", 1), FindAndModifyOptions.options().returnNew(true).upsert(true),
+                DatabaseSequence.class);
+
+        return counter != null ? counter.getSeq() : 1;
+    }
+
+    // Devuelve un ID legible con prefijo: Ej. "CL001"
+    public String generateStringSequence(String seqName, String prefix) {
+        long seq = generateSequence(seqName);
+        return String.format("%s%03d", prefix.toUpperCase(), seq);
+    }
+}

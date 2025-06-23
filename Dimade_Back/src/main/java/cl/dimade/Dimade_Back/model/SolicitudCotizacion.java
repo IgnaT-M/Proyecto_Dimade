@@ -1,7 +1,6 @@
 package cl.dimade.Dimade_Back.model;
 
 import java.util.Date;
-import java.util.List;
 
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
@@ -16,14 +15,13 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 public class SolicitudCotizacion {
     @Id
-    private String id;
+    private String id; // <-- Ahora será autoincremental
 
     private String rutSolicitante;
     private String nombreSolicitante;
     private String correo;
     private String telefono;
     private Date fechaSolicitud;
-    private List<String> productosSolicitados; // IDs o nombres de productos
-    private String estado; // Ej: Pendiente, Enviada, Aprobada, Rechazada
-    private String detalle; // Comentario o requerimiento adicional
+    private String estado;
+    private String detalle;
 }

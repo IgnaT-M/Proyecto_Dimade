@@ -1,7 +1,6 @@
 package cl.dimade.Dimade_Back.model;
 
 import java.util.Date;
-import java.util.List;
 
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
@@ -23,9 +22,9 @@ public class OrdenCompra {
     private String telefono;
     private String mail;
     private Date fechaOrden;
-    private List<String> productos; // Lista de IDs o nombres de productos
+    private String productos; // Lista de IDs o nombres de productos
     private Double total;
     private String estado; // Ej: Pendiente, Aprobada, Rechazada
-    private String tipo; //Ej: Cliente, Proveedor, Interna, etc...
+    private String tipo; // Ej: Cliente, Proveedor, Interna, etc...
     private String detalle;
 }

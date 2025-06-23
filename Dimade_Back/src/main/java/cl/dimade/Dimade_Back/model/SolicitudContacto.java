@@ -1,10 +1,13 @@
 package cl.dimade.Dimade_Back.model;
 
-import lombok.*;
+import java.util.Date;
+
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
 
-import java.util.Date;
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.NoArgsConstructor;
 
 @Document(collection = "solicitudes_contacto")
 @Data

@@ -7,16 +7,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.CrossOrigin;
-import org.springframework.web.bind.annotation.DeleteMapping;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.PutMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import cl.dimade.Dimade_Back.model.RegistroFinanciero;
 import cl.dimade.Dimade_Back.service.RegistroFinancieroService;
@@ -46,6 +37,14 @@ public class RegistroFinancieroController {
         return new ResponseEntity<>(service.guardar(registro), HttpStatus.CREATED);
     }
 
+    @PutMapping("/{id}")
+    public ResponseEntity<RegistroFinanciero> actualizar(@PathVariable String id,
+            @RequestBody RegistroFinanciero registroActualizado) {
+        return service.actualizar(id, registroActualizado)
+                .map(ResponseEntity::ok)
+                .orElse(ResponseEntity.notFound().build());
+    }
+
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> eliminar(@PathVariable String id) {
         service.eliminar(id);
@@ -63,22 +62,9 @@ public class RegistroFinancieroController {
         return service.buscarPorFecha(fecha);
     }
 
-    @PutMapping("/{id}")
-    public ResponseEntity<RegistroFinanciero> actualizar(@PathVariable String id,
-            @RequestBody RegistroFinanciero registroActualizado) {
-        return service.obtenerPorId(id)
-                .map(registroExistente -> {
-                    registroActualizado.setId(id);
-                    RegistroFinanciero actualizado = service.guardar(registroActualizado);
-                    return ResponseEntity.ok(actualizado);
-                })
-                .orElse(ResponseEntity.notFound().build());
-    }
-
     @GetMapping("/buscar")
     public List<RegistroFinanciero> buscarPorTipoYFecha(@RequestParam String tipo,
             @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) Date fecha) {
         return service.buscarPorTipoYFecha(tipo, fecha);
     }
-
 }

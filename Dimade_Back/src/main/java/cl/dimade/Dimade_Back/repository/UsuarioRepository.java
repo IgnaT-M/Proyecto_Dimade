@@ -8,5 +8,5 @@ import cl.dimade.Dimade_Back.model.Usuario;
 
 public interface UsuarioRepository extends MongoRepository<Usuario, String> {
     Optional<Usuario> findByEmail(String email);
-    
+
 }

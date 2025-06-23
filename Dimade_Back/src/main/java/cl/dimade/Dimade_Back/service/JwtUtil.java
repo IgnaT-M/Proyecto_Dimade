@@ -24,7 +24,7 @@ public class JwtUtil {
 
     private SecretKey secretKey;
 
-    private final long EXPIRATION_TIME = 86400000; // 24 horas
+    private final long EXPIRATION_TIME = 186400000; // 24 horas
 
     @PostConstruct
     public void init() {
@@ -46,6 +46,14 @@ public class JwtUtil {
 
     public String extractUsername(String token) {
         return getClaims(token).getSubject();
+    }
+
+    public Claims extractAllClaims(String token) {
+        return Jwts.parserBuilder()
+                .setSigningKey(secretKey) // Usa tu key real aquí
+                .build()
+                .parseClaimsJws(token)
+                .getBody();
     }
 
     public String extractRol(String token) {

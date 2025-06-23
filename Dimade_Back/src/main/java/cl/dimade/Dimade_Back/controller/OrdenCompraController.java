@@ -2,7 +2,6 @@ package cl.dimade.Dimade_Back.controller;
 
 import java.util.Date;
 import java.util.List;
-import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.format.annotation.DateTimeFormat;
@@ -11,8 +10,10 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -22,57 +23,69 @@ import cl.dimade.Dimade_Back.model.OrdenCompra;
 import cl.dimade.Dimade_Back.service.OrdenCompraService;
 
 @RestController
-@RequestMapping("/api/ordenes")
+@RequestMapping("/api/ordenes-compra")
 @CrossOrigin(origins = "http://localhost:5173")
 public class OrdenCompraController {
 
     @Autowired
-    private OrdenCompraService service;
+    private OrdenCompraService ordenCompraService;
 
     @GetMapping
-    public List<OrdenCompra> listar() {
-        return service.obtenerTodas();
+    public List<OrdenCompra> obtenerTodas() {
+        return ordenCompraService.obtenerTodas();
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<OrdenCompra> obtener(@PathVariable String id) {
-        Optional<OrdenCompra> orden = service.obtenerPorId(id);
-        return orden.map(ResponseEntity::ok).orElseGet(() -> ResponseEntity.notFound().build());
+    public ResponseEntity<OrdenCompra> obtenerPorId(@PathVariable String id) {
+        return ordenCompraService.obtenerPorId(id).map(ResponseEntity::ok).orElse(ResponseEntity.notFound().build());
     }
 
     @PostMapping
-    public ResponseEntity<OrdenCompra> crear(@RequestBody OrdenCompra orden) {
-        return new ResponseEntity<>(service.guardar(orden), HttpStatus.CREATED);
+    public ResponseEntity<OrdenCompra> crear(@RequestBody OrdenCompra ordenCompra) {
+        OrdenCompra creada = ordenCompraService.guardar(ordenCompra);
+        return new ResponseEntity<>(creada, HttpStatus.CREATED);
+    }
+
+    @PutMapping("/{id}")
+    public ResponseEntity<OrdenCompra> actualizarCompleta(@PathVariable String id, @RequestBody OrdenCompra orden) {
+        return ordenCompraService.actualizarCompleta(id, orden).map(ResponseEntity::ok)
+                .orElse(ResponseEntity.notFound().build());
+    }
+
+    @PatchMapping("/{id}/estado")
+    public ResponseEntity<OrdenCompra> actualizarEstado(@PathVariable String id, @RequestBody String estado) {
+        return ordenCompraService.actualizarEstado(id, estado).map(ResponseEntity::ok)
+                .orElse(ResponseEntity.notFound().build());
     }
 
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> eliminar(@PathVariable String id) {
-        service.eliminar(id);
+        ordenCompraService.eliminar(id);
         return ResponseEntity.noContent().build();
     }
-    @GetMapping("/buscar/cliente/{rutCliente}")
-public List<OrdenCompra> buscarPorRutCliente(@PathVariable String rutCliente) {
-    return service.buscarPorRutCliente(rutCliente);
-}
 
-@GetMapping("/buscar/proveedor/{rutProveedor}")
-public List<OrdenCompra> buscarPorRutProveedor(@PathVariable String rutProveedor) {
-    return service.buscarPorRutProveedor(rutProveedor);
-}
+    @GetMapping("/cliente/{rut}")
+    public List<OrdenCompra> buscarPorRutCliente(@PathVariable String rut) {
+        return ordenCompraService.buscarPorRutCliente(rut);
+    }
 
-@GetMapping("/buscar/fecha")
-public List<OrdenCompra> buscarPorFecha(@RequestParam("fecha") @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) Date fecha) {
-    return service.buscarPorFecha(fecha);
-}
+    @GetMapping("/proveedor/{rut}")
+    public List<OrdenCompra> buscarPorRutProveedor(@PathVariable String rut) {
+        return ordenCompraService.buscarPorRutProveedor(rut);
+    }
 
-@GetMapping("/buscar/tipo/{tipo}")
-public List<OrdenCompra> buscarPorTipo(@PathVariable String tipo) {
-    return service.buscarPorTipo(tipo);
-}
+    @GetMapping("/fecha")
+    public List<OrdenCompra> buscarPorFecha(@RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) Date fecha) {
+        return ordenCompraService.buscarPorFecha(fecha);
+    }
 
-@GetMapping("/buscar/estado/{estado}")
-public List<OrdenCompra> buscarPorEstado(@PathVariable String estado) {
-    return service.buscarPorEstado(estado);
-}
+    @GetMapping("/tipo/{tipo}")
+    public List<OrdenCompra> buscarPorTipo(@PathVariable String tipo) {
+        return ordenCompraService.buscarPorTipo(tipo);
+    }
 
+    @GetMapping("/estado/{estado}")
+    public List<OrdenCompra> buscarPorEstado(@PathVariable String estado) {
+        return ordenCompraService.buscarPorEstado(estado);
+    }
 }
