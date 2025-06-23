@@ -16,6 +16,9 @@ public class RegistroFinancieroService {
     @Autowired
     private RegistroFinancieroRepository repository;
 
+    @Autowired
+    private SequenceGeneratorService sequenceGeneratorService;
+
     public List<RegistroFinanciero> obtenerTodos() {
         return repository.findAll();
     }
@@ -25,7 +28,18 @@ public class RegistroFinancieroService {
     }
 
     public RegistroFinanciero guardar(RegistroFinanciero registro) {
+        if (registro.getId() == null || registro.getId().isBlank()) {
+            String idGenerado = sequenceGeneratorService.generateStringSequence("registros_financieros_sequence", "RF");
+            registro.setId(idGenerado); // Ej: "RF001"
+        }
         return repository.save(registro);
+    }
+
+    public Optional<RegistroFinanciero> actualizar(String id, RegistroFinanciero actualizado) {
+        return repository.findById(id).map(registroExistente -> {
+            actualizado.setId(id);
+            return repository.save(actualizado);
+        });
     }
 
     public void eliminar(String id) {
@@ -39,7 +53,8 @@ public class RegistroFinancieroService {
     public List<RegistroFinanciero> buscarPorFecha(Date fecha) {
         return repository.findByFecha(fecha);
     }
+
     public List<RegistroFinanciero> buscarPorTipoYFecha(String tipo, Date fecha) {
-    return repository.findByTipoAndFecha(tipo, fecha);
-}
+        return repository.findByTipoAndFecha(tipo, fecha);
+    }
 }

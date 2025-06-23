@@ -15,6 +15,9 @@ public class ProveedorService {
     @Autowired
     private ProveedorRepository repository;
 
+    @Autowired
+    private SequenceGeneratorService sequenceGeneratorService;
+
     public List<Proveedor> obtenerTodos() {
         return repository.findAll();
     }
@@ -23,11 +26,26 @@ public class ProveedorService {
         return repository.findByRut(rut);
     }
 
+    public Optional<Proveedor> obtenerPorId(String id) {
+        return repository.findById(id);
+    }
+
     public Proveedor guardar(Proveedor proveedor) {
+        if (proveedor.getId() == null || proveedor.getId().isBlank()) {
+            String idGenerado = sequenceGeneratorService.generateStringSequence("proveedores_sequence", "PR");
+            proveedor.setId(idGenerado); // Ej: "PR001"
+        }
         return repository.save(proveedor);
     }
 
     public void eliminar(String id) {
         repository.deleteById(id);
+    }
+
+    public Optional<Proveedor> actualizar(String id, Proveedor proveedorActualizado) {
+        return repository.findById(id).map(proveedorExistente -> {
+            proveedorActualizado.setId(id); // Mantenemos el mismo ID
+            return repository.save(proveedorActualizado);
+        });
     }
 }

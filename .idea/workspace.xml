@@ -1,0 +1,75 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="AutoImportSettings">
+    <option name="autoReloadType" value="SELECTIVE" />
+  </component>
+  <component name="ChangeListManager">
+    <list default="true" id="b5614eea-280e-4cf0-81e9-131576603e9b" name="Changes" comment="">
+      <change beforePath="$PROJECT_DIR$/Dimade_Back/pom.xml" beforeDir="false" afterPath="$PROJECT_DIR$/Dimade_Back/pom.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Dimade_Back/src/main/java/cl/dimade/Dimade_Back/config/CorsConfig.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Dimade_Back/src/main/java/cl/dimade/Dimade_Back/config/JwtFilter.java" beforeDir="false" afterPath="$PROJECT_DIR$/Dimade_Back/src/main/java/cl/dimade/Dimade_Back/config/JwtFilter.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Dimade_Back/src/main/java/cl/dimade/Dimade_Back/config/SecurityConfig.java" beforeDir="false" afterPath="$PROJECT_DIR$/Dimade_Back/src/main/java/cl/dimade/Dimade_Back/config/SecurityConfig.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Dimade_Back/src/main/java/cl/dimade/Dimade_Back/config/WebConfig.java" beforeDir="false" afterPath="$PROJECT_DIR$/Dimade_Back/src/main/java/cl/dimade/Dimade_Back/config/WebConfig.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Dimade_Back/src/main/java/cl/dimade/Dimade_Back/controller/OrdenCompraController.java" beforeDir="false" afterPath="$PROJECT_DIR$/Dimade_Back/src/main/java/cl/dimade/Dimade_Back/controller/OrdenCompraController.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Dimade_Back/src/main/java/cl/dimade/Dimade_Back/controller/ProveedorController.java" beforeDir="false" afterPath="$PROJECT_DIR$/Dimade_Back/src/main/java/cl/dimade/Dimade_Back/controller/ProveedorController.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Dimade_Back/src/main/java/cl/dimade/Dimade_Back/controller/RegistroFinancieroController.java" beforeDir="false" afterPath="$PROJECT_DIR$/Dimade_Back/src/main/java/cl/dimade/Dimade_Back/controller/RegistroFinancieroController.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Dimade_Back/src/main/java/cl/dimade/Dimade_Back/controller/SolicitudContactoController.java" beforeDir="false" afterPath="$PROJECT_DIR$/Dimade_Back/src/main/java/cl/dimade/Dimade_Back/controller/SolicitudContactoController.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Dimade_Back/src/main/java/cl/dimade/Dimade_Back/controller/SolicitudCotizacionController.java" beforeDir="false" afterPath="$PROJECT_DIR$/Dimade_Back/src/main/java/cl/dimade/Dimade_Back/controller/SolicitudCotizacionController.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Dimade_Back/src/main/java/cl/dimade/Dimade_Back/controller/UsuarioController.java" beforeDir="false" afterPath="$PROJECT_DIR$/Dimade_Back/src/main/java/cl/dimade/Dimade_Back/controller/UsuarioController.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Dimade_Back/src/main/java/cl/dimade/Dimade_Back/model/OrdenCompra.java" beforeDir="false" afterPath="$PROJECT_DIR$/Dimade_Back/src/main/java/cl/dimade/Dimade_Back/model/OrdenCompra.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Dimade_Back/src/main/java/cl/dimade/Dimade_Back/model/Proveedor.java" beforeDir="false" afterPath="$PROJECT_DIR$/Dimade_Back/src/main/java/cl/dimade/Dimade_Back/model/Proveedor.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Dimade_Back/src/main/java/cl/dimade/Dimade_Back/model/SolicitudContacto.java" beforeDir="false" afterPath="$PROJECT_DIR$/Dimade_Back/src/main/java/cl/dimade/Dimade_Back/model/SolicitudContacto.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Dimade_Back/src/main/java/cl/dimade/Dimade_Back/model/SolicitudCotizacion.java" beforeDir="false" afterPath="$PROJECT_DIR$/Dimade_Back/src/main/java/cl/dimade/Dimade_Back/model/SolicitudCotizacion.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Dimade_Back/src/main/java/cl/dimade/Dimade_Back/repository/OrdenCompraRepository.java" beforeDir="false" afterPath="$PROJECT_DIR$/Dimade_Back/src/main/java/cl/dimade/Dimade_Back/repository/OrdenCompraRepository.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Dimade_Back/src/main/java/cl/dimade/Dimade_Back/repository/RegistroFinancieroRepository.java" beforeDir="false" afterPath="$PROJECT_DIR$/Dimade_Back/src/main/java/cl/dimade/Dimade_Back/repository/RegistroFinancieroRepository.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Dimade_Back/src/main/java/cl/dimade/Dimade_Back/repository/SolicitudContactoRepository.java" beforeDir="false" afterPath="$PROJECT_DIR$/Dimade_Back/src/main/java/cl/dimade/Dimade_Back/repository/SolicitudContactoRepository.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Dimade_Back/src/main/java/cl/dimade/Dimade_Back/repository/SolicitudCotizacionRepository.java" beforeDir="false" afterPath="$PROJECT_DIR$/Dimade_Back/src/main/java/cl/dimade/Dimade_Back/repository/SolicitudCotizacionRepository.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Dimade_Back/src/main/java/cl/dimade/Dimade_Back/repository/UsuarioRepository.java" beforeDir="false" afterPath="$PROJECT_DIR$/Dimade_Back/src/main/java/cl/dimade/Dimade_Back/repository/UsuarioRepository.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Dimade_Back/src/main/java/cl/dimade/Dimade_Back/service/ClienteService.java" beforeDir="false" afterPath="$PROJECT_DIR$/Dimade_Back/src/main/java/cl/dimade/Dimade_Back/service/ClienteService.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Dimade_Back/src/main/java/cl/dimade/Dimade_Back/service/JwtUtil.java" beforeDir="false" afterPath="$PROJECT_DIR$/Dimade_Back/src/main/java/cl/dimade/Dimade_Back/service/JwtUtil.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Dimade_Back/src/main/java/cl/dimade/Dimade_Back/service/OrdenCompraService.java" beforeDir="false" afterPath="$PROJECT_DIR$/Dimade_Back/src/main/java/cl/dimade/Dimade_Back/service/OrdenCompraService.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Dimade_Back/src/main/java/cl/dimade/Dimade_Back/service/ProveedorService.java" beforeDir="false" afterPath="$PROJECT_DIR$/Dimade_Back/src/main/java/cl/dimade/Dimade_Back/service/ProveedorService.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Dimade_Back/src/main/java/cl/dimade/Dimade_Back/service/RegistroFinancieroService.java" beforeDir="false" afterPath="$PROJECT_DIR$/Dimade_Back/src/main/java/cl/dimade/Dimade_Back/service/RegistroFinancieroService.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Dimade_Back/src/main/java/cl/dimade/Dimade_Back/service/SolicitudContactoService.java" beforeDir="false" afterPath="$PROJECT_DIR$/Dimade_Back/src/main/java/cl/dimade/Dimade_Back/service/SolicitudContactoService.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Dimade_Back/src/main/java/cl/dimade/Dimade_Back/service/SolicitudCotizacionService.java" beforeDir="false" afterPath="$PROJECT_DIR$/Dimade_Back/src/main/java/cl/dimade/Dimade_Back/service/SolicitudCotizacionService.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Dimade_Back/src/main/java/cl/dimade/Dimade_Back/service/UsuarioService.java" beforeDir="false" afterPath="$PROJECT_DIR$/Dimade_Back/src/main/java/cl/dimade/Dimade_Back/service/UsuarioService.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Dimade_Back/src/main/resources/application.properties" beforeDir="false" afterPath="$PROJECT_DIR$/Dimade_Back/src/main/resources/application.properties" afterDir="false" />
+    </list>
+    <option name="SHOW_DIALOG" value="false" />
+    <option name="HIGHLIGHT_CONFLICTS" value="true" />
+    <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
+    <option name="LAST_RESOLUTION" value="IGNORE" />
+  </component>
+  <component name="Git.Settings">
+    <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
+  </component>
+  <component name="ProjectColorInfo"><![CDATA[{
+  "associatedIndex": 0
+}]]></component>
+  <component name="ProjectId" id="2ysxe1CWT9Ns4tZrgVf0THdWM1a" />
+  <component name="ProjectViewState">
+    <option name="hideEmptyMiddlePackages" value="true" />
+    <option name="showLibraryContents" value="true" />
+  </component>
+  <component name="PropertiesComponent"><![CDATA[{
+  "keyToString": {
+    "RunOnceActivity.ShowReadmeOnStart": "true",
+    "RunOnceActivity.git.unshallow": "true",
+    "git-widget-placeholder": "componentes/pablo",
+    "ignore.virus.scanning.warn.message": "true",
+    "kotlin-language-version-configured": "true",
+    "last_opened_file_path": "C:/Users/wpabl/Desktop/Proyecto_Dimade"
+  }
+}]]></component>
+  <component name="SpellCheckerSettings" RuntimeDictionaries="0" Folders="0" CustomDictionaries="0" DefaultDictionary="application-level" UseSingleDictionary="true" transferred="true" />
+  <component name="TaskManager">
+    <task active="true" id="Default" summary="Default task">
+      <changelist id="b5614eea-280e-4cf0-81e9-131576603e9b" name="Changes" comment="" />
+      <created>1750637175384</created>
+      <option name="number" value="Default" />
+      <option name="presentableId" value="Default" />
+      <updated>1750637175384</updated>
+    </task>
+    <servers />
+  </component>
+</project>

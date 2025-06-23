@@ -9,5 +9,6 @@ import cl.dimade.Dimade_Back.model.SolicitudContacto;
 
 public interface SolicitudContactoRepository extends MongoRepository<SolicitudContacto, String> {
     List<SolicitudContacto> findByCorreo(String correo);
+
     List<SolicitudContacto> findByFechaEnvio(Date fechaEnvio);
 }

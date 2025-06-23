@@ -15,6 +15,9 @@ public class ClienteService {
     @Autowired
     private ClienteRepository repository;
 
+    @Autowired
+    private SequenceGeneratorService sequenceGenerator;
+
     public List<Cliente> obtenerTodos() {
         return repository.findAll();
     }
@@ -22,17 +25,18 @@ public class ClienteService {
     public Optional<Cliente> obtenerPorRut(String rut) {
         return repository.findByRut(rut);
     }
+
     public Optional<Cliente> actualizar(String id, Cliente clienteActualizado) {
-    return repository.findById(id).map(clienteExistente -> {
-        clienteActualizado.setId(id);
-        return repository.save(clienteActualizado);
-    });
-}
-
-
-
+        return repository.findById(id).map(clienteExistente -> {
+            clienteActualizado.setId(id);
+            return repository.save(clienteActualizado);
+        });
+    }
 
     public Cliente guardar(Cliente cliente) {
+        if (cliente.getId() == null || cliente.getId().isBlank()) {
+            cliente.setId(sequenceGenerator.generateStringSequence("cliente_sequence", "CL"));
+        }
         return repository.save(cliente);
     }
 

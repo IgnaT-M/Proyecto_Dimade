@@ -57,7 +57,7 @@ public class SolicitudContactoController {
     }
 
     @GetMapping("/buscar/fecha")
-    public List<SolicitudContacto> buscarPorFecha(@RequestParam("fecha") @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) Date fecha) {
+    public List<SolicitudContacto> buscarPorFecha(@RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) Date fecha) {
         return service.buscarPorFecha(fecha);
     }
 }

@@ -4,7 +4,6 @@ import java.util.List;
 import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import cl.dimade.Dimade_Back.model.Usuario;
@@ -14,40 +13,38 @@ import cl.dimade.Dimade_Back.repository.UsuarioRepository;
 public class UsuarioService {
 
     @Autowired
-    private UsuarioRepository usuarioRepository;
+    private UsuarioRepository repository;
 
     @Autowired
-    private PasswordEncoder passwordEncoder;
+    private SequenceGeneratorService sequenceGenerator;
 
     public List<Usuario> obtenerTodos() {
-        return usuarioRepository.findAll();
+        return repository.findAll();
+    }
+
+    public Optional<Usuario> obtenerPorId(String id) {
+        return repository.findById(id);
     }
 
     public Usuario guardar(Usuario usuario) {
-        usuario.setPassword(passwordEncoder.encode(usuario.getPassword()));
-        return usuarioRepository.save(usuario);
-    }
-    public Optional<Usuario> actualizar(String id, Usuario usuarioActualizado) {
-    return usuarioRepository.findById(id).map(usuarioExistente -> {
-        usuarioActualizado.setId(id);
-
-        // Si viene una contraseña nueva, hashearla
-        if (usuarioActualizado.getPassword() != null && !usuarioActualizado.getPassword().isEmpty()) {
-            usuarioActualizado.setPassword(passwordEncoder.encode(usuarioActualizado.getPassword()));
-        } else {
-            usuarioActualizado.setPassword(usuarioExistente.getPassword()); // mantiene la actual
+        if (usuario.getId() == null) {
+            usuario.setId(sequenceGenerator.generateStringSequence("usuario_sequence", "US"));
         }
-
-        return usuarioRepository.save(usuarioActualizado);
-    });
-}
-
+        return repository.save(usuario);
+    }
 
     public Optional<Usuario> buscarPorEmail(String email) {
-        return usuarioRepository.findByEmail(email);
+        return repository.findByEmail(email);
     }
 
     public void eliminar(String id) {
-        usuarioRepository.deleteById(id);
+        repository.deleteById(id);
+    }
+
+    public Optional<Usuario> actualizar(String id, Usuario usuarioActualizado) {
+        return repository.findById(id).map(usuarioExistente -> {
+            usuarioActualizado.setId(id);
+            return repository.save(usuarioActualizado);
+        });
     }
 }

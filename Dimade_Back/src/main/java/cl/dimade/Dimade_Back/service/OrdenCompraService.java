@@ -16,6 +16,9 @@ public class OrdenCompraService {
     @Autowired
     private OrdenCompraRepository repository;
 
+    @Autowired
+    private SequenceGeneratorService sequenceGeneratorService;
+
     public List<OrdenCompra> obtenerTodas() {
         return repository.findAll();
     }
@@ -25,30 +28,56 @@ public class OrdenCompraService {
     }
 
     public OrdenCompra guardar(OrdenCompra orden) {
+        System.out.println("➡️ Intentando guardar orden: " + orden);
+
+        if (orden.getId() == null || orden.getId().isBlank()) {
+            String idGenerado = sequenceGeneratorService.generateStringSequence("ordenes_sequence", "OC");
+            System.out.println("✅ ID generado: " + idGenerado);
+            orden.setId(idGenerado);
+        }
+
         return repository.save(orden);
+    }
+
+    public Optional<OrdenCompra> actualizarCompleta(String id, OrdenCompra actualizada) {
+        return repository.findById(id).map(existente -> {
+            actualizada.setId(id);
+            return repository.save(actualizada);
+        });
+    }
+
+    public Optional<OrdenCompra> actualizarEstado(String id, String nuevoEstado) {
+        return repository.findById(id).map(orden -> {
+            orden.setEstado(nuevoEstado);
+            return repository.save(orden);
+        });
     }
 
     public void eliminar(String id) {
         repository.deleteById(id);
     }
+
     public List<OrdenCompra> buscarPorRutCliente(String rutCliente) {
-    return repository.findByRutCliente(rutCliente);
-}
+        return repository.findByRutCliente(rutCliente);
+    }
 
-public List<OrdenCompra> buscarPorRutProveedor(String rutProveedor) {
-    return repository.findByRutProveedor(rutProveedor);
-}
+    public List<OrdenCompra> buscarPorRutProveedor(String rutProveedor) {
+        return repository.findByRutProveedor(rutProveedor);
+    }
 
-public List<OrdenCompra> buscarPorFecha(Date fecha) {
-    return repository.findByFechaOrden(fecha);
-}
+    public List<OrdenCompra> buscarPorRutorden(String rutorden) {
+        return repository.findByRutCliente(rutorden);
+    }
 
-public List<OrdenCompra> buscarPorTipo(String tipo) {
-    return repository.findByTipo(tipo);
-}
+    public List<OrdenCompra> buscarPorFecha(Date fecha) {
+        return repository.findByFechaOrden(fecha);
+    }
 
-public List<OrdenCompra> buscarPorEstado(String estado) {
-    return repository.findByEstado(estado);
-}
+    public List<OrdenCompra> buscarPorTipo(String tipo) {
+        return repository.findByTipo(tipo);
+    }
 
+    public List<OrdenCompra> buscarPorEstado(String estado) {
+        return repository.findByEstado(estado);
+    }
 }

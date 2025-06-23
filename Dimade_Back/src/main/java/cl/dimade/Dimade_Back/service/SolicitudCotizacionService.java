@@ -16,6 +16,9 @@ public class SolicitudCotizacionService {
     @Autowired
     private SolicitudCotizacionRepository repository;
 
+    @Autowired
+    private SequenceGeneratorService sequenceGenerator;
+
     public List<SolicitudCotizacion> obtenerTodas() {
         return repository.findAll();
     }
@@ -25,7 +28,18 @@ public class SolicitudCotizacionService {
     }
 
     public SolicitudCotizacion guardar(SolicitudCotizacion solicitud) {
+        if (solicitud.getId() == null || solicitud.getId().isBlank()) {
+            String idGenerado = sequenceGenerator.generateStringSequence("solicitudes_cotizacion_sequence", "SCZ");
+            solicitud.setId(idGenerado); // Ej: "SC001"
+        }
         return repository.save(solicitud);
+    }
+
+    public Optional<SolicitudCotizacion> actualizar(String id, SolicitudCotizacion actualizada) {
+        return repository.findById(id).map(existente -> {
+            actualizada.setId(id); // Reutiliza el mismo ID
+            return repository.save(actualizada);
+        });
     }
 
     public void eliminar(String id) {
