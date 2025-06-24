@@ -1,10 +1,8 @@
 package cl.dimade.Dimade_Back.controller;
 
-import java.util.Date;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.CrossOrigin;
@@ -16,7 +14,6 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import cl.dimade.Dimade_Back.model.OrdenCompra;
@@ -31,8 +28,9 @@ public class OrdenCompraController {
     private OrdenCompraService ordenCompraService;
 
     @GetMapping
-    public List<OrdenCompra> obtenerTodas() {
-        return ordenCompraService.obtenerTodas();
+    public ResponseEntity<List<OrdenCompra>> obtenerTodas() {
+        List<OrdenCompra> ordenes = ordenCompraService.obtenerTodas();
+        return ordenes.isEmpty() ? ResponseEntity.noContent().build() : ResponseEntity.ok(ordenes);
     }
 
     @GetMapping("/{id}")
@@ -53,8 +51,8 @@ public class OrdenCompraController {
     }
 
     @PatchMapping("/{id}/estado")
-    public ResponseEntity<OrdenCompra> actualizarEstado(@PathVariable String id, @RequestBody String estado) {
-        return ordenCompraService.actualizarEstado(id, estado).map(ResponseEntity::ok)
+    public ResponseEntity<OrdenCompra> actualizarEstado(@PathVariable String id, @RequestBody EstadoRequest body) {
+        return ordenCompraService.actualizarEstado(id, body.estado()).map(ResponseEntity::ok)
                 .orElse(ResponseEntity.notFound().build());
     }
 
@@ -64,28 +62,27 @@ public class OrdenCompraController {
         return ResponseEntity.noContent().build();
     }
 
-    @GetMapping("/cliente/{rut}")
+    @GetMapping("/buscar/cliente/{rut}")
     public List<OrdenCompra> buscarPorRutCliente(@PathVariable String rut) {
         return ordenCompraService.buscarPorRutCliente(rut);
     }
 
-    @GetMapping("/proveedor/{rut}")
+    @GetMapping("/buscar/proveedor/{rut}")
     public List<OrdenCompra> buscarPorRutProveedor(@PathVariable String rut) {
         return ordenCompraService.buscarPorRutProveedor(rut);
     }
 
-    @GetMapping("/fecha")
-    public List<OrdenCompra> buscarPorFecha(@RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) Date fecha) {
-        return ordenCompraService.buscarPorFecha(fecha);
-    }
-
-    @GetMapping("/tipo/{tipo}")
+    @GetMapping("/buscar/tipo/{tipo}")
     public List<OrdenCompra> buscarPorTipo(@PathVariable String tipo) {
         return ordenCompraService.buscarPorTipo(tipo);
     }
 
-    @GetMapping("/estado/{estado}")
+    @GetMapping("/buscar/estado/{estado}")
     public List<OrdenCompra> buscarPorEstado(@PathVariable String estado) {
         return ordenCompraService.buscarPorEstado(estado);
+    }
+
+    // DTO para actualización parcial de estado
+    public record EstadoRequest(String estado) {
     }
 }

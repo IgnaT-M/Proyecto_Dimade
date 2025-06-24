@@ -21,18 +21,18 @@ import ReceiptLongIcon from "@mui/icons-material/ReceiptLong";
 const menuItems = [
   { key: "inicio", label: "Inicio", icon: <DashboardIcon /> },
   {
-    key: "OrdenesCompra",
-    label: "Órdenes de compra",
+    key: "ordenesCompra",
+    label: "Órdenes de Compra",
     icon: <ShoppingCartIcon />,
   },
   {
-    key: "SolicitudesCotizacion",
-    label: "Solicitudes de cotización",
+    key: "solicitudesCotizacion",
+    label: "Solicitudes de Cotización",
     icon: <RequestQuoteIcon />,
   },
   {
-    key: "SolicitudesContacto",
-    label: "Solicitudes de contacto",
+    key: "solicitudesContacto",
+    label: "Solicitudes de Contacto",
     icon: <SupportAgentIcon />,
   },
   { key: "clientes", label: "Clientes", icon: <PeopleIcon /> },
