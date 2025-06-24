@@ -7,6 +7,7 @@ import ProveedoresList from "../../componentes/DataList/ProveedoresList";
 import CotizacionesList from "../../componentes/DataList/CotizacionesList";
 import ContactoList from "../../componentes/DataList/ContactoList";
 import RegistrosList from "../../componentes/DataList/RegistrosList";
+import OrdenCompraList from "../../componentes/DataList/OrdenCompraList";
 import { Box } from "@mui/material";
 import Topbar from "../../componentes/Topbar";
 import { jwtDecode } from "jwt-decode";
@@ -15,9 +16,9 @@ const sectionTitles = {
   clientes: "Clientes",
   usuarios: "Usuarios",
   proveedores: "Proveedores",
-  OrdenesCompra: "Órdenes de Compra",
-  SolicitudesCotizacion: "Solicitudes de Cotización",
-  SolicitudesContacto: "Solicitudes de Contacto",
+  ordenesCompra: "Órdenes de Compra",
+  solicitudesCotizacion: "Solicitudes de Cotización",
+  solicitudesContacto: "Solicitudes de Contacto",
   registrosFinancieros: "Registros Financieros",
 };
 
@@ -28,17 +29,30 @@ const Backoffice = () => {
 
   useEffect(() => {
     const token = localStorage.getItem("jwtToken");
-    if (!token) return navigate("/");
+    if (!token) {
+      navigate("/");
+      return;
+    }
+
     try {
       const decoded = jwtDecode(token);
       const rol = decoded.rol;
-      if (rol !== "ADMIN" && rol !== "OPERADOR") return navigate("/");
-      setUsuarioLogeado({ nombre: decoded.sub, email: decoded.sub, rol });
-    } catch (e) {
-      console.error("Token inválido", e);
+
+      if (rol !== "ROLE_ADMIN" && rol !== "ROLE_OPERADOR") {
+        navigate("/");
+        return;
+      }
+
+      setUsuarioLogeado({
+        nombre: decoded.sub,
+        email: decoded.sub,
+        rol: rol,
+      });
+    } catch (error) {
+      console.error("Token inválido:", error);
       navigate("/");
     }
-  }, []);
+  }, [navigate]);
 
   const handleLogout = () => {
     localStorage.removeItem("jwtToken");
@@ -53,12 +67,14 @@ const Backoffice = () => {
         return <UsuariosList />;
       case "proveedores":
         return <ProveedoresList />;
-      case "SolicitudesCotizacion":
+      case "solicitudesCotizacion":
         return <CotizacionesList />;
-      case "SolicitudesContacto":
+      case "solicitudesContacto":
         return <ContactoList />;
       case "registrosFinancieros":
         return <RegistrosList />;
+      case "ordenesCompra":
+        return <OrdenCompraList />;
       default:
         return <Box>No hay datos disponibles.</Box>;
     }

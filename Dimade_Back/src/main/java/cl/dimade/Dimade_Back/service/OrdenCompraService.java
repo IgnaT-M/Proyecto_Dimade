@@ -1,6 +1,5 @@
 package cl.dimade.Dimade_Back.service;
 
-import java.util.Date;
 import java.util.List;
 import java.util.Optional;
 
@@ -67,10 +66,6 @@ public class OrdenCompraService {
 
     public List<OrdenCompra> buscarPorRutorden(String rutorden) {
         return repository.findByRutCliente(rutorden);
-    }
-
-    public List<OrdenCompra> buscarPorFecha(Date fecha) {
-        return repository.findByFechaOrden(fecha);
     }
 
     public List<OrdenCompra> buscarPorTipo(String tipo) {
