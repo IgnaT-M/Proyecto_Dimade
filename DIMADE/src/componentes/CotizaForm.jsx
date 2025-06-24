@@ -4,20 +4,21 @@ import {
   TextField,
   Button,
   Typography,
-  Grid,
-  Paper,
   Snackbar,
   Alert,
   MenuItem,
 } from "@mui/material";
+
 import BadgeIcon from "@mui/icons-material/Badge";
 import PersonIcon from "@mui/icons-material/Person";
 import EmailIcon from "@mui/icons-material/Email";
 import PhoneIcon from "@mui/icons-material/Phone";
 import ListAltIcon from "@mui/icons-material/ListAlt";
+
 import ModalCubitaje from "./ModalCubicador";
 
 const CotizaForm = () => {
+  // Estado para manejar los datos del formulario
   const [formData, setFormData] = useState({
     rut: "",
     nombre: "",
@@ -27,14 +28,59 @@ const CotizaForm = () => {
     mensaje: "",
   });
 
+  // Manejo de los cambios en los campos del formulario
   const [open, setOpen] = useState(false);
+  const [error, setError] = useState(null);
+  const [touched, setTouched] = useState({});
+  const [submitAttempted, setSubmitAttempted] = useState(false);
 
   const handleChange = (e) => {
     setFormData((prev) => ({ ...prev, [e.target.name]: e.target.value }));
   };
 
+
+  const handleBlur = (e) => {
+    setTouched((prev) => ({ ...prev, [e.target.name]: true }));
+  };
+  const isEmpty = (field) =>
+    (touched[field] || submitAttempted) && !formData[field];
+
+
   const handleSubmit = async (e) => {
     e.preventDefault();
+    setSubmitAttempted(true); //valida si el campo esta vacio
+
+    const camposVacios = Object.keys(formData).filter(
+      (campo) => !formData[campo]
+    );
+    if (camposVacios.length > 0) {
+      return;
+    }
+
+    const payload = {
+      rutSolicitante: formData.rut,
+      nombreSolicitante: formData.nombre,
+      correo: formData.email,
+      telefono: formData.telefono,
+      fechaSolicitud: new Date(),
+      productosSolicitados: [formData.tipoProducto],
+      estado: "Pendiente",
+      detalle: formData.mensaje,
+    };
+
+    try {
+      const response = await fetch(
+        "http://localhost:8080/api/solicitudes-cotizacion",
+        {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(payload),
+        }
+      );
+
+
+      if (!response.ok) throw new Error("Error al enviar la solicitud");
+
 
     const payload = {
       rutSolicitante: formData.rut,
@@ -61,6 +107,7 @@ const CotizaForm = () => {
 
       if (!response.ok) throw new Error("Error al enviar la solicitud");
 
+
       setOpen(true);
       setFormData({
         rut: "",
@@ -84,140 +131,122 @@ const CotizaForm = () => {
   ];
 
   return (
-    <Paper
-      elevation={0}
-      sx={{
-        maxWidth: 900,
-        mx: "auto",
-        display: "flex",
-        flexDirection: "column",
-        alignItems: "left",
-      }}
-    >
-      <Typography
-        variant="h4"
-        textAlign="left"
-        gutterBottom
-        sx={{ mt: 0, mb: 2 }}
-      >
+
+    <Box sx={{ maxWidth: 600, mx: "auto", py: 2 }}>
+      <Typography variant="h4" gutterBottom>
         Solicita tu cotización
       </Typography>
-      <Box component="form" onSubmit={handleSubmit} sx={{ width: "100%" }}>
-        <Grid container spacing={2}>
-          <Grid item xs={12} lg={6}>
-            <TextField
-              fullWidth
-              required
-              name="rut"
-              label="RUT"
-              value={formData.rut}
-              onChange={handleChange}
-              InputProps={{
-                startAdornment: <BadgeIcon sx={{ mr: 1 }} />,
-              }}
-            />
-          </Grid>
-          <Grid item xs={12} lg={6}>
-            <TextField
-              fullWidth
-              required
-              name="nombre"
-              label="Nombre"
-              value={formData.nombre}
-              onChange={handleChange}
-              InputProps={{
-                startAdornment: <PersonIcon sx={{ mr: 1 }} />,
-              }}
-            />
-          </Grid>
-          <Grid item xs={12} lg={6}>
-            <TextField
-              fullWidth
-              required
-              name="email"
-              label="Correo electrónico"
-              type="email"
-              value={formData.email}
-              onChange={handleChange}
-              InputProps={{
-                startAdornment: <EmailIcon sx={{ mr: 1 }} />,
-              }}
-            />
-          </Grid>
-          <Grid item xs={12} lg={6}>
-            <TextField
-              fullWidth
-              required
-              name="telefono"
-              label="Teléfono"
-              type="tel"
-              value={formData.telefono}
-              onChange={handleChange}
-              InputProps={{
-                startAdornment: <PhoneIcon sx={{ mr: 1 }} />,
-              }}
-            />
-          </Grid>
-          <Grid item xs={12} lg={6}>
-            <TextField
-              select
-              fullWidth
-              required
-              name="tipoProducto"
-              value={formData.tipoProducto}
-              onChange={handleChange}
-              InputProps={{
-                startAdornment: <ListAltIcon sx={{ mr: 1 }} />,
-              }}
-              SelectProps={{
-                displayEmpty: true,
-                renderValue: (value) =>
-                  value ? (
-                    value
-                  ) : (
-                    <span style={{ opacity: 0.5 }}>Selecciona tu producto</span>
-                  ),
-              }}
-            >
-              {productos.map((prod) => (
-                <MenuItem key={prod} value={prod}>
-                  {prod}
-                </MenuItem>
-              ))}
-            </TextField>
-          </Grid>
-          <Grid item xs={12}>
-            <TextField
-              fullWidth
-              multiline
-              rows={4}
-              name="mensaje"
-              label="Detalles adicionales"
-              value={formData.mensaje}
-              onChange={handleChange}
-            />
-            <Button
-              type="submit"
-              variant="contained"
-              color="primary"
-              fullWidth
-              sx={{
-                bgcolor: "#10567E",
-                color: "#fff",
-                "&:hover": {
-                  bgcolor: "#D95830",
-                },
-                mt: 3,
-                fontWeight: "bold",
-                borderRadius: 1,
-              }}
-            >
-              Enviar solicitud
-            </Button>
-            <ModalCubitaje />
-          </Grid>
-        </Grid>
+      <Box component="form" onSubmit={handleSubmit}>
+        <TextField
+          fullWidth
+          //required
+          margin="normal"
+          name="nombre"
+          label="Nombre"
+          value={formData.nombre}
+          onChange={handleChange}
+          onBlur={handleBlur}
+          error={isEmpty("nombre")}
+          helperText={isEmpty("nombre") ? "El Nombre es Obligatorio." : ""}
+        />
+        <TextField
+          fullWidth
+          //required
+          margin="normal"
+          name="rut"
+          label="RUT"
+          value={formData.rut}
+          onChange={handleChange}
+          onBlur={handleBlur}
+          error={isEmpty("rut")}
+          helperText={isEmpty("rut") ? "El RUT es obligatorio" : ""}
+        />
+        <TextField
+          fullWidth
+          //required
+          margin="normal"
+          name="email"
+          label="Correo electrónico"
+          type="email"
+          value={formData.email}
+          onChange={handleChange}
+          onBlur={handleBlur}
+          error={isEmpty("email")}
+          helperText={
+            isEmpty("email") ? "Debes Ingresar un Email, por favor" : ""
+          }
+        />
+        <TextField
+          fullWidth
+          //required
+          margin="normal"
+          name="telefono"
+          label="Teléfono"
+          type="tel"
+          value={formData.telefono}
+          onChange={handleChange}
+          onBlur={handleBlur}
+          error={isEmpty("telefono")}
+          helperText={isEmpty("telefono") ? "Debes Ingresar un Telefono" : ""}
+        />
+        <TextField
+          fullWidth
+          //required
+          select
+          margin="normal"
+          name="tipoProducto"
+          label="Producto requerido"
+          value={formData.tipoProducto}
+          onChange={handleChange}
+          onBlur={handleBlur}
+          error={isEmpty("tipoProducto")}
+          helperText={
+            isEmpty("tipoProducto")
+              ? "Por favor, Selecciona una de las Opciones"
+              : ""
+          }
+        >
+          {productos.map((prod) => (
+            <MenuItem key={prod} value={prod}>
+              {prod}
+            </MenuItem>
+          ))}
+        </TextField>
+        <TextField
+          fullWidth
+          multiline
+          rows={4}
+          margin="normal"
+          name="mensaje"
+          label="Detalles adicionales"
+          value={formData.mensaje}
+          onChange={handleChange}
+          onBlur={handleBlur}
+          error={isEmpty("mensaje")}
+          helperText={
+            isEmpty("mensaje") ? "Describe tus Productos, Por favor" : ""
+          }
+          placeholder="Ej: Necesito 50 bolsas de cemento y 10 mallas ACMA 15-15-6..."
+        />
+        <Button
+          type="submit"
+          variant="contained"
+          fullWidth
+          sx={{
+            mt: 2,
+            fontWeight: "bold",
+            borderRadius: 1,
+            bgcolor: "#10567E",
+            color: "#fff",
+            "&:hover": { bgcolor: "#D95830" },
+          }}
+        >
+          Enviar solicitud
+        </Button>
+        <ModalCubitaje />
+
       </Box>
+
       <Snackbar
         open={open}
         autoHideDuration={4000}
@@ -232,7 +261,22 @@ const CotizaForm = () => {
           ¡Solicitud de cotización enviada con éxito!
         </Alert>
       </Snackbar>
-    </Paper>
+
+      <Snackbar
+        open={error}
+        autoHideDuration={4000}
+        onClose={() => setError(false)}
+        anchorOrigin={{ vertical: "bottom", horizontal: "center" }}
+      >
+        <Alert
+          onClose={() => setError(false)}
+          severity="error"
+          sx={{ width: "100%" }}
+        >
+          Error al enviar el mensaje.
+        </Alert>
+      </Snackbar>
+    </Box>
   );
 };
 

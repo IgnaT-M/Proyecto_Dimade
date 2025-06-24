@@ -68,7 +68,7 @@ const Cubicador = () => {
       sx={{
         p: 4,
         width: { xs: "80vw", md: "60vw" },
-        height: { xs: "120vh", md: "80vh" , lg:"50vh" },
+        height: { xs: "120vh", md: "80vh", lg: "50vh" },
 
         display: "flex",
         flexDirection: "column",
@@ -187,4 +187,4 @@ const Cubicador = () => {
   );
 };
 
-export default Cubicador;
+export default Cubicador;

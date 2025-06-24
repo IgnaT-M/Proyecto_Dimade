@@ -1,4 +1,3 @@
-import React from "react";
 import {
   Drawer,
   List,
@@ -21,6 +20,7 @@ import ReceiptLongIcon from "@mui/icons-material/ReceiptLong";
 const menuItems = [
   { key: "inicio", label: "Inicio", icon: <DashboardIcon /> },
   {
+
     key: "ordenesCompra",
     label: "Órdenes de Compra",
     icon: <ShoppingCartIcon />,
@@ -34,6 +34,7 @@ const menuItems = [
     key: "solicitudesContacto",
     label: "Solicitudes de Contacto",
     icon: <SupportAgentIcon />,
+
   },
   { key: "clientes", label: "Clientes", icon: <PeopleIcon /> },
   { key: "usuarios", label: "Usuarios", icon: <GroupIcon /> },
@@ -57,15 +58,18 @@ const SideMenu = ({ onSelect, selected }) => {
         [`& .MuiDrawer-paper`]: {
           width: drawerWidth,
           boxSizing: "border-box",
-          background: "linear-gradient(to bottom, #1976d2, #1565c0)",
+          background: "linear-gradient(180deg, #10567E, #30749C)",
           color: "#fff",
         },
       }}
     >
       <Box sx={{ px: 2, py: 3 }}>
-        <Typography variant="h6" fontWeight="bold">
-          Panel Admin
-        </Typography>
+        <box
+          variant="img"
+          img
+          src="public/imagenes/banner_nosotros.jpg"
+          alt="Logo de DIMADE"
+        />
       </Box>
       <List>
         {menuItems.map((item) => (

@@ -1,11 +1,10 @@
 import React from "react";
 import Navbar from "../../componentes/NavBar.jsx";
 import Footer from "../../componentes/Footer.jsx";
-import Banner from "../../componentes/Banner.jsx";
+
 import { Box, Container, Grid, Typography, Stack, Paper } from "@mui/material";
 import Header from "../../componentes/Header.jsx";
 import bannerNosotros from "/public/banner_nosotros.jpg";
-
 
 const Us = () => {
   return (
@@ -81,7 +80,12 @@ const Us = () => {
       <Box sx={{ py: 1, width: "100vw", marginLeft: "calc(-50vw + 50%)" }}>
         <Paper
           elevation={0}
-          sx={{ py: 4, px: { xs: 2, md: 4 }, width: "100%" , backgroundColor: "#f0eeee",}}
+          sx={{
+            py: 4,
+            px: { xs: 2, md: 4 },
+            width: "100%",
+            backgroundColor: "#f0eeee",
+          }}
         >
           <Box
             sx={{

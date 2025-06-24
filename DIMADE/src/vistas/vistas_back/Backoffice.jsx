@@ -66,6 +66,7 @@ const Backoffice = () => {
       case "usuarios":
         return <UsuariosList />;
       case "proveedores":
+
         return <ProveedoresList />;
       case "solicitudesCotizacion":
         return <CotizacionesList />;

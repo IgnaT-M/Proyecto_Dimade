@@ -1,4 +1,3 @@
-import React from "react";
 import {
   Box,
   Grid,
@@ -81,7 +80,7 @@ const ContactoSection = () => {
                 <Typography variant="h6" fontWeight="bold">
                   Teléfono
                 </Typography>
-                <Typography variant="body1">+56 9 1234 5678</Typography>
+                <Typography variant="body1">+56 9 6721 6646</Typography>
               </CardContent>
             </Card>
           </Grid>
@@ -105,7 +104,9 @@ const ContactoSection = () => {
                 <Typography variant="h6" fontWeight="bold">
                   Correo
                 </Typography>
-                <Typography variant="body1">contacto@empresa.cl</Typography>
+                <Typography variant="body1">
+                  Dimadecontacto@gmail.com
+                </Typography>
               </CardContent>
             </Card>
           </Grid>
