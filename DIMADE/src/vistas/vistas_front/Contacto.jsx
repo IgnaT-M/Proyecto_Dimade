@@ -8,11 +8,6 @@ import Header from "../../componentes/Header.jsx";
 
 import ContactoSection from "../../componentes/ContactSection.jsx";
 
-<<<<<<< HEAD
-
-
-=======
->>>>>>> origin/main
 import banner_contacto from "/public/banner_contacto.jpg";
 
 const Contact = () => {
@@ -53,11 +48,7 @@ const Contact = () => {
                   xs: "100%",
                   md: "100vw",
                 },
-<<<<<<< HEAD
-                height: { xs: "auto", md: "48.4vh" },
-=======
                 height: { xs: "auto", md: "64vh" },
->>>>>>> origin/main
                 objectFit: "cover",
               }}
             />

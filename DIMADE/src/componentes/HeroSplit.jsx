@@ -1,25 +1,19 @@
-import React, { useState } from "react";
 import {
   Box,
   Typography,
   Button,
   Modal,
-  TextField,
+  Backdrop,
   Paper,
   Fade,
-  Backdrop,
-  Select,
-  MenuItem,
-  InputLabel,
-  FormControl,
-  List,
-  ListItem,
-  ListItemText,
-  IconButton,
 } from "@mui/material";
-import AddIcon from "@mui/icons-material/Add";
+import { useState } from "react";
+import { useTheme } from "@mui/material/styles"; // Importa el theme
+import ContactForm from "../componentes/ContactForm.jsx";
+import CotizaForm from "../componentes/CotizaForm.jsx";
 
-const HeroSplit = () => {
+export default function ResponsiveBoxes() {
+  const theme = useTheme(); // Usar el theme actual
   const [openCotizar, setOpenCotizar] = useState(false);
   const [openContacto, setOpenContacto] = useState(false);
 
@@ -39,101 +33,98 @@ const HeroSplit = () => {
     }
   };
 
+  // Estilos del modal que se adaptan al tema
   const styleModal = {
     position: "absolute",
     top: "50%",
     left: "50%",
     transform: "translate(-50%, -50%)",
-    width: 500,
+    width: { xs: "90%", sm: 400, md: 500 },
     p: 4,
     borderRadius: 3,
     boxShadow: 24,
-    bgcolor: "#fff",
+    bgcolor: theme.palette.modalBg,
+    color: theme.palette.text.primary,
     maxHeight: "90vh",
     overflowY: "auto",
   };
 
-  const commonBoxStyles = {
-    width: "50%",
-    height: 400,
-    color: "#fff",
-    display: "flex",
-    flexDirection: "column",
-    justifyContent: "center",
-    alignItems: "center",
-    px: 4,
-    position: "relative",
-    textAlign: "center",
-    backgroundSize: "cover",
-    backgroundPosition: "center",
-  };
-
   return (
     <>
-      <Box display="flex" width="100%" flexWrap="wrap" mt={4}>
-        {/* Izquierda - Cotizar */}
+      <Box
+        display="flex"
+        flexDirection={{ xs: "column", md: "row" }}
+        width="100%"
+        mt={4}
+      >
+        {/* Cotizar */}
         <Box
+          id="cotizar"
           sx={{
-            ...commonBoxStyles,
-            backgroundImage: 'url("/public/cotiza.jpg")',
+            width: { xs: "100%", md: "50%" },
+            height: 300,
+            backgroundImage:
+              'linear-gradient(rgba(0,0,0,0.5), rgba(0,0,0,0.5)), url("/cotiza.jpg")',
+            backgroundSize: "cover",
+            backgroundPosition: "center",
+            display: "flex",
+            flexDirection: "column",
+            justifyContent: "center",
+            alignItems: "center",
+            textAlign: "center",
+            color: "#fff",
+            p: 2,
+            marginBottom: { xs: 0.5, md: 0 },
           }}
         >
-          <Box
-            sx={{
-              position: "absolute",
-              inset: 0,
-              backgroundColor: "rgba(0,0,0,0.5)",
-              zIndex: 1,
-            }}
-          />
-          <Box sx={{ zIndex: 2 }}>
-            <Typography variant="h4" fontWeight="bold" gutterBottom>
-              ¿Necesitas una cotización?
-            </Typography>
-            <Typography variant="body1" mb={2}>
-              Envíanos los detalles de tu requerimiento y te responderemos a la
-              brevedad.
-            </Typography>
-            <Button
-              variant="outlined"
-              color="inherit"
-              onClick={() => setOpenCotizar(true)}
-            >
-              Cotizar ahora
-            </Button>
-          </Box>
+          <Typography variant="h4" fontWeight="bold" gutterBottom>
+            ¿Necesitas una cotización?
+          </Typography>
+          <Typography variant="body1" mb={2}>
+            Envíanos los detalles de tu requerimiento y te responderemos a la
+            brevedad.
+          </Typography>
+          <Button
+            variant="outlined"
+            color="inherit"
+            onClick={() => setOpenCotizar(true)}
+          >
+            Cotizar ahora
+          </Button>
         </Box>
 
-        {/* Derecha - Contacto */}
+        {/* Contactar */}
         <Box
+          id="contacto"
           sx={{
-            ...commonBoxStyles,
-            backgroundImage: 'url("/public/contacto.jpg")',
+            width: { xs: "100%", md: "50%" },
+            height: 300,
+            backgroundImage:
+              'linear-gradient(rgba(0,0,0,0.5), rgba(0,0,0,0.5)), url("/contacto.jpg")',
+            backgroundSize: "cover",
+            backgroundPosition: "center",
+            display: "flex",
+            flexDirection: "column",
+            justifyContent: "center",
+            alignItems: "center",
+            textAlign: "center",
+            color: "#fff",
+            p: 2,
           }}
         >
-          <Box
-            sx={{
-              position: "absolute",
-              inset: 0,
-              backgroundColor: "rgba(0,0,0,0.5)",
-              zIndex: 1,
-            }}
-          />
-          <Box sx={{ zIndex: 2 }}>
-            <Typography variant="h4" fontWeight="bold" gutterBottom>
-              ¿Tienes preguntas?
-            </Typography>
-            <Typography variant="body1" mb={2}>
-              Estamos aquí para ayudarte. Escríbenos y resolveremos tus dudas.
-            </Typography>
-            <Button
-              variant="outlined"
-              color="inherit"
-              onClick={() => setOpenContacto(true)}
-            >
-              Contactar
-            </Button>
-          </Box>
+          <Typography variant="h4" fontWeight="bold" gutterBottom>
+            ¿Tienes preguntas?
+          </Typography>
+          <Typography variant="body1" mb={2}>
+            Estamos aquí para ayudarte. Escríbenos y resolveremos tus dudas.
+          </Typography>
+          <Button
+            variant="outlined"
+            color="inherit"
+            onClick={() => setOpenContacto(true)}
+          >
+            Contactar
+          </Button>
         </Box>
       </Box>
 
@@ -147,27 +138,7 @@ const HeroSplit = () => {
       >
         <Fade in={openCotizar}>
           <Paper sx={styleModal}>
-            <Typography variant="h6" gutterBottom>
-              Cotización
-            </Typography>
-            <TextField label="Nombre completo" fullWidth margin="normal" />
-            <TextField label="Teléfono" fullWidth margin="normal" />
-            <TextField label="Email" fullWidth margin="normal" />
-            <TextField label="Empresa" fullWidth margin="normal" />
-
-            {/* Nueva casilla única de descripción */}
-            <TextField
-              label="Descripción del requerimiento"
-              fullWidth
-              multiline
-              rows={4}
-              margin="normal"
-              placeholder="Ej: Necesito 50 bolsas de cemento y 10 mallas ACMA 15-15-6..."
-            />
-
-            <Button variant="contained" fullWidth sx={{ mt: 2 }}>
-              Enviar
-            </Button>
+            <CotizaForm />
           </Paper>
         </Fade>
       </Modal>
@@ -182,42 +153,10 @@ const HeroSplit = () => {
       >
         <Fade in={openContacto}>
           <Paper sx={styleModal}>
-            <Typography variant="h6" gutterBottom>
-              Contacto
-            </Typography>
-            <TextField label="Nombre completo" fullWidth margin="normal" />
-            <TextField label="Email" fullWidth margin="normal" />
-            <TextField label="Teléfono" fullWidth margin="normal" />
-
-            <FormControl fullWidth margin="normal">
-              <InputLabel id="asunto-label">Asunto</InputLabel>
-              <Select
-                labelId="asunto-label"
-                value={asunto}
-                label="Asunto"
-                onChange={(e) => setAsunto(e.target.value)}
-              >
-                <MenuItem value="Soporte">Soporte</MenuItem>
-                <MenuItem value="Ventas">Ventas</MenuItem>
-                <MenuItem value="Otro">Otro</MenuItem>
-              </Select>
-            </FormControl>
-
-            <TextField
-              label="Mensaje"
-              fullWidth
-              multiline
-              rows={3}
-              margin="normal"
-            />
-            <Button variant="contained" fullWidth sx={{ mt: 2 }}>
-              Enviar
-            </Button>
+            <ContactForm />
           </Paper>
         </Fade>
       </Modal>
     </>
   );
-};
-
-export default HeroSplit;
+}

@@ -1,3 +1,5 @@
+// Footer.jsx
+
 import React from "react";
 import {
   Box,
@@ -8,6 +10,7 @@ import {
   IconButton,
   Stack,
   Button,
+  useTheme,
 } from "@mui/material";
 import FacebookIcon from "@mui/icons-material/Facebook";
 import InstagramIcon from "@mui/icons-material/Instagram";
@@ -15,20 +18,29 @@ import TwitterIcon from "@mui/icons-material/Twitter";
 import EmailIcon from "@mui/icons-material/Email";
 import PhoneIcon from "@mui/icons-material/Phone";
 
-import LogoutIcon from "@mui/icons-material/Logout";
+// ¡Único cambio aquí: Importar LoginIcon y asegurar que LogoutIcon no se use!
+import LoginIcon from "@mui/icons-material/Login";
+// Si LogoutIcon ya no se usa en este archivo, puedes eliminar la siguiente línea para limpiar:
+// import LogoutIcon from "@mui/icons-material/Logout";
 
-import logoDimade from "/imagenes/logo_dimade_nav2.png"; // Asegúrate de que la ruta sea correcta
 import { Link as RouterLink } from "react-router-dom";
 
+// Asegúrate de que esta ruta sea la correcta para tu logo
+import logoDimade from "/imagenes/logo_dimade_nav2.png";
+
 const Footer = () => {
+  const theme = useTheme();
+
   return (
     <Box
       component="footer"
       sx={{
         width: "100%",
-        background: "linear-gradient(0deg, #10567E 10%, #30749C 60%)",
-        color: "#ffffff",
-        pt: 4,
+        // Usar la variable de tema correcta para el fondo del footer. Asumo que está configurada correctamente en tu tema.
+        background: `linear-gradient(180deg, ${theme.palette.navFooterBgGradientStart} 10%, ${theme.palette.navFooterBgGradientEnd} 120%)`,
+        // Usar la variable de tema correcta para el color del texto del footer. Asumo que está configurada correctamente en tu tema.
+        color: theme.palette.navFooterText,
+        pt: 6,
         pb: 3,
         mt: "auto",
         textAlign: "start",
@@ -48,7 +60,8 @@ const Footer = () => {
                 borderRadius: 4,
                 ":hover": {
                   cursor: "pointer",
-                  borderColor: "#000000",
+                  // El borde en hover debe ser el color del texto del footer (blanco)
+                  borderColor: theme.palette.navFooterText,
                   borderWidth: 2,
                   transition: "0.3s",
                   transform: "scale(1.04)",
@@ -104,7 +117,7 @@ const Footer = () => {
                     <Link
                       component={RouterLink}
                       to="/"
-                      color="inherit"
+                      color="inherit" // Hereda el color del texto del footer (blanco)
                       underline="hover"
                     >
                       Inicio
@@ -175,28 +188,48 @@ const Footer = () => {
         </Grid>
 
         {/* Línea divisoria y derechos */}
-
-        <Box mt={4} borderTop={1} borderColor="#333" pt={2}>
-          <Typography variant="body2" align="center" color="white">
+        <Box
+          mt={4}
+          borderTop={1}
+          borderColor={theme.palette.navFooterText}
+          pt={2}
+        >
+          {/* El borderColor de la línea divisoria también usa el color del texto del footer (blanco) */}
+          <Typography variant="body2" align="center" color="inherit">
             © {new Date().getFullYear()} dimade.cl – Todos los derechos
             reservados.
           </Typography>
 
-          {/* Botón salir abajo a la derecha */}
+          {/* Botón de ENTRADA AL BACKOFFICE a la derecha abajo del footer */}
           <Box
             sx={{
-              position: "absolute",
-              bottom: 0,
-              right: 16,
+              position: "absolute", // Posiciona el botón respecto al footer
+              bottom: 40, // Alineado a la parte inferior del footer
+              right: 20, // Alineado a la derecha del footer
+              transform: "translateY(50%)", // Mueve el botón la mitad de su altura hacia abajo para que quede "a caballo" entre el footer y el espacio de abajo
+              zIndex: 1, // Asegura que esté por encima del contenido del footer si es necesario
             }}
           >
             <Button
               variant="contained"
-              color="background"
-              startIcon={<LogoutIcon />}
+              color="primary" // Asumo que el botón usará el color 'primary' (naranja) de tu tema
+              startIcon={<LoginIcon />} // ¡ICONO CAMBIADO AQUÍ a LoginIcon!
               component={RouterLink}
               to="/login"
-              sx={{ mt: 2 }}
+              sx={{
+                mt: 2, // Margen superior si lo necesitas, aunque translateY podría manejar el espacio
+                borderRadius: "50%",
+                minWidth: 0,
+                width: 56, // Ancho fijo para que sea circular
+                height: 56, // Alto fijo para que sea circular
+                boxShadow: 3,
+                display: "flex", // Para centrar el ícono
+                justifyContent: "center", // Centra horizontalmente el ícono
+                alignItems: "center", // Centra verticalmente el ícono
+                "&:hover": {
+                  backgroundColor: theme.palette.primary.dark, // Efecto hover usando el dark de primary
+                },
+              }}
             ></Button>
           </Box>
         </Box>
@@ -205,4 +238,4 @@ const Footer = () => {
   );
 };
 
-export default Footer;
+export default Footer;

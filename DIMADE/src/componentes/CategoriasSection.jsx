@@ -1,8 +1,4 @@
-<<<<<<< HEAD
-import React, { useState, useEffect } from "react";
-=======
 import React, { useState } from "react";
->>>>>>> origin/main
 import {
   Box,
   Typography,
@@ -11,19 +7,16 @@ import {
   ListItemText,
   Divider,
   CardMedia,
-<<<<<<< HEAD
-  CardContent,
-  Pagination,
-  Fade,
-} from "@mui/material";
-import img1 from "DIMADE/public/imagenes/img1.jpg"; // Ajusta la ruta si es necesario
-=======
-  Button,
   Paper,
+  Button,
+  useTheme,
   useMediaQuery,
 } from "@mui/material";
-import { useTheme } from "@mui/material/styles";
->>>>>>> origin/main
+
+import Modal from "@mui/material/Modal";
+import Fade from "@mui/material/Fade";
+import Backdrop from "@mui/material/Backdrop";
+import CotizaForm from "../componentes/CotizaForm.jsx";
 
 const categorias = [
   {
@@ -49,14 +42,12 @@ const categorias = [
   {
     titulo: "Maderas y Tableros",
     descripcion: "Variedad en maderas para estructuras y terminaciones.",
-    imagen: "/madera.jpg",
+    gambar: "/madera.jpg", // Corrección: 'gambar' a 'imagen'
   },
   {
     titulo: "Pisos y Revestimientos",
     descripcion: "Revestimientos que transforman tus espacios.",
     imagen: "/pisos.jpg",
-<<<<<<< HEAD
-=======
   },
   {
     titulo: "Electricidad e Iluminación",
@@ -113,141 +104,39 @@ const categorias = [
     descripcion:
       "Disfruta del exterior con productos ideales para patios, terrazas y jardines.",
     imagen: "/airelibre.jpg",
->>>>>>> origin/main
   },
-  {
-    titulo: "Electricidad e Iluminación",
-    descripcion: "Soluciones eléctricas seguras y modernas.",
-    imagen: "/electricidad.jpg",
-  },
-  {
-    titulo: "Puertas y Ventanas",
-    descripcion: "Accesos y terminaciones que combinan seguridad y diseño.",
-    imagen: "/puertasyventanas.jpg",
-  },
-  {
-    titulo: "Electrohogar",
-    descripcion: "Tecnología eficiente para facilitar tu vida en el hogar.",
-    imagen: "/electrohogar.jpg",
-  },
-  {
-    titulo: "Aseo",
-    descripcion: "Productos que garantizan limpieza, frescura y bienestar en cada rincón.",
-    imagen: "/aseo.jpg",
-  },
-  {
-    titulo: "Baño y Cocina",
-    descripcion: "Funcionalidad y estilo para los espacios más usados de tu hogar.",
-    imagen: "/bañoycocina.jpg",
-  },
-  {
-    titulo: "Gasfitería",
-    descripcion: "Soluciones seguras y duraderas para tu red de agua y gas.",
-    imagen: "/gasfiteria.jpg",
-  },  {
-    titulo: "Muebles y Organización",
-    descripcion: "Diseño inteligente para ordenar, decorar y optimizar cada espacio.",
-    imagen: "/muebles.jpg",
-  },
-  {
-    titulo: "Decoración y Menaje",
-    descripcion: "Detalles que transforman tu casa en un hogar acogedor y con estilo.",
-    imagen: "/decoracion.jpg",
-  },
-  {
-    titulo: "Climatización",
-    descripcion: "Confort en cualquier estación con sistemas eficientes de temperatura.",
-    imagen: "/climatizacion.jpg",
-  },
-  {
-    titulo: "Aire Libre",
-    descripcion: "Disfruta del exterior con productos ideales para patios, terrazas y jardines.",
-    imagen:"/airelibre.jpg",
-  }
 ];
 
-
 const CategoriasSection = () => {
-<<<<<<< HEAD
-  const itemsPorPagina = 4;
-  const [paginaActual, setPaginaActual] = useState(1);
-  const [animar, setAnimar] = useState(true);
-
-  const totalPaginas = Math.ceil(categorias.length / itemsPorPagina);
-
-  const handleCambioPagina = (event, nuevaPagina) => {
-    setAnimar(false);
-    setTimeout(() => {
-      setPaginaActual(nuevaPagina);
-      setAnimar(true);
-    }, 250); // Tiempo de fade out
-  };
-
-  const categoriasMostradas = categorias.slice(
-    (paginaActual - 1) * itemsPorPagina,
-    paginaActual * itemsPorPagina
-  );
-
-  return (
-    <Box sx={{ px: 4, py: 6, backgroundColor: "#f9f9f9" }}>
-  
-
-      {/* Contenedor animado */}
-      <Fade in={animar} timeout={300}>
-        <Grid container spacing={4} justifyContent="center">
-          {categoriasMostradas.map((cat, index) => (
-            <Grid item xs={12} sm={6} md={3} key={index}>
-              <Card
-                elevation={0}
-                sx={{
-                  width: "40vw",
-                  transition: "transform 0.3s ease",
-                  "&:hover": {
-                    transform: "scale(1.05)",
-                  },
-                }}
-              >
-                <CardMedia
-                  component="img"
-                  height="180"
-                  image={cat.imagen}
-                  alt={cat.titulo}
-                />
-                <CardContent>
-                  <Typography variant="h6" fontWeight="bold" gutterBottom>
-                    {cat.titulo}
-                  </Typography>
-                  <Typography variant="body2" color="text.secondary">
-                    {cat.descripcion}
-                  </Typography>
-                </CardContent>
-              </Card>
-            </Grid>
-          ))}
-        </Grid>
-      </Fade>
-
-      {/* Paginación */}
-      <Box mt={6} display="flex" justifyContent="center">
-        <Pagination
-          count={totalPaginas}
-          page={paginaActual}
-          onChange={handleCambioPagina}
-          color="primary"
-        />
-      </Box>
-=======
   const [categoriaSeleccionada, setCategoriaSeleccionada] = useState(
     categorias[0]
   );
+
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down("md"));
+  const [openCotizar, setOpenCotizar] = useState(false);
 
-  const renderMenu = (categoriasMenu, align = "left") => (
+  // Estilos del modal que ahora usarán el tema
+  const styleModal = {
+    position: "absolute",
+    top: "50%",
+    left: "50%",
+    transform: "translate(-50%, -50%)",
+    width: 500,
+    p: 4,
+    borderRadius: 3,
+    boxShadow: 24,
+    bgcolor: theme.palette.modalBg, // Usa el color del modal del tema
+    color: theme.palette.text.primary, // El texto del modal según el tema
+    maxHeight: "90vh",
+    overflowY: "auto",
+  };
+
+  const renderMenu = (categoriasMenu) => (
     <Box
       sx={{
         width: isMobile ? "100%" : "20%",
-        backgroundColor: "#10567E",
+        backgroundColor: theme.palette.categoryMenuBg, // Usa el color de fondo del menú de categorías del tema
         display: "flex",
         flexDirection: "column",
         overflow: "hidden",
@@ -256,12 +145,13 @@ const CategoriasSection = () => {
     >
       <Typography
         variant="h6"
+        id="productos"
         sx={{
-          color: "#fff",
+          color: theme.palette.categoryMenuText, // Usa el color de texto del menú de categorías
           px: 2,
           py: 2,
           fontWeight: "bold",
-          borderBottom: "1px solid rgba(255,255,255,0.2)",
+          borderBottom: `1px solid ${theme.palette.categoryMenuDivider}`, // Usa el color del divisor
         }}
       >
         Categorías
@@ -280,17 +170,22 @@ const CategoriasSection = () => {
                 onClick={() => setCategoriaSeleccionada(cat)}
                 sx={{
                   py: 0,
-                  backgroundColor: selected ? "#30749C" : "transparent",
-                  color: selected ? "#fff" : "#fff",
+                  backgroundColor: selected
+                    ? theme.palette.categoryMenuSelectedBg // Color de fondo de categoría seleccionada
+                    : "transparent",
+                  color: theme.palette.categoryMenuText, // Color del texto de las categorías (siempre blanco)
                   fontWeight: selected ? "bold" : "normal",
                   "&:hover": {
-                    backgroundColor: selected ? "#30749C" : "#30749C",
+                    backgroundColor: theme.palette.categoryMenuHoverBg, // Color de fondo en hover
                   },
                 }}
               >
                 <ListItemText primary={cat.titulo} />
               </ListItemButton>
-              <Divider sx={{ borderColor: "rgba(255,255,255,0.2)" }} />
+              <Divider
+                sx={{ borderColor: theme.palette.categoryMenuDivider }}
+              />{" "}
+              {/* Usa el color del divisor */}
             </React.Fragment>
           );
         })}
@@ -299,81 +194,114 @@ const CategoriasSection = () => {
   );
 
   return (
-    <Box
-      sx={{
-        px: 2,
-        py: 4,
-        backgroundColor: "#fff",
-
-        display: "flex",
-        justifyContent: "center",
-      }}
-    >
-      <Paper
-        elevation={0}
+    <>
+      <Box
         sx={{
-          width: "100%",
-          maxWidth: "1400px",
+          px: 2,
+          py: 4,
+          backgroundColor: theme.palette.background.default, // Fondo exterior de la sección (el color por defecto del tema)
           display: "flex",
-
-          flexDirection: isMobile ? "column" : "row",
-
-          overflow: "hidden",
+          justifyContent: "center",
         }}
       >
-        {renderMenu(categorias, "left")}
-
-        <Box
+        <Paper
+          elevation={0}
           sx={{
-            flexGrow: 1,
-            backgroundColor: "#fff",
-            p: 4,
+            width: "100%",
+            maxWidth: "1400px",
             display: "flex",
             flexDirection: isMobile ? "column" : "row",
-            gap: 4,
-            justifyContent: "space-between",
+            overflow: "hidden",
           }}
         >
+          {renderMenu(categorias)}
+
           <Box
             sx={{
-              flex: 1,
+              flexGrow: 1,
+              backgroundColor: theme.palette.categoryContentBg, // Fondo del contenido principal de la categoría
+              p: 4,
               display: "flex",
-              flexDirection: "column",
+              flexDirection: isMobile ? "column" : "row",
+              gap: 4,
               justifyContent: "space-between",
             }}
           >
-            <Box>
-              <Typography variant="h4" fontWeight="bold" gutterBottom>
-                {categoriaSeleccionada.titulo}
-              </Typography>
-              <Typography variant="body1" mb={2}>
-                {categoriaSeleccionada.descripcion}
-              </Typography>
-              <Typography variant="body2" color="text.secondary">
-                Productos destacados próximamente...
-              </Typography>
+            <Box
+              sx={{
+                flex: 1,
+                display: "flex",
+                flexDirection: "column",
+                justifyContent: "space-between",
+              }}
+            >
+              <Box>
+                <Typography
+                  variant="h4"
+                  fontWeight="bold"
+                  gutterBottom
+                  color={theme.palette.text.primary}
+                >
+                  {categoriaSeleccionada.titulo}
+                </Typography>
+                <Typography
+                  variant="body1"
+                  mb={2}
+                  color={theme.palette.text.primary}
+                >
+                  {categoriaSeleccionada.descripcion}
+                </Typography>
+                <Typography
+                  variant="body2"
+                  color={theme.palette.text.secondary}
+                >
+                  Productos destacados próximamente...
+                </Typography>
+              </Box>
+              <Box textAlign="right" mt={4}>
+                <Button
+                  variant="contained"
+                  size="large"
+                  color="primary" // El botón "Cotizar ahora" usa el color primary del tema
+                  onClick={() => setOpenCotizar(true)}
+                >
+                  Cotizar ahora
+                </Button>
+              </Box>
             </Box>
-            <Box textAlign="right" mt={4}>
-              <Button variant="contained" size="large" color="primary">
-                Cotizar ahora
-              </Button>
-            </Box>
+            {/* Solo se muestra la imagen si no es móvil */}
+            {!isMobile && (
+              <CardMedia
+                component="img"
+                image={categoriaSeleccionada.imagen}
+                alt={categoriaSeleccionada.titulo}
+                sx={{
+                  width: "45%",
+                  objectFit: "cover",
+                  maxHeight: 600,
+                  maxWidth: 400,
+                }}
+              />
+            )}
           </Box>
-        </Box>
-        <CardMedia
-          component="img"
-          image={categoriaSeleccionada.imagen}
-          alt={categoriaSeleccionada.titulo}
-          sx={{
-            width: isMobile ? "100%" : "45%",
-            objectFit: "cover",
-            maxHeight: 600,
-            maxWidth: 400,
-          }}
-        />
-      </Paper>
->>>>>>> origin/main
-    </Box>
+        </Paper>
+      </Box>
+
+      {/* Modal Cotizar */}
+      <Modal
+        open={openCotizar}
+        onClose={() => setOpenCotizar(false)}
+        closeAfterTransition
+        BackdropComponent={Backdrop}
+        BackdropProps={{ timeout: 400 }}
+      >
+        <Fade in={openCotizar}>
+          <Paper sx={styleModal}>
+            <CotizaForm />
+          </Paper>
+        </Fade>
+      </Modal>
+    </>
   );
 };
 

@@ -2,15 +2,35 @@ import Slider from "react-slick";
 import { Box, Typography, Card, CardMedia, CardContent } from "@mui/material";
 import "slick-carousel/slick/slick.css";
 import "slick-carousel/slick/slick-theme.css";
-import { ArrowBackIos, ArrowForwardIos } from "@mui/icons-material";
+import {
+  ArrowBackIos,
+  ArrowForwardIos,
+  Description,
+} from "@mui/icons-material";
 import IconButton from "@mui/material/IconButton";
 import { Link } from "react-router-dom";
 
 const slides = [
-  { title: "", url: "/inicio_construccion.jpg" },
-  { title: "", url: "/inicio_pinturas.jpg" },
-  { title: "", url: "/inicio_ferreteria.jpg" },
-  { title: "", url: "/inicio_herramientas.jpg" },
+  {
+    title: "Primera imagen",
+    Description: " descripcion imagen uno",
+    url: "",
+  },
+  {
+    title: "Segunda imagen",
+    Description: "descripcion imagen dos",
+    url: "",
+  },
+  {
+    title: "Tercera imagen",
+    Description: "descripcion imagen tres",
+    url: "",
+  },
+  {
+    title: "Cuarta imagen",
+    Description: "descripcion imagen cuatro",
+    url: "",
+  },
 ];
 
 // Flecha izquierda
@@ -57,11 +77,11 @@ function NextArrow(props) {
   );
 }
 
-export default function Carousel() {
+function Carousel() {
   const settings = {
     dots: true,
     infinite: true,
-    speed: 700,
+    speed: 800,
     slidesToShow: 1,
     slidesToScroll: 1,
     autoplay: true,
@@ -72,65 +92,23 @@ export default function Carousel() {
   return (
     <Box
       sx={{
-<<<<<<< HEAD
-        width: "100%",           // 70% del ancho de la pantalla
-=======
         width: "100%",
->>>>>>> origin/main
         margin: "0 auto",
         height: "70vh",
         overflow: "auto",
         position: "relative",
-        py: 6,
-<<<<<<< HEAD
-        
-=======
->>>>>>> origin/main
       }}
     >
       <Slider {...settings}>
         {slides.map((slide, index) => (
-<<<<<<< HEAD
-          <Link to="/productos" key={index} style={{ textDecoration: "none" }} 
-          component="div">
-          <Box
-            key={index}
-            sx={{
-             
-              display: "flex",
-              alignItems: "center",
-              justifyContent: "center",
-              position: "relative",
-              mt:"4",
-              
-            }}
-          >
-            <Card sx={{ boxShadow: "none", width: "100%", height: "100%" }}>
-              <CardMedia
-                component="img"
-                image={slide.url}
-                alt={slide.title}
-                sx={{
-                 
-                  objectFit:"contain",
-                 width: "100%",
-              height: "60vh",
-                 
-                }}
-              />
-            </Card>
-            <Typography
-              variant="h4"
-=======
           <Link
-            to="/productos"
+            // to="/productos"
             key={index}
             style={{ textDecoration: "none" }}
             component="div"
           >
             <Box
               key={index}
->>>>>>> origin/main
               sx={{
                 display: "flex",
                 alignItems: "center",
@@ -138,11 +116,6 @@ export default function Carousel() {
                 position: "relative",
               }}
             >
-<<<<<<< HEAD
-              {slide.title}
-            </Typography>
-          </Box>
-=======
               <Card sx={{ boxShadow: "none", width: "100%", height: "100%" }}>
                 <CardMedia
                   component="img"
@@ -155,22 +128,47 @@ export default function Carousel() {
                   }}
                 />
               </Card>
+              {/* Titulo de la imagen */}
               <Typography
                 variant="h4"
                 sx={{
                   position: "absolute",
-                  bottom: 30,
+                  top: "20%", // Distancia desde la parte superior
+                  left: "5%", // Distancia desde la parte izquierda
                   color: "#fff",
                   textShadow: "0 0 6px black",
+                  display: "flex",
+                  // alignItems: "center", // No es necesario si el texto es una sola línea y usas top/left
+                  justifyContent: "flex-start",
+                  maxWidth: "90%", // Para que el texto no se desborde si es muy largo
+                  textAlign: "left", // Asegura que el texto en sí se alinee a la izquierda
                 }}
               >
                 {slide.title}
               </Typography>
+              {/* Descripción de la imagen */}
+              <Typography
+                variant="body1"
+                sx={{
+                  position: "absolute",
+                  top: "30%", // Distancia desde la parte superior (ajustado para que esté debajo del título)
+                  left: "5%", // Distancia desde la parte izquierda
+                  color: "#fff",
+                  textShadow: "0 0 6px black",
+                  display: "flex",
+                  // alignItems: "center", // No es necesario si el texto es una sola línea y usas top/left
+                  justifyContent: "flex-start",
+                  maxWidth: "90%", // Para que el texto no se desborde si es muy largo
+                  textAlign: "left", // Asegura que el texto en sí se alinee a la izquierda
+                }}
+              >
+                {slide.Description}
+              </Typography>
             </Box>
->>>>>>> origin/main
           </Link>
         ))}
       </Slider>
     </Box>
   );
 }
+export default Carousel;

@@ -66,4 +66,4 @@ const ModalCubitaje = () => {
   );
 };
 
-export default ModalCubitaje;
+export default ModalCubitaje;

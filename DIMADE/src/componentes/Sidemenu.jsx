@@ -1,4 +1,3 @@
-import React from "react";
 import {
   Drawer,
   List,
@@ -19,12 +18,12 @@ const menuItems = [
   { key: "inicio", label: "Inicio", icon: <DashboardIcon /> },
   {
     key: "ordenes1",
-    label: "Órdenes de compra(Clientes)",
+    label: "Órdenes Clientes",
     icon: <ShoppingCartIcon />,
   },
   {
     key: "ordenes2",
-    label: "Órdenes de compra(Proveedores)",
+    label: "Órdenes Proveedores",
     icon: <ShoppingCartIcon />,
   },
   { key: "clientes", label: "Clientes", icon: <PeopleIcon /> },
@@ -44,15 +43,18 @@ const SideMenu = ({ onSelect, selected }) => {
         [`& .MuiDrawer-paper`]: {
           width: drawerWidth,
           boxSizing: "border-box",
-          background: "linear-gradient(to bottom, #1976d2, #1565c0)",
+          background: "linear-gradient(180deg, #10567E, #30749C)",
           color: "#fff",
         },
       }}
     >
       <Box sx={{ px: 2, py: 3 }}>
-        <Typography variant="h6" fontWeight="bold">
-          Panel Admin
-        </Typography>
+        <box
+          variant="img"
+          img
+          src="public/imagenes/banner_nosotros.jpg"
+          alt="Logo de DIMADE"
+        />
       </Box>
       <List>
         {menuItems.map((item) => (

@@ -8,32 +8,24 @@ import ProveedorSlider from "../../componentes/Slider.jsx";
 import MiniBanner from "../../componentes/MiniBanner.jsx";
 import CategoryCard from "../../componentes/CustomCard.jsx";
 import { Grid, Box, Typography } from "@mui/material";
-// import img1 from "../../../public/imagenes/img1.jpg"; // Asegúrate de que la ruta sea correcta
 import Carousel from "../../componentes/carusel.jsx";
 import CategoriasSection from "../../componentes/CategoriasSection.jsx";
 import MiniBannerNosotros from "../../componentes/MiniBannerNosotros.jsx";
 import HeroSplit from "../../componentes/HeroSplit.jsx";
-import ContactoSection from "../../componentes/ContactSection.jsx";
-
-// const categorias = [
-//   { titulo: "Construccion", imagen: img1 },
-//   { titulo: "Ferretería", imagen: img1 },
-//   { titulo: "Herramientas", imagen: img1 },
-//   { titulo: "Electricidad", imagen: img1 },
-// ];
+import BtnInicio from "../../componentes/BtnInicio.jsx";
+import WhatsAppButton from "../../componentes/BtnWhatsApp.jsx";
 
 const Home = () => {
   return (
     <>
       <Navbar />
       <Carousel />
-      {/* <Banner /> */}
       <CategoriasSection />
       <HeroSplit />
       <ProveedorSlider />
-
       <MiniBannerNosotros />
-
+      <BtnInicio />
+      <WhatsAppButton />
       <Footer />
     </>
   );
