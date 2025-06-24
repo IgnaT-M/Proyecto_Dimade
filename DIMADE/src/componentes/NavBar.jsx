@@ -131,6 +131,7 @@ const Navbar = () => {
           />
         </Box>
 
+
         <IconButton
           color="inherit" // Hereda el color definido en MuiIconButton en el tema (que es navFooterText)
           aria-label="open drawer"
@@ -183,6 +184,7 @@ const Navbar = () => {
             </Button>
           ))}
           <ThemeToggleButton />
+
         </Stack>
       </Toolbar>
 

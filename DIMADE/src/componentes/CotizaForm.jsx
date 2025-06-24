@@ -8,6 +8,13 @@ import {
   Alert,
   MenuItem,
 } from "@mui/material";
+
+import BadgeIcon from "@mui/icons-material/Badge";
+import PersonIcon from "@mui/icons-material/Person";
+import EmailIcon from "@mui/icons-material/Email";
+import PhoneIcon from "@mui/icons-material/Phone";
+import ListAltIcon from "@mui/icons-material/ListAlt";
+
 import ModalCubitaje from "./ModalCubicador";
 
 const CotizaForm = () => {
@@ -31,11 +38,13 @@ const CotizaForm = () => {
     setFormData((prev) => ({ ...prev, [e.target.name]: e.target.value }));
   };
 
+
   const handleBlur = (e) => {
     setTouched((prev) => ({ ...prev, [e.target.name]: true }));
   };
   const isEmpty = (field) =>
     (touched[field] || submitAttempted) && !formData[field];
+
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -69,7 +78,35 @@ const CotizaForm = () => {
         }
       );
 
+
       if (!response.ok) throw new Error("Error al enviar la solicitud");
+
+
+    const payload = {
+      rutSolicitante: formData.rut,
+      nombreSolicitante: formData.nombre,
+      correo: formData.email,
+      telefono: formData.telefono,
+      fechaSolicitud: new Date(),
+      productosSolicitados: [formData.tipoProducto],
+      estado: "Pendiente",
+      detalle: formData.mensaje,
+    };
+
+    try {
+      const response = await fetch(
+        "http://localhost:8080/api/solicitudes-cotizacion",
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify(payload),
+        }
+      );
+
+      if (!response.ok) throw new Error("Error al enviar la solicitud");
+
 
       setOpen(true);
       setFormData({
@@ -94,6 +131,7 @@ const CotizaForm = () => {
   ];
 
   return (
+
     <Box sx={{ maxWidth: 600, mx: "auto", py: 2 }}>
       <Typography variant="h4" gutterBottom>
         Solicita tu cotización
@@ -206,6 +244,7 @@ const CotizaForm = () => {
           Enviar solicitud
         </Button>
         <ModalCubitaje />
+
       </Box>
 
       <Snackbar

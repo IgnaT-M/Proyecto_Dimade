@@ -13,6 +13,7 @@ const ContactForm = () => {
   const [formData, setFormData] = useState({
     nombre: "",
     correo: "",
+
     telefono: "",
     rut: "",
     asunto: "",
@@ -21,12 +22,15 @@ const ContactForm = () => {
 
   const [open, setOpen] = useState(false);
   const [error, setError] = useState(false);
+
   const [touched, setTouched] = useState({});
   const [submitAttempted, setSubmitAttempted] = useState(false);
+
 
   const handleChange = (e) => {
     setFormData((prev) => ({ ...prev, [e.target.name]: e.target.value }));
   };
+
 
   const handleBlur = (e) => {
     setTouched((prev) => ({ ...prev, [e.target.name]: true }));
@@ -44,13 +48,27 @@ const ContactForm = () => {
     );
     if (camposVacios.length > 0) return;
 
+
+    const payload = {
+      nombre: formData.nombre,
+      correo: formData.correo,
+      telefono: formData.telefono,
+      rut: formData.rut,
+      asunto: formData.asunto,
+      mensaje: formData.mensaje,
+    };
+
+
     try {
       const response = await fetch(
         "http://localhost:8080/api/solicitudes-contacto",
         {
           method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify(formData),
+
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify(payload),
         }
       );
 
@@ -67,6 +85,7 @@ const ContactForm = () => {
       });
       setTouched({});
       setSubmitAttempted(false);
+
     } catch (err) {
       console.error(err);
       setError(true);
@@ -82,6 +101,7 @@ const ContactForm = () => {
   ];
 
   return (
+
     <Box sx={{ maxWidth: 600, mx: "auto", py: 2 }}>
       <Typography variant="h4" gutterBottom>
         Déjanos tu mensaje
@@ -187,6 +207,7 @@ const ContactForm = () => {
         >
           Enviar
         </Button>
+
       </Box>
 
       <Snackbar
@@ -218,7 +239,9 @@ const ContactForm = () => {
           Error al enviar el mensaje.
         </Alert>
       </Snackbar>
+
     </Box>
+
   );
 };
 
