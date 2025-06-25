@@ -6,6 +6,7 @@ import CotizaForm from "../../componentes/CotizaForm.jsx";
 import Cubicador from "../../componentes/Cubicador.jsx";
 import Header from "../../componentes/Header.jsx";
 import banner_cotizar from "/public/banner_cotizar.jpg";
+import BtnInicio from "../../componentes/BtnInicio.jsx";
 import {
   Box,
   Grid,
@@ -58,6 +59,7 @@ const Cotizar = () => {
         </Paper>
       </Box>
 
+      <BtnInicio />
       <Footer />
     </>
   );

@@ -1,7 +1,7 @@
 import React from "react";
 import Navbar from "../../componentes/NavBar.jsx";
 import Footer from "../../componentes/Footer.jsx";
-import Banner from "../../componentes/Banner.jsx";
+
 import { Box, Container, Grid, Typography, Stack, Paper } from "@mui/material";
 import Header from "../../componentes/Header.jsx";
 import bannerNosotros from "/public/banner_nosotros.jpg";

@@ -2,15 +2,35 @@ import Slider from "react-slick";
 import { Box, Typography, Card, CardMedia, CardContent } from "@mui/material";
 import "slick-carousel/slick/slick.css";
 import "slick-carousel/slick/slick-theme.css";
-import { ArrowBackIos, ArrowForwardIos } from "@mui/icons-material";
+import {
+  ArrowBackIos,
+  ArrowForwardIos,
+  Description,
+} from "@mui/icons-material";
 import IconButton from "@mui/material/IconButton";
 import { Link } from "react-router-dom";
 
 const slides = [
-  { title: "", url: "/inicio_construccion.jpg" },
-  { title: "", url: "/inicio_pinturas.jpg" },
-  { title: "", url: "/inicio_ferreteria.jpg" },
-  { title: "", url: "/inicio_herramientas.jpg" },
+  {
+    title: "Primera imagen",
+    Description: " descripcion imagen uno",
+    url: "",
+  },
+  {
+    title: "Segunda imagen",
+    Description: "descripcion imagen dos",
+    url: "",
+  },
+  {
+    title: "Tercera imagen",
+    Description: "descripcion imagen tres",
+    url: "",
+  },
+  {
+    title: "Cuarta imagen",
+    Description: "descripcion imagen cuatro",
+    url: "",
+  },
 ];
 
 // Flecha izquierda
@@ -57,11 +77,11 @@ function NextArrow(props) {
   );
 }
 
-export default function Carousel() {
+function Carousel() {
   const settings = {
     dots: true,
     infinite: true,
-    speed: 700,
+    speed: 800,
     slidesToShow: 1,
     slidesToScroll: 1,
     autoplay: true,
@@ -82,7 +102,7 @@ export default function Carousel() {
       <Slider {...settings}>
         {slides.map((slide, index) => (
           <Link
-            to="/productos"
+            // to="/productos"
             key={index}
             style={{ textDecoration: "none" }}
             component="div"
@@ -109,21 +129,42 @@ export default function Carousel() {
                   }}
                 />
               </Card>
+              {/* Titulo de la imagen */}
               <Typography
                 variant="h4"
                 sx={{
                   position: "absolute",
-                  bottom: 20,
-                  left: 20,
-                  color: "white",
-                  textShadow: "2px 2px 4px rgba(0, 0, 0, 0.7)",
-                  backgroundColor: "rgba(29, 109, 159, 0.5)",
-                  padding: "10px",
-                  borderRadius: "8px",
+                  top: "20%", // Distancia desde la parte superior
+                  left: "5%", // Distancia desde la parte izquierda
+                  color: "#fff",
+                  textShadow: "0 0 6px black",
+                  display: "flex",
+                  // alignItems: "center", // No es necesario si el texto es una sola línea y usas top/left
+                  justifyContent: "flex-start",
+                  maxWidth: "90%", // Para que el texto no se desborde si es muy largo
+                  textAlign: "left", // Asegura que el texto en sí se alinee a la izquierda
                 }}
               >
                 En dimade tenemos todo para tu hogar y tu negocio
                 {slide.title}
+              </Typography>
+              {/* Descripción de la imagen */}
+              <Typography
+                variant="body1"
+                sx={{
+                  position: "absolute",
+                  top: "30%", // Distancia desde la parte superior (ajustado para que esté debajo del título)
+                  left: "5%", // Distancia desde la parte izquierda
+                  color: "#fff",
+                  textShadow: "0 0 6px black",
+                  display: "flex",
+                  // alignItems: "center", // No es necesario si el texto es una sola línea y usas top/left
+                  justifyContent: "flex-start",
+                  maxWidth: "90%", // Para que el texto no se desborde si es muy largo
+                  textAlign: "left", // Asegura que el texto en sí se alinee a la izquierda
+                }}
+              >
+                {slide.Description}
               </Typography>
             </Box>
           </Link>
@@ -132,3 +173,4 @@ export default function Carousel() {
     </Box>
   );
 }
+export default Carousel;

@@ -4,26 +4,16 @@ import {
   TextField,
   Button,
   Typography,
-  Grid,
-  Paper,
   Snackbar,
   Alert,
   MenuItem,
-  InputAdornment,
 } from "@mui/material";
-import EmailIcon from "@mui/icons-material/Email";
-import PersonIcon from "@mui/icons-material/Person";
-import MessageIcon from "@mui/icons-material/Message";
-import HomeIcon from "@mui/icons-material/Home";
-import PhoneIcon from "@mui/icons-material/Phone";
-import BadgeIcon from "@mui/icons-material/Badge";
-import SubjectIcon from "@mui/icons-material/Subject";
 
 const ContactForm = () => {
   const [formData, setFormData] = useState({
     nombre: "",
-    email: "",
-    direccion: "",
+    correo: "",
+
     telefono: "",
     rut: "",
     asunto: "",
@@ -31,24 +21,75 @@ const ContactForm = () => {
   });
 
   const [open, setOpen] = useState(false);
+  const [error, setError] = useState(false);
+
+  const [touched, setTouched] = useState({});
+  const [submitAttempted, setSubmitAttempted] = useState(false);
+
 
   const handleChange = (e) => {
     setFormData((prev) => ({ ...prev, [e.target.name]: e.target.value }));
   };
 
-  const handleSubmit = (e) => {
+
+  const handleBlur = (e) => {
+    setTouched((prev) => ({ ...prev, [e.target.name]: true }));
+  };
+
+  const isEmpty = (field) =>
+    (touched[field] || submitAttempted) && !formData[field];
+
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    console.log(formData);
-    setOpen(true);
-    setFormData({
-      nombre: "",
-      email: "",
-      direccion: "",
-      telefono: "",
-      rut: "",
-      asunto: "",
-      mensaje: "",
-    });
+    setSubmitAttempted(true);
+
+    const camposVacios = Object.keys(formData).filter(
+      (campo) => !formData[campo]
+    );
+    if (camposVacios.length > 0) return;
+
+
+    const payload = {
+      nombre: formData.nombre,
+      correo: formData.correo,
+      telefono: formData.telefono,
+      rut: formData.rut,
+      asunto: formData.asunto,
+      mensaje: formData.mensaje,
+    };
+
+
+    try {
+      const response = await fetch(
+        "http://localhost:8080/api/solicitudes-contacto",
+        {
+          method: "POST",
+
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify(payload),
+        }
+      );
+
+      if (!response.ok) throw new Error("Error en el envío");
+
+      setOpen(true);
+      setFormData({
+        nombre: "",
+        correo: "",
+        telefono: "",
+        rut: "",
+        asunto: "",
+        mensaje: "",
+      });
+      setTouched({});
+      setSubmitAttempted(false);
+
+    } catch (err) {
+      console.error(err);
+      setError(true);
+    }
   };
 
   const asuntos = [
@@ -60,178 +101,113 @@ const ContactForm = () => {
   ];
 
   return (
-    <Paper
-          elevation={0}
-            sx={{
-              
-              maxWidth: 900,
-              mx: "auto",
-              display: "flex",
-              flexDirection: "column",
-              alignItems: "left",
-            
-            }}
-          >
-            <Typography
-                      variant="h4"
-                      textAlign="left"
-                      gutterBottom
-                      sx={{ mt: 0, mb: 2 }}
-                    >
-                      Déjanos tu mensaje
-            </Typography>
+
+    <Box sx={{ maxWidth: 600, mx: "auto", py: 2 }}>
+      <Typography variant="h4" gutterBottom>
+        Déjanos tu mensaje
+      </Typography>
       <Box component="form" onSubmit={handleSubmit}>
-        <Grid container spacing={2}>
-          <Grid item xs={12} md={6} lg={6}>
-            <TextField
-              fullWidth
-              required
-              label="Nombre"
-              name="nombre"
-              value={formData.nombre}
-              onChange={handleChange}
-              InputProps={{
-                startAdornment: (
-                  <InputAdornment position="start">
-                    <PersonIcon />
-                  </InputAdornment>
-                ),
-              }}
-            />
-          </Grid>
-          <Grid Grid item xs={12} md={6} lg={6}>
-            <TextField
-              fullWidth
-              required
-              label="Correo electrónico"
-              name="email"
-              type="email"
-              value={formData.email}
-              onChange={handleChange}
-              InputProps={{
-                startAdornment: (
-                  <InputAdornment position="start">
-                    <EmailIcon />
-                  </InputAdornment>
-                ),
-              }}
-            />
-          </Grid>
-          <Grid Grid item xs={12} md={6} lg={6}>
-            <TextField
-              fullWidth
-              required
-              label="Dirección"
-              name="direccion"
-              value={formData.direccion}
-              onChange={handleChange}
-              InputProps={{
-                startAdornment: (
-                  <InputAdornment position="start">
-                    <HomeIcon />
-                  </InputAdornment>
-                ),
-              }}
-            />
-          </Grid>
-          <Grid Grid item xs={12} md={6} lg={6}>
-            <TextField
-              fullWidth
-              required
-              label="Teléfono"
-              name="telefono"
-              value={formData.telefono}
-              onChange={handleChange}
-              InputProps={{
-                startAdornment: (
-                  <InputAdornment position="start">
-                    <PhoneIcon />
-                  </InputAdornment>
-                ),
-              }}
-            />
-          </Grid>
-          <Grid Grid item xs={12} md={6} lg={6}>
-            <TextField
-              fullWidth
-              required
-              label="RUT"
-              name="rut"
-              value={formData.rut}
-              onChange={handleChange}
-              InputProps={{
-                startAdornment: (
-                  <InputAdornment position="start">
-                    <BadgeIcon />
-                  </InputAdornment>
-                ),
-              }}
-            />
-          </Grid>
-          <Grid Grid item xs={12} md={6} lg={6}>
-            <TextField
-              select
-              fullWidth
-              required
-              label="Asunto"
-              name="asunto"
-              value={formData.asunto}
-              onChange={handleChange}
-              InputProps={{
-                startAdornment: (
-                  <InputAdornment position="start">
-                    <SubjectIcon />
-                  </InputAdornment>
-                ),
-              }}
-              SelectProps={{
-                displayEmpty: true,
-                renderValue: (value) =>
-                  value ? (
-                    value
-                  ) : (
-                    <span style={{ opacity: 0.5 }}>
-                      Selecciona una opcion ...
-                    </span>
-                  ),
-              }}
-            >
-              {asuntos.map((option, index) => (
-                <MenuItem key={index} value={option}>
-                  {option}
-                </MenuItem>
-              ))}
-            </TextField>
-          </Grid>
-          <Grid Grid item xs={12} md={12} lg={12} sx={{ width: "100%" }}>
-            <TextField
-              fullWidth
-              required
-              multiline
-              rows={4}
-              label="Mensaje"
-              name="mensaje"
-              value={formData.mensaje}
-              onChange={handleChange}
-              InputProps={{
-                startAdornment: (
-                  <InputAdornment position="start">
-                    <MessageIcon sx={{ mt: 1 }} />
-                  </InputAdornment>
-                ),
-              }}
-            />
-            <Button
-              type="submit"
-              variant="contained"
-              color="primary"
-              fullWidth
-              sx={{ mt: 3, fontWeight: "bold", borderRadius: 1 }}
-            >
-              Enviar mensaje
-            </Button>
-          </Grid>
-        </Grid>
+        <TextField
+          fullWidth
+          margin="normal"
+          label="Nombre completo"
+          name="nombre"
+          value={formData.nombre}
+          onChange={handleChange}
+          onBlur={handleBlur}
+          error={isEmpty("nombre")}
+          helperText={isEmpty("nombre") ? "El Nombre es obligatorio" : ""}
+        />
+        <TextField
+          fullWidth
+          margin="normal"
+          label="RUT"
+          name="rut"
+          value={formData.rut}
+          onChange={handleChange}
+          onBlur={handleBlur}
+          error={isEmpty("rut")}
+          helperText={isEmpty("rut") ? "El RUT es obligatorio" : ""}
+        />
+        <TextField
+          fullWidth
+          margin="normal"
+          label="Correo electrónico"
+          name="correo"
+          type="email"
+          value={formData.correo}
+          onChange={handleChange}
+          onBlur={handleBlur}
+          error={isEmpty("correo")}
+          helperText={
+            isEmpty("correo") ? "Debes ingresar un correo válido" : ""
+          }
+        />
+        <TextField
+          fullWidth
+          margin="normal"
+          label="Teléfono"
+          name="telefono"
+          value={formData.telefono}
+          onChange={handleChange}
+          onBlur={handleBlur}
+          error={isEmpty("telefono")}
+          helperText={isEmpty("telefono") ? "Debes ingresar un teléfono" : ""}
+        />
+        <TextField
+          fullWidth
+          select
+          margin="normal"
+          label="Asunto"
+          name="asunto"
+          value={formData.asunto}
+          onChange={handleChange}
+          onBlur={handleBlur}
+          error={isEmpty("asunto")}
+          helperText={
+            isEmpty("asunto") ? "Selecciona una de las opciones" : ""
+          }
+        >
+          {asuntos.map((option, index) => (
+            <MenuItem key={index} value={option}>
+              {option}
+            </MenuItem>
+          ))}
+        </TextField>
+        <TextField
+          fullWidth
+          multiline
+          rows={4}
+          margin="normal"
+          label="Descripción del requerimiento"
+          name="mensaje"
+          value={formData.mensaje}
+          onChange={handleChange}
+          onBlur={handleBlur}
+          error={isEmpty("mensaje")}
+          helperText={
+            isEmpty("mensaje")
+              ? "Déjanos tus consultas, sugerencias o reclamos"
+              : ""
+          }
+          placeholder="Ej: Necesito 50 bolsas de cemento y 10 mallas ACMA 15-15-6..."
+        />
+        <Button
+          type="submit"
+          variant="contained"
+          fullWidth
+          sx={{
+            mt: 2,
+            fontWeight: "bold",
+            borderRadius: 1,
+            bgcolor: "#10567E",
+            color: "#fff",
+            "&:hover": { bgcolor: "#D95830" },
+          }}
+        >
+          Enviar
+        </Button>
+
       </Box>
 
       <Snackbar
@@ -248,8 +224,25 @@ const ContactForm = () => {
           ¡Mensaje enviado con éxito!
         </Alert>
       </Snackbar>
-    </Paper>
+
+      <Snackbar
+        open={error}
+        autoHideDuration={4000}
+        onClose={() => setError(false)}
+        anchorOrigin={{ vertical: "bottom", horizontal: "center" }}
+      >
+        <Alert
+          onClose={() => setError(false)}
+          severity="error"
+          sx={{ width: "100%" }}
+        >
+          Error al enviar el mensaje.
+        </Alert>
+      </Snackbar>
+
+    </Box>
+
   );
 };
 
-export default ContactForm;
+export default ContactForm;
