@@ -30,7 +30,7 @@ public class SolicitudContactoService {
     public SolicitudContacto guardar(SolicitudContacto contacto) {
         if (contacto.getId() == null || contacto.getId().isBlank()) {
             String idGenerado = sequenceGeneratorService.generateStringSequence("solicitudcontacto_sequence", "SCT");
-            contacto.setId(idGenerado); // Ej: "SC001"
+            contacto.setId(idGenerado); // Ej: "SCT001"
         }
         return repository.save(contacto);
     }
@@ -45,5 +45,17 @@ public class SolicitudContactoService {
 
     public List<SolicitudContacto> buscarPorFecha(Date fecha) {
         return repository.findByFechaEnvio(fecha);
+    }
+
+    // Nuevo método de actualización
+    public Optional<SolicitudContacto> actualizar(String id, SolicitudContacto nuevosDatos) {
+        return repository.findById(id).map(contactoExistente -> {
+            contactoExistente.setNombre(nuevosDatos.getNombre());
+            contactoExistente.setCorreo(nuevosDatos.getCorreo());
+            contactoExistente.setTelefono(nuevosDatos.getTelefono());
+            contactoExistente.setMensaje(nuevosDatos.getMensaje());
+            contactoExistente.setFechaEnvio(nuevosDatos.getFechaEnvio());
+            return repository.save(contactoExistente);
+        });
     }
 }

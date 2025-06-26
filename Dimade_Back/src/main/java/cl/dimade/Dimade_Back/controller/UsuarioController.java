@@ -31,13 +31,17 @@ public class UsuarioController {
     public List<Usuario> listar() {
         return usuarioService.obtenerTodos();
     }
-    @PutMapping("/{id}")
-    public ResponseEntity<Usuario> actualizar(@PathVariable String id, @RequestBody Usuario usuario) {
-    return usuarioService.actualizar(id, usuario)
-            .map(ResponseEntity::ok)
-            .orElse(ResponseEntity.notFound().build());
+
+    @GetMapping("/{id}")
+    public ResponseEntity<Usuario> ObtenerPorId(@PathVariable String id) {
+        Optional<Usuario> usuario = usuarioService.obtenerPorId(id);
+        return usuario.map(ResponseEntity::ok).orElseGet(() -> ResponseEntity.notFound().build());
     }
 
+    @PutMapping("/{id}")
+    public ResponseEntity<Usuario> actualizar(@PathVariable String id, @RequestBody Usuario usuario) {
+        return usuarioService.actualizar(id, usuario).map(ResponseEntity::ok).orElse(ResponseEntity.notFound().build());
+    }
 
     @PostMapping
     public ResponseEntity<Usuario> crear(@RequestBody Usuario usuario) {
@@ -45,7 +49,7 @@ public class UsuarioController {
         return new ResponseEntity<>(usuarioGuardado, HttpStatus.CREATED);
     }
 
-    @GetMapping("/{email}")
+    @GetMapping("/email/{email}")
     public ResponseEntity<Usuario> buscarPorEmail(@PathVariable String email) {
         Optional<Usuario> usuario = usuarioService.buscarPorEmail(email);
         return usuario.map(ResponseEntity::ok).orElseGet(() -> ResponseEntity.notFound().build());

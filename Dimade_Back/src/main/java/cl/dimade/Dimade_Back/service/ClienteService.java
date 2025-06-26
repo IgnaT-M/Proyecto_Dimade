@@ -22,6 +22,10 @@ public class ClienteService {
         return repository.findAll();
     }
 
+    public Optional<Cliente> obtenerPorId(String id) {
+        return repository.findById(id);
+    }
+
     public Optional<Cliente> obtenerPorRut(String rut) {
         return repository.findByRut(rut);
     }
