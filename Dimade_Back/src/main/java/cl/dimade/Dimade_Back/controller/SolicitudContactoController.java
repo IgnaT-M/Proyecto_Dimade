@@ -12,6 +12,7 @@ import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -35,14 +36,18 @@ public class SolicitudContactoController {
 
     @GetMapping("/{id}")
     public ResponseEntity<SolicitudContacto> obtener(@PathVariable String id) {
-        return service.obtenerPorId(id)
-                .map(ResponseEntity::ok)
-                .orElse(ResponseEntity.notFound().build());
+        return service.obtenerPorId(id).map(ResponseEntity::ok).orElse(ResponseEntity.notFound().build());
     }
 
     @PostMapping
     public ResponseEntity<SolicitudContacto> crear(@RequestBody SolicitudContacto solicitud) {
         return new ResponseEntity<>(service.guardar(solicitud), HttpStatus.CREATED);
+    }
+
+    @PutMapping("/{id}")
+    public ResponseEntity<SolicitudContacto> actualizar(@PathVariable String id,
+            @RequestBody SolicitudContacto actualizada) {
+        return service.actualizar(id, actualizada).map(ResponseEntity::ok).orElse(ResponseEntity.notFound().build());
     }
 
     @DeleteMapping("/{id}")
@@ -57,7 +62,8 @@ public class SolicitudContactoController {
     }
 
     @GetMapping("/buscar/fecha")
-    public List<SolicitudContacto> buscarPorFecha(@RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) Date fecha) {
+    public List<SolicitudContacto> buscarPorFecha(
+            @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) Date fecha) {
         return service.buscarPorFecha(fecha);
     }
 }

@@ -5,6 +5,7 @@ import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.http.HttpMethod;
 import org.springframework.security.authentication.AuthenticationManager;
 import static org.springframework.security.config.Customizer.withDefaults;
 import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
@@ -42,15 +43,18 @@ public class SecurityConfig {
 
     @Bean
     SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
-        http.cors(withDefaults()).csrf(csrf -> csrf.disable()).authorizeHttpRequests(auth -> auth
-                .requestMatchers("/api/auth/**", "/api/solicitudes-contacto", "/api/solicitudes-cotizacion").permitAll()
+        http.cors(withDefaults()).csrf(csrf -> csrf.disable())
+                .authorizeHttpRequests(auth -> auth.requestMatchers("/api/auth/**").permitAll()
+                        .requestMatchers(HttpMethod.POST, "/api/solicitudes-contacto").permitAll()
+                        .requestMatchers(HttpMethod.POST, "/api/solicitudes-cotizacion").permitAll()
 
-                // Rutas protegidas por token
-                .requestMatchers("/api/registros-financieros/**", "/api/clientes/**", "/api/proveedores/**",
-                        "/api/ordenes-compra/**", "/api/usuarios/**")
-                .authenticated()
+                        // Rutas protegidas por token
+                        .requestMatchers("/api/registros-financieros/**", "/api/clientes/**", "/api/proveedores/**",
+                                "/api/ordenes-compra/**", "/api/usuarios/**", "/api/solicitudes-contacto/**",
+                                "/api/solicitudes-cotizacion/**")
+                        .authenticated()
 
-                .anyRequest().denyAll())
+                        .anyRequest().denyAll())
                 .sessionManagement(sess -> sess.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .addFilterBefore(jwtRequestFilter(), UsernamePasswordAuthenticationFilter.class);
 

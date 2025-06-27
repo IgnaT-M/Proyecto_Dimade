@@ -32,7 +32,13 @@ public class ClienteController {
         return service.obtenerTodos();
     }
 
-    @GetMapping("/{rut}")
+    @GetMapping("/{id}")
+    public ResponseEntity<Cliente> obtenerPorId(@PathVariable String id) {
+        Optional<Cliente> cliente = service.obtenerPorId(id);
+        return cliente.map(ResponseEntity::ok).orElseGet(() -> ResponseEntity.notFound().build());
+    }
+
+    @GetMapping("/rut/{rut}")
     public ResponseEntity<Cliente> obtenerPorRut(@PathVariable String rut) {
         Optional<Cliente> cliente = service.obtenerPorRut(rut);
         return cliente.map(ResponseEntity::ok).orElseGet(() -> ResponseEntity.notFound().build());
@@ -45,9 +51,7 @@ public class ClienteController {
 
     @PutMapping("/{id}")
     public ResponseEntity<Cliente> actualizar(@PathVariable String id, @RequestBody Cliente cliente) {
-        return service.actualizar(id, cliente)
-                .map(ResponseEntity::ok)
-                .orElse(ResponseEntity.notFound().build());
+        return service.actualizar(id, cliente).map(ResponseEntity::ok).orElse(ResponseEntity.notFound().build());
     }
 
     @DeleteMapping("/{id}")
