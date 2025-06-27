@@ -9,7 +9,7 @@ const sections = [
     background: "/nosotros.jpg",
     description:
       "En DIMADE, conectamos proveedores y clientes del rubro de la construcción con eficiencia, confianza y tecnología.",
-    route: "/nosotros",
+    
   },
   {
     key: "mision",
@@ -17,7 +17,7 @@ const sections = [
     background: "/nosotros1.jpg",
     description:
       "Brindar una plataforma eficiente que facilite la conexión directa entre proveedores y clientes del área de la construcción.",
-    route: "/nosotros#mision",
+    
   },
   {
     key: "vision",
@@ -25,7 +25,7 @@ const sections = [
     background: "/nosotros2.jpg",
     description:
       "Ser líderes en soluciones digitales para el abastecimiento y gestión de proyectos constructivos en Latinoamérica.",
-    route: "/nosotros#vision",
+    
   },
 ];
 
