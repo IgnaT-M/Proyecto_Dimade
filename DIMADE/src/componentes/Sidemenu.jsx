@@ -13,22 +13,37 @@ import ShoppingCartIcon from "@mui/icons-material/ShoppingCart";
 import PeopleIcon from "@mui/icons-material/People";
 import GroupIcon from "@mui/icons-material/Group";
 import BusinessIcon from "@mui/icons-material/Business";
+import SupportAgentIcon from "@mui/icons-material/SupportAgent";
+import RequestQuoteIcon from "@mui/icons-material/RequestQuote";
+import ReceiptLongIcon from "@mui/icons-material/ReceiptLong";
 
 const menuItems = [
   { key: "inicio", label: "Inicio", icon: <DashboardIcon /> },
   {
-    key: "ordenes1",
-    label: "Órdenes Clientes",
+
+    key: "ordenesCompra",
+    label: "Órdenes de Compra",
     icon: <ShoppingCartIcon />,
   },
   {
-    key: "ordenes2",
-    label: "Órdenes Proveedores",
-    icon: <ShoppingCartIcon />,
+    key: "solicitudesCotizacion",
+    label: "Solicitudes de Cotización",
+    icon: <RequestQuoteIcon />,
+  },
+  {
+    key: "solicitudesContacto",
+    label: "Solicitudes de Contacto",
+    icon: <SupportAgentIcon />,
+
   },
   { key: "clientes", label: "Clientes", icon: <PeopleIcon /> },
   { key: "usuarios", label: "Usuarios", icon: <GroupIcon /> },
   { key: "proveedores", label: "Proveedores", icon: <BusinessIcon /> },
+  {
+    key: "registrosFinancieros",
+    label: "Registros Financieros",
+    icon: <ReceiptLongIcon />,
+  },
 ];
 
 const drawerWidth = 240;

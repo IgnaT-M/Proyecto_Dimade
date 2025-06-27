@@ -8,6 +8,13 @@ import {
   Alert,
   MenuItem,
 } from "@mui/material";
+
+import BadgeIcon from "@mui/icons-material/Badge";
+import PersonIcon from "@mui/icons-material/Person";
+import EmailIcon from "@mui/icons-material/Email";
+import PhoneIcon from "@mui/icons-material/Phone";
+import ListAltIcon from "@mui/icons-material/ListAlt";
+
 import ModalCubitaje from "./ModalCubicador";
 
 const CotizaForm = () => {
@@ -82,6 +89,7 @@ const CotizaForm = () => {
       });
     } catch (error) {
       console.error("Error al enviar solicitud:", error);
+      setError(true);
     }
   };
 
