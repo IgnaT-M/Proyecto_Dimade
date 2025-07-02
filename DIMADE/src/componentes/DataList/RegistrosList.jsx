@@ -24,6 +24,7 @@ import {
   Button,
   Snackbar,
   Alert,
+  Chip,
 } from "@mui/material";
 import SearchIcon from "@mui/icons-material/Search";
 import VisibilityIcon from "@mui/icons-material/Visibility";
@@ -31,6 +32,7 @@ import DeleteIcon from "@mui/icons-material/Delete";
 import EditIcon from "@mui/icons-material/Edit";
 import ToggleOnIcon from "@mui/icons-material/ToggleOn";
 import ToggleOffIcon from "@mui/icons-material/ToggleOff";
+import AddIcon from "@mui/icons-material/Add";
 
 const RegistrosList = () => {
   const [registros, setRegistros] = useState([]);
@@ -44,6 +46,7 @@ const RegistrosList = () => {
     datos: null,
   });
   const [openSnackbar, setOpenSnackbar] = useState(false);
+  const [modalMode, setModalMode] = useState("view");
 
   const fetchRegistros = async () => {
     try {
@@ -51,9 +54,7 @@ const RegistrosList = () => {
       const res = await fetch(
         "http://localhost:8080/api/registros-financieros",
         {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
+          headers: { Authorization: `Bearer ${token}` },
         }
       );
       const data = await res.json();
@@ -97,9 +98,7 @@ const RegistrosList = () => {
         `http://localhost:8080/api/registros-financieros/${id}`,
         {
           method: "DELETE",
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
+          headers: { Authorization: `Bearer ${token}` },
         }
       );
       if (res.ok) {
@@ -113,17 +112,20 @@ const RegistrosList = () => {
   const handleGuardarCambios = async () => {
     try {
       const token = localStorage.getItem("jwtToken");
-      const res = await fetch(
-        `http://localhost:8080/api/registros-financieros/${modalRegistro.datos.id}`,
-        {
-          method: "PUT",
-          headers: {
-            "Content-Type": "application/json",
-            Authorization: `Bearer ${token}`,
-          },
-          body: JSON.stringify(modalRegistro.datos),
-        }
-      );
+      const method = modalMode === "edit" ? "PUT" : "POST";
+      const url =
+        modalMode === "edit"
+          ? `http://localhost:8080/api/registros-financieros/${modalRegistro.datos.id}`
+          : "http://localhost:8080/api/registros-financieros";
+
+      const res = await fetch(url, {
+        method,
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
+        },
+        body: JSON.stringify(modalRegistro.datos),
+      });
 
       if (res.ok) {
         fetchRegistros();
@@ -131,8 +133,33 @@ const RegistrosList = () => {
         setOpenSnackbar(true);
       }
     } catch (err) {
-      console.error("Error al actualizar registro:", err);
+      console.error("Error al guardar registro:", err);
     }
+  };
+
+  const handleOpenModal = (registro, mode) => {
+    setModalRegistro({
+      open: true,
+      datos: registro
+        ? { ...registro }
+        : {
+            monto: 0,
+            concepto: "",
+            observaciones: "",
+            tipo: "ingreso",
+            fecha: new Date().toISOString().substring(0, 10),
+          },
+    });
+    setModalMode(mode);
+  };
+
+  const formatDate = (dateString) => {
+    const d = new Date(dateString);
+    return d.toLocaleDateString("es-CL", {
+      day: "2-digit",
+      month: "2-digit",
+      year: "numeric",
+    });
   };
 
   return (
@@ -188,51 +215,58 @@ const RegistrosList = () => {
             <MenuItem value="asc">Más antiguos</MenuItem>
           </Select>
         </FormControl>
+
+        <Button
+          variant="contained"
+          startIcon={<AddIcon />}
+          onClick={() => handleOpenModal(null, "new")}
+        >
+          Agregar
+        </Button>
       </Box>
 
       <Paper>
         <Table>
           <TableHead>
             <TableRow>
-              {Object.keys(paginatedRegistros[0] || {}).map((key) => (
-                <TableCell key={key}>{key}</TableCell>
-              ))}
+              <TableCell>ID</TableCell>
+              <TableCell>Fecha</TableCell>
+              <TableCell>Tipo</TableCell>
+              <TableCell>Concepto</TableCell>
+              <TableCell>Observaciones</TableCell>
+              <TableCell>Monto</TableCell>
               <TableCell>Acciones</TableCell>
             </TableRow>
           </TableHead>
           <TableBody>
             {paginatedRegistros.map((r) => (
               <TableRow key={r.id}>
-                {Object.entries(r).map(([k, v]) => (
-                  <TableCell key={k}>{String(v)}</TableCell>
-                ))}
+                <TableCell>{r.id}</TableCell>
+                <TableCell>{formatDate(r.fecha)}</TableCell>
                 <TableCell>
-                  <Tooltip title="Ver / Editar">
-                    <IconButton
-                      onClick={() =>
-                        setModalRegistro({ open: true, datos: { ...r } })
-                      }
-                    >
-                      <VisibilityIcon />
+                  <Chip
+                    label={r.tipo.charAt(0).toUpperCase() + r.tipo.slice(1)}
+                    color={r.tipo === "ingreso" ? "success" : "error"}
+                    size="small"
+                  />
+                </TableCell>
+                <TableCell>{r.concepto}</TableCell>
+                <TableCell>{r.observaciones}</TableCell>
+                <TableCell>${r.monto.toLocaleString("es-CL")}</TableCell>
+                <TableCell>
+                  <Tooltip title="Ver">
+                    <IconButton onClick={() => handleOpenModal(r, "view")}>
+                      <VisibilityIcon sx={{ color: "#1976d2" }} />
                     </IconButton>
                   </Tooltip>
                   <Tooltip title="Editar">
-                    <IconButton
-                      onClick={() =>
-                        setModalRegistro({ open: true, datos: { ...r } })
-                      }
-                    >
-                      <EditIcon />
+                    <IconButton onClick={() => handleOpenModal(r, "edit")}>
+                      <EditIcon sx={{ color: "#f57c00" }} />
                     </IconButton>
                   </Tooltip>
                   <Tooltip title="Eliminar">
                     <IconButton onClick={() => handleDelete(r.id)}>
-                      <DeleteIcon />
-                    </IconButton>
-                  </Tooltip>
-                  <Tooltip title={r.activo ? "Desactivar" : "Activar"}>
-                    <IconButton>
-                      {r.activo ? <ToggleOnIcon /> : <ToggleOffIcon />}
+                      <DeleteIcon sx={{ color: "#d32f2f" }} />
                     </IconButton>
                   </Tooltip>
                 </TableCell>
@@ -240,7 +274,7 @@ const RegistrosList = () => {
             ))}
             {paginatedRegistros.length === 0 && (
               <TableRow>
-                <TableCell colSpan={100} align="center">
+                <TableCell colSpan={7} align="center">
                   No se encontraron registros
                 </TableCell>
               </TableRow>
@@ -262,14 +296,19 @@ const RegistrosList = () => {
         />
       </Paper>
 
-      {/* Modal Ver/Editar */}
       <Dialog
         open={modalRegistro.open}
         onClose={() => setModalRegistro({ open: false, datos: null })}
         maxWidth="sm"
         fullWidth
       >
-        <DialogTitle>Detalle del Registro</DialogTitle>
+        <DialogTitle>
+          {modalMode === "edit"
+            ? "Editar Registro"
+            : modalMode === "view"
+            ? "Ver Registro"
+            : "Nuevo Registro"}
+        </DialogTitle>
         <DialogContent dividers>
           <TextField
             label="Monto"
@@ -283,10 +322,24 @@ const RegistrosList = () => {
                 datos: { ...prev.datos, monto: parseFloat(e.target.value) },
               }))
             }
+            InputProps={{ readOnly: modalMode === "view" }}
           />
           <TextField
-            label="Detalle"
-            value={modalRegistro.datos?.detalle || ""}
+            label="Concepto"
+            value={modalRegistro.datos?.concepto || ""}
+            fullWidth
+            margin="normal"
+            onChange={(e) =>
+              setModalRegistro((prev) => ({
+                ...prev,
+                datos: { ...prev.datos, concepto: e.target.value },
+              }))
+            }
+            InputProps={{ readOnly: modalMode === "view" }}
+          />
+          <TextField
+            label="Observaciones"
+            value={modalRegistro.datos?.observaciones || ""}
             fullWidth
             multiline
             rows={2}
@@ -294,9 +347,10 @@ const RegistrosList = () => {
             onChange={(e) =>
               setModalRegistro((prev) => ({
                 ...prev,
-                datos: { ...prev.datos, detalle: e.target.value },
+                datos: { ...prev.datos, observaciones: e.target.value },
               }))
             }
+            InputProps={{ readOnly: modalMode === "view" }}
           />
           <FormControl fullWidth margin="normal">
             <InputLabel>Tipo</InputLabel>
@@ -309,6 +363,7 @@ const RegistrosList = () => {
                   datos: { ...prev.datos, tipo: e.target.value },
                 }))
               }
+              disabled={modalMode === "view"}
             >
               <MenuItem value="ingreso">Ingreso</MenuItem>
               <MenuItem value="egreso">Egreso</MenuItem>
@@ -327,6 +382,7 @@ const RegistrosList = () => {
                 datos: { ...prev.datos, fecha: e.target.value },
               }))
             }
+            InputProps={{ readOnly: modalMode === "view" }}
           />
         </DialogContent>
         <DialogActions>
@@ -335,13 +391,15 @@ const RegistrosList = () => {
           >
             Cancelar
           </Button>
-          <Button
-            variant="contained"
-            color="primary"
-            onClick={handleGuardarCambios}
-          >
-            Guardar Cambios
-          </Button>
+          {modalMode !== "view" && (
+            <Button
+              variant="contained"
+              color="primary"
+              onClick={handleGuardarCambios}
+            >
+              Guardar Cambios
+            </Button>
+          )}
         </DialogActions>
       </Dialog>
 

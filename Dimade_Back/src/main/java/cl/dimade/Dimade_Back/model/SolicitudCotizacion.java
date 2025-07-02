@@ -15,10 +15,11 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 public class SolicitudCotizacion {
     @Id
-    private String id; // <-- Ahora será autoincremental
+    private String id;
 
     private String rutSolicitante;
     private String nombreSolicitante;
+    private String direccion;
     private String correo;
     private String telefono;
     private Date fechaSolicitud;

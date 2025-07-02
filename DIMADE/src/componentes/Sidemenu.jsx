@@ -20,7 +20,6 @@ import ReceiptLongIcon from "@mui/icons-material/ReceiptLong";
 const menuItems = [
   { key: "inicio", label: "Inicio", icon: <DashboardIcon /> },
   {
-
     key: "ordenesCompra",
     label: "Órdenes de Compra",
     icon: <ShoppingCartIcon />,
@@ -34,7 +33,6 @@ const menuItems = [
     key: "solicitudesContacto",
     label: "Solicitudes de Contacto",
     icon: <SupportAgentIcon />,
-
   },
   { key: "clientes", label: "Clientes", icon: <PeopleIcon /> },
   { key: "usuarios", label: "Usuarios", icon: <GroupIcon /> },
@@ -64,10 +62,11 @@ const SideMenu = ({ onSelect, selected }) => {
       }}
     >
       <Box sx={{ px: 2, py: 3 }}>
-        <box
+        <Box
           variant="img"
-          img
-          src="public/imagenes/banner_nosotros.jpg"
+          component="img"
+          sx={{ width: "10vw", height: "auto", mb: 2 }}
+          src="public/imagenes/logo_dimade.png"
           alt="Logo de DIMADE"
         />
       </Box>

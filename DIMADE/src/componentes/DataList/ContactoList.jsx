@@ -1,300 +1,432 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useMemo } from "react";
 import {
   Box,
-  TextField,
+  Typography,
   IconButton,
+  Paper,
   Table,
-  TableBody,
-  TableCell,
-  TableContainer,
   TableHead,
   TableRow,
-  Paper,
+  TableCell,
+  TableBody,
+  TextField,
+  InputAdornment,
+  TablePagination,
+  Tooltip,
+  Modal,
   Button,
   MenuItem,
   Select,
-  InputLabel,
   FormControl,
-  Dialog,
-  DialogTitle,
-  DialogContent,
-  DialogActions,
-  Typography,
+  InputLabel,
 } from "@mui/material";
-import { Delete, Edit, Visibility } from "@mui/icons-material";
-import axios from "axios";
+import {
+  Search as SearchIcon,
+  Visibility as VisibilityIcon,
+  Delete as DeleteIcon,
+  Edit as EditIcon,
+  Add as AddIcon,
+} from "@mui/icons-material";
 
 const ContactoList = () => {
   const [solicitudes, setSolicitudes] = useState([]);
-  const [busqueda, setBusqueda] = useState("");
-  const [ordenFecha, setOrdenFecha] = useState("desc");
+  const [search, setSearch] = useState("");
+  const [asuntoFiltro, setAsuntoFiltro] = useState("");
+  const [estadoFiltro, setEstadoFiltro] = useState("");
+  const [orden, setOrden] = useState("recientes");
+  const [page, setPage] = useState(0);
+  const [rowsPerPage, setRowsPerPage] = useState(10);
+  const [selected, setSelected] = useState(null);
+  const [modalMode, setModalMode] = useState("view");
+  const [openModal, setOpenModal] = useState(false);
+  const [deleteId, setDeleteId] = useState(null);
 
-  const [modalEliminar, setModalEliminar] = useState({ open: false, id: null });
-  const [modalVer, setModalVer] = useState({ open: false, datos: null });
-  const [modalEditar, setModalEditar] = useState({ open: false, datos: null });
+  useEffect(() => {
+    fetchSolicitudes();
+  }, []);
 
   const fetchSolicitudes = async () => {
     try {
-      const res = await axios.get("/api/solicitudes-contacto");
-      let data = res.data;
-
-      if (busqueda.trim()) {
-        data = data.filter(
-          (s) =>
-            s.nombre.toLowerCase().includes(busqueda.toLowerCase()) ||
-            s.email.toLowerCase().includes(busqueda.toLowerCase())
-        );
-      }
-
-      data.sort((a, b) => {
-        const fechaA = new Date(a.fecha);
-        const fechaB = new Date(b.fecha);
-        return ordenFecha === "asc" ? fechaA - fechaB : fechaB - fechaA;
-      });
-
-      setSolicitudes(data);
+      const token = localStorage.getItem("jwtToken");
+      const res = await fetch(
+        "http://localhost:8080/api/solicitudes-contacto",
+        {
+          headers: { Authorization: `Bearer ${token}` },
+        }
+      );
+      const data = await res.json();
+      setSolicitudes(Array.isArray(data) ? data : [data]);
     } catch (err) {
       console.error("Error al cargar solicitudes:", err);
     }
   };
 
-  useEffect(() => {
-    fetchSolicitudes();
-  }, [busqueda, ordenFecha]);
+  const filtered = useMemo(() => {
+    return solicitudes
+      .filter((s) => {
+        const matchesSearch = Object.values(s).some((val) =>
+          String(val).toLowerCase().includes(search.toLowerCase())
+        );
+        const matchesAsunto = asuntoFiltro ? s.asunto === asuntoFiltro : true;
+        const matchesEstado = estadoFiltro ? s.estado === estadoFiltro : true;
+        return matchesSearch && matchesAsunto && matchesEstado;
+      })
+      .sort((a, b) => {
+        const fechaA = new Date(a.fechaEnvio);
+        const fechaB = new Date(b.fechaEnvio);
+        return orden === "recientes" ? fechaB - fechaA : fechaA - fechaB;
+      });
+  }, [solicitudes, search, asuntoFiltro, estadoFiltro, orden]);
 
-  const handleEliminar = async () => {
+  const paginated = useMemo(() => {
+    const start = page * rowsPerPage;
+    return filtered.slice(start, start + rowsPerPage);
+  }, [filtered, page, rowsPerPage]);
+
+  const handleOpenModal = (item, mode) => {
+    if (mode === "new") {
+      setSelected({
+        nombre: "",
+        correo: "",
+        telefono: "",
+        mensaje: "",
+        asunto: "Consulta",
+        estado: "Pendiente",
+        fechaEnvio: new Date().toISOString(),
+      });
+    } else {
+      setSelected({ ...item });
+    }
+    setModalMode(mode);
+    setOpenModal(true);
+  };
+
+  const handleCloseModal = () => {
+    setSelected(null);
+    setOpenModal(false);
+  };
+
+  const handleChange = (e) => {
+    setSelected((prev) => ({
+      ...prev,
+      [e.target.name]: e.target.value,
+    }));
+  };
+
+  const handleSave = async () => {
     try {
-      await axios.delete(`/api/solicitudes-contacto/${modalEliminar.id}`);
-      setModalEliminar({ open: false, id: null });
-      fetchSolicitudes();
+      const token = localStorage.getItem("jwtToken");
+      const url =
+        modalMode === "new"
+          ? "http://localhost:8080/api/solicitudes-contacto"
+          : `http://localhost:8080/api/solicitudes-contacto/${selected.id}`;
+      const method = modalMode === "new" ? "POST" : "PUT";
+
+      const res = await fetch(url, {
+        method,
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
+        },
+        body: JSON.stringify({
+          ...selected,
+          fechaEnvio: selected.fechaEnvio
+            ? new Date(selected.fechaEnvio)
+            : new Date(),
+        }),
+      });
+
+      if (res.ok) {
+        await fetchSolicitudes();
+        handleCloseModal();
+      }
+    } catch (err) {
+      console.error("Error al guardar:", err);
+    }
+  };
+
+  const handleDelete = async () => {
+    try {
+      const token = localStorage.getItem("jwtToken");
+      const res = await fetch(
+        `http://localhost:8080/api/solicitudes-contacto/${deleteId}`,
+        {
+          method: "DELETE",
+          headers: { Authorization: `Bearer ${token}` },
+        }
+      );
+      if (res.ok) {
+        await fetchSolicitudes();
+        setDeleteId(null);
+      }
     } catch (err) {
       console.error("Error al eliminar:", err);
     }
   };
 
-  const handleGuardarEdicion = async () => {
-    try {
-      await axios.put(
-        `/api/solicitudes-contacto/${modalEditar.datos._id}`,
-        modalEditar.datos
-      );
-      setModalEditar({ open: false, datos: null });
-      fetchSolicitudes();
-    } catch (err) {
-      console.error("Error al editar:", err);
-    }
-  };
-
   return (
-    <Box sx={{ p: 2 }}>
-      {/* Buscador y filtro */}
-      <TextField
-        label="Buscar por nombre o correo"
-        variant="outlined"
-        fullWidth
-        margin="normal"
-        value={busqueda}
-        onChange={(e) => setBusqueda(e.target.value)}
-      />
+    <Box>
+      <Box
+        sx={{
+          display: "flex",
+          justifyContent: "space-between",
+          mb: 2,
+          gap: 2,
+          flexWrap: "wrap",
+        }}
+      >
+        <Typography variant="h5" fontWeight="bold">
+          Solicitudes de Contacto
+        </Typography>
+        <Box sx={{ display: "flex", gap: 1, flexWrap: "wrap" }}>
+          <TextField
+            size="small"
+            placeholder="Buscar..."
+            value={search}
+            onChange={(e) => setSearch(e.target.value)}
+            InputProps={{
+              startAdornment: (
+                <InputAdornment position="start">
+                  <SearchIcon />
+                </InputAdornment>
+              ),
+            }}
+          />
+          <FormControl size="small">
+            <InputLabel>Asunto</InputLabel>
+            <Select
+              value={asuntoFiltro}
+              label="Asunto"
+              onChange={(e) => setAsuntoFiltro(e.target.value)}
+              sx={{ minWidth: 120 }}
+            >
+              <MenuItem value="">Todos</MenuItem>
+              <MenuItem value="Consulta">Consulta</MenuItem>
+              <MenuItem value="Reclamo">Reclamo</MenuItem>
+              <MenuItem value="Sugerencia">Sugerencia</MenuItem>
+              <MenuItem value="Otro">Otro</MenuItem>
+            </Select>
+          </FormControl>
+          <FormControl size="small">
+            <InputLabel>Estado</InputLabel>
+            <Select
+              value={estadoFiltro}
+              label="Estado"
+              onChange={(e) => setEstadoFiltro(e.target.value)}
+              sx={{ minWidth: 120 }}
+            >
+              <MenuItem value="">Todos</MenuItem>
+              <MenuItem value="Pendiente">Pendiente</MenuItem>
+              <MenuItem value="Revisado">Revisado</MenuItem>
+              <MenuItem value="Rechazado">Rechazado</MenuItem>
+              <MenuItem value="Otro">Otro</MenuItem>
+            </Select>
+          </FormControl>
+          <FormControl size="small">
+            <InputLabel>Orden</InputLabel>
+            <Select
+              value={orden}
+              label="Orden"
+              onChange={(e) => setOrden(e.target.value)}
+              sx={{ minWidth: 120 }}
+            >
+              <MenuItem value="recientes">Más recientes</MenuItem>
+              <MenuItem value="antiguos">Más antiguos</MenuItem>
+            </Select>
+          </FormControl>
+          <Button
+            variant="contained"
+            startIcon={<AddIcon />}
+            onClick={() => handleOpenModal(null, "new")}
+          >
+            Agregar
+          </Button>
+        </Box>
+      </Box>
 
-      <FormControl fullWidth sx={{ mb: 2 }}>
-        <InputLabel>Ordenar por fecha</InputLabel>
-        <Select
-          value={ordenFecha}
-          label="Ordenar por fecha"
-          onChange={(e) => setOrdenFecha(e.target.value)}
-        >
-          <MenuItem value="desc">Más recientes primero</MenuItem>
-          <MenuItem value="asc">Más antiguas primero</MenuItem>
-        </Select>
-      </FormControl>
-
-      {/* Tabla */}
-      <TableContainer component={Paper}>
+      <Paper>
         <Table>
           <TableHead>
             <TableRow>
+              <TableCell>ID</TableCell>
               <TableCell>Nombre</TableCell>
-              <TableCell>Email</TableCell>
+              <TableCell>Correo</TableCell>
               <TableCell>Teléfono</TableCell>
               <TableCell>Mensaje</TableCell>
-              <TableCell>Fecha</TableCell>
-              <TableCell align="center">Acciones</TableCell>
+              <TableCell>Asunto</TableCell>
+              <TableCell>Estado</TableCell>
+              <TableCell>Fecha de Envío</TableCell>
+              <TableCell>Acciones</TableCell>
             </TableRow>
           </TableHead>
           <TableBody>
-            {solicitudes.map((s) => (
-              <TableRow key={s._id}>
+            {paginated.map((s) => (
+              <TableRow key={s.id}>
+                <TableCell>{s.id}</TableCell>
                 <TableCell>{s.nombre}</TableCell>
-                <TableCell>{s.email}</TableCell>
+                <TableCell>{s.correo}</TableCell>
                 <TableCell>{s.telefono}</TableCell>
                 <TableCell>{s.mensaje}</TableCell>
-                <TableCell>{new Date(s.fecha).toLocaleString()}</TableCell>
-                <TableCell align="center">
-                  <IconButton
-                    color="primary"
-                    onClick={() => setModalVer({ open: true, datos: s })}
-                  >
-                    <Visibility />
-                  </IconButton>
-                  <IconButton
-                    color="warning"
-                    onClick={() =>
-                      setModalEditar({ open: true, datos: { ...s } })
-                    }
-                  >
-                    <Edit />
-                  </IconButton>
-                  <IconButton
-                    color="error"
-                    onClick={() => setModalEliminar({ open: true, id: s._id })}
-                  >
-                    <Delete />
-                  </IconButton>
+                <TableCell>{s.asunto}</TableCell>
+                <TableCell>{s.estado}</TableCell>
+                <TableCell>
+                  {new Date(s.fechaEnvio).toLocaleString([], {
+                    dateStyle: "short",
+                    timeStyle: "short",
+                  })}
+                </TableCell>
+                <TableCell>
+                  <Tooltip title="Ver">
+                    <IconButton onClick={() => handleOpenModal(s, "view")}>
+                      <VisibilityIcon sx={{ color: "#1976d2" }} />
+                    </IconButton>
+                  </Tooltip>
+                  <Tooltip title="Editar">
+                    <IconButton onClick={() => handleOpenModal(s, "edit")}>
+                      <EditIcon sx={{ color: "#f57c00" }} />
+                    </IconButton>
+                  </Tooltip>
+                  <Tooltip title="Eliminar">
+                    <IconButton onClick={() => setDeleteId(s.id)}>
+                      <DeleteIcon sx={{ color: "#d32f2f" }} />
+                    </IconButton>
+                  </Tooltip>
                 </TableCell>
               </TableRow>
             ))}
-            {solicitudes.length === 0 && (
-              <TableRow>
-                <TableCell colSpan={6} align="center">
-                  No se encontraron resultados
-                </TableCell>
-              </TableRow>
-            )}
           </TableBody>
         </Table>
-      </TableContainer>
 
-      {/* Modal Ver */}
-      <Dialog
-        open={modalVer.open}
-        onClose={() => setModalVer({ open: false, datos: null })}
-      >
-        <DialogTitle>Detalle de solicitud</DialogTitle>
-        <DialogContent dividers>
-          {modalVer.datos && (
-            <>
-              <Typography>
-                <b>Nombre:</b> {modalVer.datos.nombre}
-              </Typography>
-              <Typography>
-                <b>Email:</b> {modalVer.datos.email}
-              </Typography>
-              <Typography>
-                <b>Teléfono:</b> {modalVer.datos.telefono}
-              </Typography>
-              <Typography>
-                <b>Mensaje:</b> {modalVer.datos.mensaje}
-              </Typography>
-              <Typography>
-                <b>Fecha:</b> {new Date(modalVer.datos.fecha).toLocaleString()}
-              </Typography>
-            </>
+        <TablePagination
+          component="div"
+          count={filtered.length}
+          page={page}
+          onPageChange={(_, newPage) => setPage(newPage)}
+          rowsPerPage={rowsPerPage}
+          onRowsPerPageChange={(e) =>
+            setRowsPerPage(parseInt(e.target.value, 10))
+          }
+          rowsPerPageOptions={[10, 20, 50]}
+          labelRowsPerPage="Filas por página:"
+        />
+      </Paper>
+
+      {/* Modal de Detalle y Edición */}
+      <Modal open={openModal} onClose={handleCloseModal}>
+        <Box
+          sx={{
+            position: "absolute",
+            top: "50%",
+            left: "50%",
+            transform: "translate(-50%, -50%)",
+            width: 400,
+            bgcolor: "background.paper",
+            p: 4,
+            borderRadius: 2,
+            boxShadow: 24,
+          }}
+        >
+          <Typography variant="h6" mb={2}>
+            {modalMode === "view"
+              ? "Ver Solicitud"
+              : modalMode === "edit"
+              ? "Editar Solicitud"
+              : "Nueva Solicitud"}
+          </Typography>
+          {selected &&
+            Object.entries(selected).map(([key, value]) => {
+              if (key === "asunto" || key === "estado") {
+                return (
+                  <FormControl key={key} fullWidth margin="dense">
+                    <InputLabel>
+                      {key.charAt(0).toUpperCase() + key.slice(1)}
+                    </InputLabel>
+                    <Select
+                      name={key}
+                      value={value || ""}
+                      onChange={handleChange}
+                      disabled={modalMode === "view"}
+                      label={key}
+                    >
+                      {key === "asunto" ? (
+                        <>
+                          <MenuItem value="Consulta">Consulta</MenuItem>
+                          <MenuItem value="Reclamo">Reclamo</MenuItem>
+                          <MenuItem value="Sugerencia">Sugerencia</MenuItem>
+                          <MenuItem value="Otro">Otro</MenuItem>
+                        </>
+                      ) : (
+                        <>
+                          <MenuItem value="Pendiente">Pendiente</MenuItem>
+                          <MenuItem value="Revisado">Revisado</MenuItem>
+                          <MenuItem value="Rechazado">Rechazado</MenuItem>
+                          <MenuItem value="Otro">Otro</MenuItem>
+                        </>
+                      )}
+                    </Select>
+                  </FormControl>
+                );
+              }
+
+              return (
+                <TextField
+                  key={key}
+                  label={key}
+                  name={key}
+                  fullWidth
+                  margin="dense"
+                  type={key === "fechaEnvio" ? "datetime-local" : "text"}
+                  value={
+                    key === "fechaEnvio"
+                      ? new Date(value).toISOString().slice(0, 16)
+                      : value
+                  }
+                  onChange={modalMode === "view" ? undefined : handleChange}
+                  InputProps={{
+                    readOnly:
+                      modalMode === "view" ||
+                      (key === "id" && modalMode !== "new"),
+                  }}
+                />
+              );
+            })}
+          {modalMode !== "view" && (
+            <Box sx={{ mt: 2, textAlign: "right" }}>
+              <Button variant="contained" onClick={handleSave}>
+                Guardar
+              </Button>
+            </Box>
           )}
-        </DialogContent>
-        <DialogActions>
-          <Button onClick={() => setModalVer({ open: false, datos: null })}>
-            Cerrar
-          </Button>
-        </DialogActions>
-      </Dialog>
+        </Box>
+      </Modal>
 
-      {/* Modal Editar */}
-      <Dialog
-        open={modalEditar.open}
-        onClose={() => setModalEditar({ open: false, datos: null })}
-      >
-        <DialogTitle>Editar solicitud</DialogTitle>
-        <DialogContent dividers>
-          {modalEditar.datos && (
-            <>
-              <TextField
-                label="Nombre"
-                value={modalEditar.datos.nombre}
-                fullWidth
-                margin="normal"
-                onChange={(e) =>
-                  setModalEditar((prev) => ({
-                    ...prev,
-                    datos: { ...prev.datos, nombre: e.target.value },
-                  }))
-                }
-              />
-              <TextField
-                label="Email"
-                value={modalEditar.datos.email}
-                fullWidth
-                margin="normal"
-                onChange={(e) =>
-                  setModalEditar((prev) => ({
-                    ...prev,
-                    datos: { ...prev.datos, email: e.target.value },
-                  }))
-                }
-              />
-              <TextField
-                label="Teléfono"
-                value={modalEditar.datos.telefono}
-                fullWidth
-                margin="normal"
-                onChange={(e) =>
-                  setModalEditar((prev) => ({
-                    ...prev,
-                    datos: { ...prev.datos, telefono: e.target.value },
-                  }))
-                }
-              />
-              <TextField
-                label="Mensaje"
-                value={modalEditar.datos.mensaje}
-                fullWidth
-                multiline
-                rows={3}
-                margin="normal"
-                onChange={(e) =>
-                  setModalEditar((prev) => ({
-                    ...prev,
-                    datos: { ...prev.datos, mensaje: e.target.value },
-                  }))
-                }
-              />
-            </>
-          )}
-        </DialogContent>
-        <DialogActions>
-          <Button onClick={() => setModalEditar({ open: false, datos: null })}>
-            Cancelar
-          </Button>
-          <Button
-            onClick={handleGuardarEdicion}
-            variant="contained"
-            color="primary"
-          >
-            Guardar
-          </Button>
-        </DialogActions>
-      </Dialog>
-
-      {/* Modal Confirmar Eliminación */}
-      <Dialog
-        open={modalEliminar.open}
-        onClose={() => setModalEliminar({ open: false, id: null })}
-      >
-        <DialogTitle>Confirmar eliminación</DialogTitle>
-        <DialogContent>
-          <Typography>
+      {/* Modal de Eliminación */}
+      <Modal open={!!deleteId} onClose={() => setDeleteId(null)}>
+        <Box
+          sx={{
+            position: "absolute",
+            top: "50%",
+            left: "50%",
+            transform: "translate(-50%, -50%)",
+            width: 300,
+            bgcolor: "background.paper",
+            p: 3,
+            borderRadius: 2,
+            boxShadow: 24,
+            textAlign: "center",
+          }}
+        >
+          <Typography mb={2}>
             ¿Estás seguro de que deseas eliminar esta solicitud?
           </Typography>
-        </DialogContent>
-        <DialogActions>
-          <Button onClick={() => setModalEliminar({ open: false, id: null })}>
-            Cancelar
-          </Button>
-          <Button onClick={handleEliminar} variant="contained" color="error">
-            Eliminar
-          </Button>
-        </DialogActions>
-      </Dialog>
+          <Box sx={{ display: "flex", justifyContent: "center", gap: 1 }}>
+            <Button onClick={() => setDeleteId(null)}>Cancelar</Button>
+            <Button variant="contained" color="error" onClick={handleDelete}>
+              Eliminar
+            </Button>
+          </Box>
+        </Box>
+      </Modal>
     </Box>
   );
 };
