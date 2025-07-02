@@ -36,7 +36,7 @@ const ContactoList = () => {
   const [orden, setOrden] = useState("recientes");
   const [page, setPage] = useState(0);
   const [rowsPerPage, setRowsPerPage] = useState(10);
-  const [selected, setSelected] = useState(null);
+  const [selectedSolicitud, setSelectedSolicitud] = useState(null);
   const [modalMode, setModalMode] = useState("view");
   const [openModal, setOpenModal] = useState(false);
   const [deleteId, setDeleteId] = useState(null);
@@ -64,12 +64,12 @@ const ContactoList = () => {
   const filtered = useMemo(() => {
     return solicitudes
       .filter((s) => {
-        const matchesSearch = Object.values(s).some((val) =>
+        const matchSearch = Object.values(s).some((val) =>
           String(val).toLowerCase().includes(search.toLowerCase())
         );
-        const matchesAsunto = asuntoFiltro ? s.asunto === asuntoFiltro : true;
-        const matchesEstado = estadoFiltro ? s.estado === estadoFiltro : true;
-        return matchesSearch && matchesAsunto && matchesEstado;
+        const matchAsunto = asuntoFiltro ? s.asunto === asuntoFiltro : true;
+        const matchEstado = estadoFiltro ? s.estado === estadoFiltro : true;
+        return matchSearch && matchAsunto && matchEstado;
       })
       .sort((a, b) => {
         const fechaA = new Date(a.fechaEnvio);
@@ -83,9 +83,9 @@ const ContactoList = () => {
     return filtered.slice(start, start + rowsPerPage);
   }, [filtered, page, rowsPerPage]);
 
-  const handleOpenModal = (item, mode) => {
+  const handleOpenModal = (solicitud, mode) => {
     if (mode === "new") {
-      setSelected({
+      setSelectedSolicitud({
         nombre: "",
         correo: "",
         telefono: "",
@@ -95,21 +95,22 @@ const ContactoList = () => {
         fechaEnvio: new Date().toISOString(),
       });
     } else {
-      setSelected({ ...item });
+      setSelectedSolicitud(solicitud);
     }
     setModalMode(mode);
     setOpenModal(true);
   };
 
   const handleCloseModal = () => {
-    setSelected(null);
+    setSelectedSolicitud(null);
     setOpenModal(false);
   };
 
   const handleChange = (e) => {
-    setSelected((prev) => ({
+    const { name, value } = e.target;
+    setSelectedSolicitud((prev) => ({
       ...prev,
-      [e.target.name]: e.target.value,
+      [name]: value,
     }));
   };
 
@@ -119,7 +120,7 @@ const ContactoList = () => {
       const url =
         modalMode === "new"
           ? "http://localhost:8080/api/solicitudes-contacto"
-          : `http://localhost:8080/api/solicitudes-contacto/${selected.id}`;
+          : `http://localhost:8080/api/solicitudes-contacto/${selectedSolicitud.id}`;
       const method = modalMode === "new" ? "POST" : "PUT";
 
       const res = await fetch(url, {
@@ -128,12 +129,7 @@ const ContactoList = () => {
           "Content-Type": "application/json",
           Authorization: `Bearer ${token}`,
         },
-        body: JSON.stringify({
-          ...selected,
-          fechaEnvio: selected.fechaEnvio
-            ? new Date(selected.fechaEnvio)
-            : new Date(),
-        }),
+        body: JSON.stringify(selectedSolicitud),
       });
 
       if (res.ok) {
@@ -166,19 +162,18 @@ const ContactoList = () => {
 
   return (
     <Box>
-      <Box
-        sx={{
-          display: "flex",
-          justifyContent: "space-between",
-          mb: 2,
-          gap: 2,
-          flexWrap: "wrap",
-        }}
-      >
+      <Box sx={{ display: "flex", justifyContent: "space-between", mb: 2 }}>
         <Typography variant="h5" fontWeight="bold">
           Solicitudes de Contacto
         </Typography>
-        <Box sx={{ display: "flex", gap: 1, flexWrap: "wrap" }}>
+        <Box
+          sx={{
+            display: "flex",
+            gap: 1,
+            flexWrap: "wrap",
+            alignItems: "center",
+          }}
+        >
           <TextField
             size="small"
             placeholder="Buscar..."
@@ -192,52 +187,50 @@ const ContactoList = () => {
               ),
             }}
           />
-          <FormControl size="small">
-            <InputLabel>Asunto</InputLabel>
-            <Select
-              value={asuntoFiltro}
-              label="Asunto"
-              onChange={(e) => setAsuntoFiltro(e.target.value)}
-              sx={{ minWidth: 120 }}
-            >
-              <MenuItem value="">Todos</MenuItem>
-              <MenuItem value="Consulta">Consulta</MenuItem>
-              <MenuItem value="Reclamo">Reclamo</MenuItem>
-              <MenuItem value="Sugerencia">Sugerencia</MenuItem>
-              <MenuItem value="Otro">Otro</MenuItem>
-            </Select>
-          </FormControl>
-          <FormControl size="small">
-            <InputLabel>Estado</InputLabel>
-            <Select
-              value={estadoFiltro}
-              label="Estado"
-              onChange={(e) => setEstadoFiltro(e.target.value)}
-              sx={{ minWidth: 120 }}
-            >
-              <MenuItem value="">Todos</MenuItem>
-              <MenuItem value="Pendiente">Pendiente</MenuItem>
-              <MenuItem value="Revisado">Revisado</MenuItem>
-              <MenuItem value="Rechazado">Rechazado</MenuItem>
-              <MenuItem value="Otro">Otro</MenuItem>
-            </Select>
-          </FormControl>
-          <FormControl size="small">
-            <InputLabel>Orden</InputLabel>
-            <Select
-              value={orden}
-              label="Orden"
-              onChange={(e) => setOrden(e.target.value)}
-              sx={{ minWidth: 120 }}
-            >
-              <MenuItem value="recientes">Más recientes</MenuItem>
-              <MenuItem value="antiguos">Más antiguos</MenuItem>
-            </Select>
-          </FormControl>
+          <TextField
+            select
+            size="small"
+            label="Asunto"
+            value={asuntoFiltro}
+            onChange={(e) => setAsuntoFiltro(e.target.value)}
+            sx={{ minWidth: 130 }}
+          >
+            <MenuItem value="">Todos</MenuItem>
+            <MenuItem value="Consulta">Consulta</MenuItem>
+            <MenuItem value="Reclamo">Reclamo</MenuItem>
+            <MenuItem value="Sugerencia">Sugerencia</MenuItem>
+            <MenuItem value="Otro">Otro</MenuItem>
+          </TextField>
+          <TextField
+            select
+            size="small"
+            label="Estado"
+            value={estadoFiltro}
+            onChange={(e) => setEstadoFiltro(e.target.value)}
+            sx={{ minWidth: 130 }}
+          >
+            <MenuItem value="">Todos</MenuItem>
+            <MenuItem value="Pendiente">Pendiente</MenuItem>
+            <MenuItem value="Revisado">Revisado</MenuItem>
+            <MenuItem value="Rechazado">Rechazado</MenuItem>
+            <MenuItem value="Otro">Otro</MenuItem>
+          </TextField>
+          <TextField
+            select
+            size="small"
+            label="Orden"
+            value={orden}
+            onChange={(e) => setOrden(e.target.value)}
+            sx={{ minWidth: 130 }}
+          >
+            <MenuItem value="recientes">Más recientes</MenuItem>
+            <MenuItem value="antiguos">Más antiguos</MenuItem>
+          </TextField>
           <Button
             variant="contained"
             startIcon={<AddIcon />}
             onClick={() => handleOpenModal(null, "new")}
+            sx={{ bgcolor: "#d84315", "&:hover": { bgcolor: "#bf360c" } }}
           >
             Agregar
           </Button>
@@ -252,7 +245,7 @@ const ContactoList = () => {
               <TableCell>Nombre</TableCell>
               <TableCell>Correo</TableCell>
               <TableCell>Teléfono</TableCell>
-              <TableCell>Mensaje</TableCell>
+
               <TableCell>Asunto</TableCell>
               <TableCell>Estado</TableCell>
               <TableCell>Fecha de Envío</TableCell>
@@ -266,15 +259,9 @@ const ContactoList = () => {
                 <TableCell>{s.nombre}</TableCell>
                 <TableCell>{s.correo}</TableCell>
                 <TableCell>{s.telefono}</TableCell>
-                <TableCell>{s.mensaje}</TableCell>
                 <TableCell>{s.asunto}</TableCell>
                 <TableCell>{s.estado}</TableCell>
-                <TableCell>
-                  {new Date(s.fechaEnvio).toLocaleString([], {
-                    dateStyle: "short",
-                    timeStyle: "short",
-                  })}
-                </TableCell>
+                <TableCell>{new Date(s.fechaEnvio).toLocaleString()}</TableCell>
                 <TableCell>
                   <Tooltip title="Ver">
                     <IconButton onClick={() => handleOpenModal(s, "view")}>
@@ -311,7 +298,6 @@ const ContactoList = () => {
         />
       </Paper>
 
-      {/* Modal de Detalle y Edición */}
       <Modal open={openModal} onClose={handleCloseModal}>
         <Box
           sx={{
@@ -333,74 +319,100 @@ const ContactoList = () => {
               ? "Editar Solicitud"
               : "Nueva Solicitud"}
           </Typography>
-          {selected &&
-            Object.entries(selected).map(([key, value]) => {
-              if (key === "asunto" || key === "estado") {
-                return (
-                  <FormControl key={key} fullWidth margin="dense">
-                    <InputLabel>
-                      {key.charAt(0).toUpperCase() + key.slice(1)}
-                    </InputLabel>
-                    <Select
-                      name={key}
-                      value={value || ""}
-                      onChange={handleChange}
-                      disabled={modalMode === "view"}
-                      label={key}
-                    >
-                      {key === "asunto" ? (
-                        <>
-                          <MenuItem value="Consulta">Consulta</MenuItem>
-                          <MenuItem value="Reclamo">Reclamo</MenuItem>
-                          <MenuItem value="Sugerencia">Sugerencia</MenuItem>
-                          <MenuItem value="Otro">Otro</MenuItem>
-                        </>
-                      ) : (
-                        <>
-                          <MenuItem value="Pendiente">Pendiente</MenuItem>
-                          <MenuItem value="Revisado">Revisado</MenuItem>
-                          <MenuItem value="Rechazado">Rechazado</MenuItem>
-                          <MenuItem value="Otro">Otro</MenuItem>
-                        </>
-                      )}
-                    </Select>
-                  </FormControl>
-                );
-              }
-
-              return (
-                <TextField
-                  key={key}
-                  label={key}
-                  name={key}
-                  fullWidth
-                  margin="dense"
-                  type={key === "fechaEnvio" ? "datetime-local" : "text"}
-                  value={
-                    key === "fechaEnvio"
-                      ? new Date(value).toISOString().slice(0, 16)
-                      : value
-                  }
-                  onChange={modalMode === "view" ? undefined : handleChange}
-                  InputProps={{
-                    readOnly:
-                      modalMode === "view" ||
-                      (key === "id" && modalMode !== "new"),
-                  }}
-                />
-              );
-            })}
-          {modalMode !== "view" && (
-            <Box sx={{ mt: 2, textAlign: "right" }}>
-              <Button variant="contained" onClick={handleSave}>
-                Guardar
-              </Button>
-            </Box>
+          {selectedSolicitud && (
+            <>
+              <TextField
+                label="Nombre"
+                name="nombre"
+                fullWidth
+                margin="dense"
+                value={selectedSolicitud.nombre}
+                onChange={modalMode === "view" ? undefined : handleChange}
+                InputProps={{ readOnly: modalMode === "view" }}
+              />
+              <TextField
+                label="Correo"
+                name="correo"
+                fullWidth
+                margin="dense"
+                value={selectedSolicitud.correo}
+                onChange={modalMode === "view" ? undefined : handleChange}
+                InputProps={{ readOnly: modalMode === "view" }}
+              />
+              <TextField
+                label="Teléfono"
+                name="telefono"
+                fullWidth
+                margin="dense"
+                value={selectedSolicitud.telefono}
+                onChange={modalMode === "view" ? undefined : handleChange}
+                InputProps={{ readOnly: modalMode === "view" }}
+              />
+              <TextField
+                label="Mensaje"
+                name="mensaje"
+                fullWidth
+                margin="dense"
+                multiline
+                minRows={2}
+                value={selectedSolicitud.mensaje}
+                onChange={modalMode === "view" ? undefined : handleChange}
+                InputProps={{ readOnly: modalMode === "view" }}
+              />
+              <TextField
+                select
+                label="Asunto"
+                name="asunto"
+                fullWidth
+                margin="dense"
+                value={selectedSolicitud.asunto}
+                onChange={modalMode === "view" ? undefined : handleChange}
+                InputProps={{ readOnly: modalMode === "view" }}
+              >
+                <MenuItem value="Consulta">Consulta</MenuItem>
+                <MenuItem value="Reclamo">Reclamo</MenuItem>
+                <MenuItem value="Sugerencia">Sugerencia</MenuItem>
+                <MenuItem value="Otro">Otro</MenuItem>
+              </TextField>
+              <TextField
+                select
+                label="Estado"
+                name="estado"
+                fullWidth
+                margin="dense"
+                value={selectedSolicitud.estado}
+                onChange={modalMode === "view" ? undefined : handleChange}
+                InputProps={{ readOnly: modalMode === "view" }}
+              >
+                <MenuItem value="Pendiente">Pendiente</MenuItem>
+                <MenuItem value="Revisado">Revisado</MenuItem>
+                <MenuItem value="Rechazado">Rechazado</MenuItem>
+                <MenuItem value="Otro">Otro</MenuItem>
+              </TextField>
+              <TextField
+                label="Fecha de Envío"
+                name="fechaEnvio"
+                fullWidth
+                margin="dense"
+                type="datetime-local"
+                value={new Date(selectedSolicitud.fechaEnvio)
+                  .toISOString()
+                  .slice(0, 16)}
+                onChange={modalMode === "view" ? undefined : handleChange}
+                InputProps={{ readOnly: modalMode === "view" }}
+              />
+              {modalMode !== "view" && (
+                <Box sx={{ mt: 2, textAlign: "right" }}>
+                  <Button variant="contained" onClick={handleSave}>
+                    Guardar
+                  </Button>
+                </Box>
+              )}
+            </>
           )}
         </Box>
       </Modal>
 
-      {/* Modal de Eliminación */}
       <Modal open={!!deleteId} onClose={() => setDeleteId(null)}>
         <Box
           sx={{

@@ -333,25 +333,70 @@ const OrdenCompraList = () => {
               "tipo",
               "detalle",
               "fechaOrden",
-            ].map((key) => (
-              <TextField
-                key={key}
-                label={key}
-                name={key}
-                fullWidth
-                margin="dense"
-                value={
-                  key === "fechaOrden"
-                    ? new Date(selectedOrden[key]).toISOString().slice(0, 16)
-                    : selectedOrden[key]
-                }
-                onChange={modalMode === "view" ? undefined : handleEditChange}
-                type={key === "fechaOrden" ? "datetime-local" : "text"}
-                InputProps={{ readOnly: modalMode === "view" || key === "id" }}
-                multiline={key === "detalle"}
-                minRows={key === "detalle" ? 3 : undefined}
-              />
-            ))}
+            ].map((key) => {
+              const isReadOnly = modalMode === "view" || key === "id";
+
+              if (key === "estado") {
+                return (
+                  <TextField
+                    key={key}
+                    label="Estado"
+                    name="estado"
+                    select
+                    fullWidth
+                    margin="dense"
+                    value={selectedOrden.estado}
+                    onChange={isReadOnly ? undefined : handleEditChange}
+                    InputProps={{ readOnly: isReadOnly }}
+                  >
+                    <MenuItem value="Pendiente">Pendiente</MenuItem>
+                    <MenuItem value="Aprobada">Aprobada</MenuItem>
+                    <MenuItem value="Rechazada">Rechazada</MenuItem>
+                  </TextField>
+                );
+              }
+
+              if (key === "tipo") {
+                return (
+                  <TextField
+                    key={key}
+                    label="Tipo"
+                    name="tipo"
+                    select
+                    fullWidth
+                    margin="dense"
+                    value={selectedOrden.tipo}
+                    onChange={isReadOnly ? undefined : handleEditChange}
+                    InputProps={{ readOnly: isReadOnly }}
+                  >
+                    <MenuItem value="Cliente">Cliente</MenuItem>
+                    <MenuItem value="Proveedor">Proveedor</MenuItem>
+                    <MenuItem value="Otros">Otros</MenuItem>
+                  </TextField>
+                );
+              }
+
+              return (
+                <TextField
+                  key={key}
+                  label={key}
+                  name={key}
+                  fullWidth
+                  margin="dense"
+                  value={
+                    key === "fechaOrden"
+                      ? new Date(selectedOrden[key]).toISOString().slice(0, 16)
+                      : selectedOrden[key]
+                  }
+                  onChange={isReadOnly ? undefined : handleEditChange}
+                  type={key === "fechaOrden" ? "datetime-local" : "text"}
+                  InputProps={{ readOnly: isReadOnly }}
+                  multiline={key === "detalle"}
+                  minRows={key === "detalle" ? 3 : undefined}
+                />
+              );
+            })}
+
           {modalMode !== "view" && (
             <Box sx={{ mt: 2, textAlign: "right" }}>
               <Button variant="contained" onClick={handleSave}>
