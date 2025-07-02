@@ -295,22 +295,46 @@ const CotizacionesList = () => {
           </Typography>
 
           {selected &&
-            Object.entries(selected).map(([key, value]) => (
-              <TextField
-                key={key}
-                label={key}
-                name={key}
-                fullWidth
-                margin="dense"
-                value={value}
-                onChange={modalMode === "view" ? undefined : handleChange}
-                multiline={key === "detalle"}
-                minRows={key === "detalle" ? 3 : undefined}
-                InputProps={{
-                  readOnly: modalMode === "view" || key === "id",
-                }}
-              />
-            ))}
+            Object.entries(selected).map(([key, value]) => {
+              if (key === "estado") {
+                return (
+                  <TextField
+                    key={key}
+                    label="Estado"
+                    name="estado"
+                    select
+                    fullWidth
+                    margin="dense"
+                    value={value}
+                    onChange={modalMode === "view" ? undefined : handleChange}
+                    InputProps={{
+                      readOnly: modalMode === "view",
+                    }}
+                  >
+                    <MenuItem value="Pendiente">Pendiente</MenuItem>
+                    <MenuItem value="Aprobada">Aprobada</MenuItem>
+                    <MenuItem value="Rechazada">Rechazada</MenuItem>
+                  </TextField>
+                );
+              }
+
+              return (
+                <TextField
+                  key={key}
+                  label={key}
+                  name={key}
+                  fullWidth
+                  margin="dense"
+                  value={value}
+                  onChange={modalMode === "view" ? undefined : handleChange}
+                  multiline={key === "detalle"}
+                  minRows={key === "detalle" ? 3 : undefined}
+                  InputProps={{
+                    readOnly: modalMode === "view" || key === "id",
+                  }}
+                />
+              );
+            })}
 
           {modalMode !== "view" && (
             <Box sx={{ mt: 2, textAlign: "right" }}>
