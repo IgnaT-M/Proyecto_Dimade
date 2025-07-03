@@ -7,7 +7,16 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.CrossOrigin;
+import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RestController;
 
 import cl.dimade.Dimade_Back.model.SolicitudCotizacion;
 import cl.dimade.Dimade_Back.service.SolicitudCotizacionService;
@@ -21,15 +30,15 @@ public class SolicitudCotizacionController {
     private SolicitudCotizacionService service;
 
     @GetMapping
-    public List<SolicitudCotizacion> listar() {
-        return service.obtenerTodas();
+    public Object listar() {
+        Object crudo = service.obtenerTodas();
+        System.out.println("Respuesta cruda desde backend: " + crudo);
+        return crudo;
     }
 
     @GetMapping("/{id}")
     public ResponseEntity<SolicitudCotizacion> obtener(@PathVariable String id) {
-        return service.obtenerPorId(id)
-                .map(ResponseEntity::ok)
-                .orElse(ResponseEntity.notFound().build());
+        return service.obtenerPorId(id).map(ResponseEntity::ok).orElse(ResponseEntity.notFound().build());
     }
 
     @PostMapping
@@ -40,9 +49,7 @@ public class SolicitudCotizacionController {
     @PutMapping("/{id}")
     public ResponseEntity<SolicitudCotizacion> actualizar(@PathVariable String id,
             @RequestBody SolicitudCotizacion actualizada) {
-        return service.actualizar(id, actualizada)
-                .map(ResponseEntity::ok)
-                .orElse(ResponseEntity.notFound().build());
+        return service.actualizar(id, actualizada).map(ResponseEntity::ok).orElse(ResponseEntity.notFound().build());
     }
 
     @DeleteMapping("/{id}")

@@ -22,5 +22,6 @@ public class SolicitudContacto {
     private String telefono;
     private String asunto;
     private String mensaje;
+    private String estado;
     private Date fechaEnvio;
 }
