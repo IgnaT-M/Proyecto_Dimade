@@ -1,4 +1,3 @@
-// CotizacionesList.jsx
 import React, { useEffect, useState, useMemo } from "react";
 import {
   Box,
@@ -17,6 +16,9 @@ import {
   Modal,
   Button,
   MenuItem,
+  Chip,
+  useMediaQuery,
+  useTheme,
 } from "@mui/material";
 import {
   Search as SearchIcon,
@@ -26,6 +28,15 @@ import {
   Add as AddIcon,
   ShoppingCartCheckout as ShoppingCartCheckoutIcon,
 } from "@mui/icons-material";
+
+const formatFecha = (dateString) => {
+  if (!dateString) return "N/A";
+  return new Date(dateString).toLocaleString("es-CL", {
+    day: "2-digit",
+    month: "2-digit",
+    year: "numeric",
+  });
+};
 
 const CotizacionesList = () => {
   const [solicitudes, setSolicitudes] = useState([]);
@@ -38,18 +49,10 @@ const CotizacionesList = () => {
   const [modalMode, setModalMode] = useState("view");
   const [openModal, setOpenModal] = useState(false);
   const [openOrdenModal, setOpenOrdenModal] = useState(false);
-  const [ordenData, setOrdenData] = useState({
-    rutProveedor: "",
-    rutCliente: "",
-    telefono: "",
-    mail: "",
-    fechaOrden: new Date().toISOString(),
-    productos: "",
-    total: 0,
-    estado: "Pendiente",
-    tipo: "Cliente",
-    detalle: "",
-  });
+  const [ordenData, setOrdenData] = useState(null);
+
+  const theme = useTheme();
+  const isMobile = useMediaQuery(theme.breakpoints.down("md"));
 
   useEffect(() => {
     fetchSolicitudes();
@@ -60,12 +63,10 @@ const CotizacionesList = () => {
       const token = localStorage.getItem("jwtToken");
       const res = await fetch(
         "http://localhost:8080/api/solicitudes-cotizacion",
-        {
-          headers: { Authorization: `Bearer ${token}` },
-        }
+        { headers: { Authorization: `Bearer ${token}` } }
       );
       const data = await res.json();
-      setSolicitudes(data);
+      setSolicitudes(Array.isArray(data) ? data : []);
     } catch (err) {
       console.error("Error al cargar cotizaciones:", err);
     }
@@ -102,33 +103,30 @@ const CotizacionesList = () => {
         method: "DELETE",
         headers: { Authorization: `Bearer ${token}` },
       });
-      setSolicitudes((prev) => prev.filter((s) => s.id !== id));
+      fetchSolicitudes();
     } catch (err) {
       console.error("Error al eliminar:", err);
     }
   };
 
   const handleOpenModal = (item, mode) => {
-    if (mode === "new") {
-      setSelected({
-        nombreSolicitante: "",
-        rutSolicitante: "",
-        correo: "",
-        telefono: "",
-        direccion: "",
-        detalle: "",
-        estado: "Pendiente",
-      });
-    } else {
-      setSelected(item);
-    }
+    const initialData = {
+      nombreSolicitante: "",
+      rutSolicitante: "",
+      correo: "",
+      telefono: "",
+      direccion: "",
+      detalle: "",
+      estado: "Pendiente",
+    };
+    setSelected(mode === "new" ? initialData : item);
     setModalMode(mode);
     setOpenModal(true);
   };
 
   const handleCloseModal = () => {
-    setSelected(null);
     setOpenModal(false);
+    setSelected(null);
   };
 
   const handleChange = (e) => {
@@ -143,21 +141,22 @@ const CotizacionesList = () => {
     }));
   };
 
-  const handleCrearOrden = () => {
-    if (!selected) return;
+  const handleCrearOrden = (item) => {
+    if (!item) return;
     setOrdenData({
       rutProveedor: "",
-      rutCliente: selected.rutSolicitante || "",
-      telefono: selected.telefono || "",
-      mail: selected.correo || "",
-      fechaOrden: new Date().toISOString(),
+      rutCliente: item.rutSolicitante || "",
+      telefono: item.telefono || "",
+      mail: item.correo || "",
+      fechaOrden: new Date().toISOString().slice(0, 16),
       productos: "",
       total: 0,
       estado: "Pendiente",
       tipo: "Cliente",
-      detalle: selected.detalle || "",
+      detalle: item.detalle || "",
     });
     setOpenOrdenModal(true);
+    if (openModal) handleCloseModal();
   };
 
   const handleSave = async () => {
@@ -176,7 +175,7 @@ const CotizacionesList = () => {
         },
         body: JSON.stringify({
           ...selected,
-          fechaSolicitud: selected.fechaSolicitud || new Date(),
+          fechaSolicitud: selected.fechaSolicitud || new Date().toISOString(),
         }),
       });
       await fetchSolicitudes();
@@ -187,6 +186,7 @@ const CotizacionesList = () => {
   };
 
   const handleSaveOrden = async () => {
+    if (!ordenData) return;
     try {
       const token = localStorage.getItem("jwtToken");
       const res = await fetch("http://localhost:8080/api/ordenes-compra", {
@@ -199,14 +199,77 @@ const CotizacionesList = () => {
       });
       if (res.ok) {
         setOpenOrdenModal(false);
+        setOrdenData(null);
         alert("Orden creada con éxito");
       } else {
+        alert("Error al crear la orden. Revise la consola.");
         console.error("Error al crear orden");
       }
     } catch (err) {
       console.error("Error al guardar orden:", err);
     }
   };
+
+  const modalStyle = {
+    position: "absolute",
+    top: "50%",
+    left: "50%",
+    transform: "translate(-50%, -50%)",
+    width: { xs: "90%", md: 500 },
+    bgcolor: "background.paper",
+    p: 4,
+    borderRadius: 2,
+    boxShadow: 24,
+    maxHeight: "90vh",
+    overflowY: "auto",
+  };
+
+  const getEstadoColor = (estado) => {
+    switch (estado) {
+      case "Aprobada":
+        return "success";
+      case "Pendiente":
+        return "warning";
+      case "Rechazada":
+        return "error";
+      default:
+        return "default";
+    }
+  };
+
+  const renderActions = (item) => (
+    <Box
+      sx={{
+        display: "flex",
+        justifyContent: "flex-end",
+        flexWrap: "wrap",
+        alignItems: "center",
+      }}
+    >
+      <Tooltip title="Ver">
+        <IconButton onClick={() => handleOpenModal(item, "view")}>
+          <VisibilityIcon sx={{ color: "#1976d2" }} />
+        </IconButton>
+      </Tooltip>
+      <Tooltip title="Editar">
+        <IconButton onClick={() => handleOpenModal(item, "edit")}>
+          <EditIcon sx={{ color: "#f57c00" }} />
+        </IconButton>
+      </Tooltip>
+      <Tooltip title="Eliminar">
+        <IconButton onClick={() => handleDelete(item.id)}>
+          <DeleteIcon sx={{ color: "#d32f2f" }} />
+        </IconButton>
+      </Tooltip>
+      {item.estado === "Aprobada" && (
+        <Tooltip title="Crear Orden de Compra">
+          <IconButton onClick={() => handleCrearOrden(item)}>
+            <ShoppingCartCheckoutIcon color="success" />
+          </IconButton>
+        </Tooltip>
+      )}
+    </Box>
+  );
 
   return (
     <Box>
@@ -215,7 +278,7 @@ const CotizacionesList = () => {
           display: "flex",
           justifyContent: "space-between",
           mb: 2,
-          flexWrap: "wrap",
+          flexDirection: { xs: "column", md: "row" },
           gap: 2,
         }}
       >
@@ -242,6 +305,7 @@ const CotizacionesList = () => {
             value={estadoFiltro}
             onChange={(e) => setEstadoFiltro(e.target.value)}
             label="Estado"
+            sx={{ minWidth: 120 }}
           >
             <MenuItem value="todos">Todos</MenuItem>
             <MenuItem value="Pendiente">Pendiente</MenuItem>
@@ -254,6 +318,7 @@ const CotizacionesList = () => {
             value={ordenFecha}
             onChange={(e) => setOrdenFecha(e.target.value)}
             label="Orden"
+            sx={{ minWidth: 140 }}
           >
             <MenuItem value="recientes">Más recientes</MenuItem>
             <MenuItem value="antiguos">Más antiguos</MenuItem>
@@ -268,69 +333,86 @@ const CotizacionesList = () => {
         </Box>
       </Box>
 
-      <Paper>
-        <Table>
-          <TableHead>
-            <TableRow>
-              {paginated[0] &&
-                Object.keys(paginated[0])
-                  .filter((key) => key !== "detalle")
-                  .map((key) => <TableCell key={key}>{key}</TableCell>)}
-              <TableCell>Acciones</TableCell>
-            </TableRow>
-          </TableHead>
-          <TableBody>
-            {paginated.map((s) => (
-              <TableRow key={s.id}>
-                {Object.entries(s)
-                  .filter(([k]) => k !== "detalle")
-                  .map(([k, v]) => (
-                    <TableCell key={k}>
-                      {k === "fechaSolicitud"
-                        ? new Date(v).toLocaleString()
-                        : String(v)}
-                    </TableCell>
-                  ))}
-                <TableCell>
-                  <Tooltip title="Ver">
-                    <IconButton onClick={() => handleOpenModal(s, "view")}>
-                      <VisibilityIcon sx={{ color: "#1976d2" }} />
-                    </IconButton>
-                  </Tooltip>
-                  <Tooltip title="Editar">
-                    <IconButton onClick={() => handleOpenModal(s, "edit")}>
-                      <EditIcon sx={{ color: "#f57c00" }} />
-                    </IconButton>
-                  </Tooltip>
-                  <Tooltip title="Eliminar">
-                    <IconButton onClick={() => handleDelete(s.id)}>
-                      <DeleteIcon sx={{ color: "#d32f2f" }} />
-                    </IconButton>
-                  </Tooltip>
-                </TableCell>
+      {isMobile ? (
+        <Box>
+          {paginated.map((s) => (
+            <Paper key={s.id} sx={{ p: 2, mb: 2 }}>
+              <Box
+                sx={{
+                  display: "flex",
+                  justifyContent: "space-between",
+                  alignItems: "flex-start",
+                  mb: 1,
+                }}
+              >
+                <Typography variant="subtitle1" fontWeight="bold">
+                  Solicitud #{s.id}
+                </Typography>
+                <Chip
+                  label={s.estado}
+                  color={getEstadoColor(s.estado)}
+                  size="small"
+                />
+              </Box>
+              <Typography variant="body2">
+                <strong>{s.nombreSolicitante}</strong> ({s.rutSolicitante})
+              </Typography>
+              <Typography variant="body2" color="text.secondary">
+                Fecha: {formatFecha(s.fechaSolicitud)}
+              </Typography>
+              <Box sx={{ mt: 2, display: "flex", justifyContent: "flex-end" }}>
+                {renderActions(s)}
+              </Box>
+            </Paper>
+          ))}
+        </Box>
+      ) : (
+        <Paper>
+          <Table>
+            <TableHead>
+              <TableRow>
+                {paginated[0] &&
+                  Object.keys(paginated[0])
+                    .filter((key) => key !== "detalle")
+                    .map((key) => (
+                      <TableCell sx={{ textTransform: "capitalize" }} key={key}>
+                        {key}
+                      </TableCell>
+                    ))}
+                <TableCell align="right">Acciones</TableCell>
               </TableRow>
-            ))}
-          </TableBody>
-        </Table>
+            </TableHead>
+            <TableBody>
+              {paginated.map((s) => (
+                <TableRow key={s.id}>
+                  {Object.entries(s)
+                    .filter(([k]) => k !== "detalle")
+                    .map(([k, v]) => (
+                      <TableCell key={k}>
+                        {k === "fechaSolicitud" ? formatFecha(v) : String(v)}
+                      </TableCell>
+                    ))}
+                  <TableCell align="right">{renderActions(s)}</TableCell>
+                </TableRow>
+              ))}
+            </TableBody>
+          </Table>
+        </Paper>
+      )}
 
-        <TablePagination
-          component="div"
-          count={filtered.length}
-          page={page}
-          onPageChange={(_, newPage) => setPage(newPage)}
-          rowsPerPage={rowsPerPage}
-          onRowsPerPageChange={(e) =>
-            setRowsPerPage(parseInt(e.target.value, 10))
-          }
-          rowsPerPageOptions={[10, 20, 50]}
-          labelRowsPerPage="Filas por página:"
-        />
-      </Paper>
+      <TablePagination
+        component="div"
+        count={filtered.length}
+        page={page}
+        onPageChange={(_, newPage) => setPage(newPage)}
+        rowsPerPage={rowsPerPage}
+        onRowsPerPageChange={(e) =>
+          setRowsPerPage(parseInt(e.target.value, 10))
+        }
+      />
 
       <Modal open={openModal} onClose={handleCloseModal}>
-        <Box sx={estiloModal}>
-          {" "}
-          {/* modal solicitud */}
+        <Box sx={modalStyle}>
           <Typography variant="h6" mb={2}>
             {modalMode === "view"
               ? "Ver Solicitud"
@@ -339,49 +421,49 @@ const CotizacionesList = () => {
               : "Nueva Solicitud"}
           </Typography>
           {selected &&
-            Object.entries(selected).map(([key, value]) =>
-              key === "estado" ? (
+            Object.keys(selected).map((key) => {
+              if (key === "id" || key === "fechaSolicitud") return null;
+              const isReadOnly = modalMode === "view";
+              const label = key
+                .replace(/([A-Z])/g, " $1")
+                .replace(/^./, (str) => str.toUpperCase());
+
+              if (key === "estado") {
+                return (
+                  <TextField
+                    key={key}
+                    label="Estado"
+                    name="estado"
+                    select
+                    fullWidth
+                    margin="dense"
+                    value={selected.estado}
+                    onChange={isReadOnly ? undefined : handleChange}
+                    InputProps={{ readOnly: isReadOnly }}
+                  >
+                    <MenuItem value="Pendiente">Pendiente</MenuItem>
+                    <MenuItem value="Aprobada">Aprobada</MenuItem>
+                    <MenuItem value="Rechazada">Rechazada</MenuItem>
+                  </TextField>
+                );
+              }
+              return (
                 <TextField
                   key={key}
-                  label="Estado"
-                  name="estado"
-                  select
-                  fullWidth
-                  margin="dense"
-                  value={value}
-                  onChange={modalMode === "view" ? undefined : handleChange}
-                  InputProps={{ readOnly: modalMode === "view" }}
-                >
-                  <MenuItem value="Pendiente">Pendiente</MenuItem>
-                  <MenuItem value="Aprobada">Aprobada</MenuItem>
-                  <MenuItem value="Rechazada">Rechazada</MenuItem>
-                </TextField>
-              ) : (
-                <TextField
-                  key={key}
-                  label={key}
+                  label={label}
                   name={key}
                   fullWidth
                   margin="dense"
-                  value={value}
-                  onChange={modalMode === "view" ? undefined : handleChange}
+                  value={selected[key]}
+                  onChange={isReadOnly ? undefined : handleChange}
                   multiline={key === "detalle"}
-                  minRows={key === "detalle" ? 3 : undefined}
-                  InputProps={{
-                    readOnly: modalMode === "view" || key === "id",
-                  }}
+                  rows={key === "detalle" ? 3 : 1}
+                  InputProps={{ readOnly: isReadOnly }}
                 />
-              )
-            )}
+              );
+            })}
           {modalMode === "view" && (
-            <Box mt={2} display="flex" justifyContent="space-between">
-              <Button
-                variant="outlined"
-                startIcon={<ShoppingCartCheckoutIcon />}
-                onClick={handleCrearOrden}
-              >
-                Crear Orden de Compra
-              </Button>
+            <Box mt={2}>
               <Button variant="contained" onClick={handleCloseModal}>
                 Cerrar
               </Button>
@@ -398,88 +480,62 @@ const CotizacionesList = () => {
       </Modal>
 
       <Modal open={openOrdenModal} onClose={() => setOpenOrdenModal(false)}>
-        <Box sx={estiloModal}>
-          {" "}
-          {/* modal orden */}
+        <Box sx={modalStyle}>
           <Typography variant="h6" mb={2}>
             Nueva Orden de Compra
           </Typography>
-          {Object.entries(ordenData).map(([key, value]) => {
-            if (key === "estado") {
+          {ordenData &&
+            Object.keys(ordenData).map((key) => {
+              const label = key
+                .replace(/([A-Z])/g, " $1")
+                .replace(/^./, (str) => str.toUpperCase());
+              if (key === "estado" || key === "tipo") {
+                const options =
+                  key === "estado"
+                    ? ["Pendiente", "Aprobada", "Rechazada"]
+                    : ["Cliente", "Proveedor", "Otros"];
+                return (
+                  <TextField
+                    key={key}
+                    label={label}
+                    name={key}
+                    select
+                    fullWidth
+                    margin="dense"
+                    value={ordenData[key]}
+                    onChange={handleOrdenChange}
+                  >
+                    {options.map((opt) => (
+                      <MenuItem key={opt} value={opt}>
+                        {opt}
+                      </MenuItem>
+                    ))}
+                  </TextField>
+                );
+              }
               return (
                 <TextField
                   key={key}
+                  label={label}
                   name={key}
-                  label="Estado"
-                  select
                   fullWidth
                   margin="dense"
-                  value={value}
-                  onChange={handleOrdenChange}
-                >
-                  <MenuItem value="Pendiente">Pendiente</MenuItem>
-                  <MenuItem value="Aprobada">Aprobada</MenuItem>
-                  <MenuItem value="Rechazada">Rechazada</MenuItem>
-                </TextField>
-              );
-            }
-
-            if (key === "tipo") {
-              return (
-                <TextField
-                  key={key}
-                  name={key}
-                  label="Tipo"
-                  select
-                  fullWidth
-                  margin="dense"
-                  value={value}
-                  onChange={handleOrdenChange}
-                >
-                  <MenuItem value="Cliente">Cliente</MenuItem>
-                  <MenuItem value="Proveedor">Proveedor</MenuItem>
-                  <MenuItem value="Interna">Interna</MenuItem>
-                </TextField>
-              );
-            }
-
-            if (key === "fechaOrden") {
-              return (
-                <TextField
-                  key={key}
-                  name={key}
-                  label="Fecha de Orden"
-                  type="datetime-local"
-                  fullWidth
-                  margin="dense"
-                  value={new Date(value).toISOString().slice(0, 16)}
-                  onChange={(e) =>
-                    setOrdenData((prev) => ({
-                      ...prev,
-                      [key]: new Date(e.target.value).toISOString(),
-                    }))
+                  value={
+                    key === "fechaOrden" ? ordenData[key] : ordenData[key] || ""
                   }
+                  onChange={handleOrdenChange}
+                  type={
+                    key === "fechaOrden"
+                      ? "datetime-local"
+                      : key === "total"
+                      ? "number"
+                      : "text"
+                  }
+                  multiline={key === "detalle" || key === "productos"}
+                  rows={key === "detalle" || key === "productos" ? 3 : 1}
                 />
               );
-            }
-
-            return (
-              <TextField
-                key={key}
-                name={key}
-                label={key}
-                fullWidth
-                margin="dense"
-                value={value}
-                onChange={handleOrdenChange}
-                type={key === "total" ? "number" : "text"}
-                multiline={key === "detalle" || key === "productos"}
-                minRows={
-                  key === "detalle" || key === "productos" ? 2 : undefined
-                }
-              />
-            );
-          })}
+            })}
           <Box sx={{ mt: 2, textAlign: "right" }}>
             <Button variant="contained" onClick={handleSaveOrden}>
               Confirmar Orden
@@ -489,18 +545,6 @@ const CotizacionesList = () => {
       </Modal>
     </Box>
   );
-};
-
-const estiloModal = {
-  position: "absolute",
-  top: "50%",
-  left: "50%",
-  transform: "translate(-50%, -50%)",
-  width: 420,
-  bgcolor: "background.paper",
-  p: 4,
-  borderRadius: 2,
-  boxShadow: 24,
 };
 
 export default CotizacionesList;

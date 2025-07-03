@@ -1,5 +1,3 @@
-// src/componentes/PanelAdministracion.jsx (Código Final con Transparencia Ajustada)
-
 import React, { useState } from "react";
 import {
   AppBar,
@@ -87,14 +85,16 @@ const PanelAdministracion = ({
   }
 
   const drawerContent = (
-    <div>
+    // === CAMBIO 1: Convertimos el div en un Box para usar flexbox y ocupar toda la altura ===
+    <Box sx={{ display: "flex", flexDirection: "column", height: "100%" }}>
       <Toolbar />
       <Box sx={{ px: 2, py: 3, textAlign: "center" }}>
         <Typography variant="h5" component="div">
           DIMADE
         </Typography>
       </Box>
-      <List>
+      {/* === CAMBIO 2: Hacemos que la lista crezca para empujar el botón hacia abajo === */}
+      <List sx={{ flexGrow: 1 }}>
         {menuItems.map((item) => (
           <ListItem key={item.key} disablePadding>
             <ListItemButton
@@ -105,17 +105,13 @@ const PanelAdministracion = ({
                 }
               }}
               selected={selected === item.key}
-              // === CAMBIO REALIZADO AQUÍ: Aumentamos la opacidad ===
               sx={(theme) => ({
                 color: "categoryMenuText",
-                // Hover en item no seleccionado: de 15% a 30%
                 "&:hover": {
                   backgroundColor: alpha(theme.palette.primary.main, 0.3),
                 },
-                // Item seleccionado: de 25% a 45%
                 "&.Mui-selected": {
                   backgroundColor: alpha(theme.palette.primary.main, 0.45),
-                  // Hover en item seleccionado: de 35% a 55%
                   "&:hover": {
                     backgroundColor: alpha(theme.palette.primary.main, 0.55),
                   },
@@ -130,13 +126,31 @@ const PanelAdministracion = ({
           </ListItem>
         ))}
       </List>
-    </div>
+      {/* === CAMBIO 3: Añadimos el botón de modo oscuro/claro SOLO en la vista móvil === */}
+      {isMobile && (
+        <Box sx={{ p: 2, display: "flex", justifyContent: "flex-end" }}>
+          <Tooltip
+            title={theme.palette.mode === "dark" ? "Modo claro" : "Modo oscuro"}
+          >
+            <IconButton
+              onClick={colorMode.toggleColorMode}
+              sx={{ color: "categoryMenuText" }}
+            >
+              {theme.palette.mode === "dark" ? (
+                <Brightness7Icon />
+              ) : (
+                <Brightness4Icon />
+              )}
+            </IconButton>
+          </Tooltip>
+        </Box>
+      )}
+    </Box>
   );
 
   return (
     <Box sx={{ display: "flex" }}>
       <CssBaseline />
-
       <AppBar
         position="fixed"
         color="secondary"
@@ -163,30 +177,37 @@ const PanelAdministracion = ({
             </Typography>
           </Box>
 
-          <Box display="flex" alignItems="center" gap={3}>
-            <Tooltip
-              title={
-                theme.palette.mode === "dark" ? "Modo claro" : "Modo oscuro"
-              }
-            ></Tooltip>
-
-            <Box textAlign="right">
+          <Box display="flex" alignItems="center" gap={{ xs: 1, sm: 2 }}>
+            <Box
+              textAlign="right"
+              sx={{ display: { xs: "none", sm: "block" } }}
+            >
               <Typography variant="body1" fontWeight="bold">
                 {displayName}
               </Typography>
               <Typography variant="body2">{usuario.email}</Typography>
             </Box>
-
             <Avatar sx={{ bgcolor: "primary.main" }}>
               {usuario.nombre.charAt(0).toUpperCase()}
             </Avatar>
-            <IconButton onClick={colorMode.toggleColorMode} color="inherit">
-              {theme.palette.mode === "dark" ? (
-                <Brightness7Icon />
-              ) : (
-                <Brightness4Icon />
-              )}
-            </IconButton>
+            {/* Este botón se mantiene para la vista de escritorio */}
+            <Tooltip
+              title={
+                theme.palette.mode === "dark" ? "Modo claro" : "Modo oscuro"
+              }
+            >
+              <IconButton
+                onClick={colorMode.toggleColorMode}
+                color="inherit"
+                sx={{ display: { xs: "none", md: "inline-flex" } }}
+              >
+                {theme.palette.mode === "dark" ? (
+                  <Brightness7Icon />
+                ) : (
+                  <Brightness4Icon />
+                )}
+              </IconButton>
+            </Tooltip>
             <Tooltip title="Cerrar sesión">
               <IconButton onClick={onLogout} color="inherit">
                 <LogoutIcon />

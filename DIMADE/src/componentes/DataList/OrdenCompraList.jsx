@@ -19,6 +19,9 @@ import {
   FormControl,
   InputLabel,
   Select,
+  Chip,
+  useMediaQuery,
+  useTheme,
 } from "@mui/material";
 import {
   Search as SearchIcon,
@@ -27,6 +30,22 @@ import {
   Edit as EditIcon,
   Add as AddIcon,
 } from "@mui/icons-material";
+
+const formatFecha = (dateString) => {
+  if (!dateString) return "N/A";
+  return new Date(dateString).toLocaleString("es-CL", {
+    day: "2-digit",
+    month: "2-digit",
+    year: "numeric",
+  });
+};
+
+const formatTotal = (amount) => {
+  return new Intl.NumberFormat("es-CL", {
+    style: "currency",
+    currency: "CLP",
+  }).format(amount);
+};
 
 const OrdenCompraList = () => {
   const [ordenes, setOrdenes] = useState([]);
@@ -40,6 +59,9 @@ const OrdenCompraList = () => {
   const [modalMode, setModalMode] = useState("view");
   const [openModal, setOpenModal] = useState(false);
 
+  const theme = useTheme();
+  const isMobile = useMediaQuery(theme.breakpoints.down("md"));
+
   useEffect(() => {
     fetchOrdenes();
   }, []);
@@ -51,7 +73,7 @@ const OrdenCompraList = () => {
         headers: { Authorization: `Bearer ${token}` },
       });
       const data = await res.json();
-      setOrdenes(Array.isArray(data) ? data : [data]);
+      setOrdenes(Array.isArray(data) ? data : []);
     } catch (err) {
       console.error("Error cargando órdenes de compra:", err);
     }
@@ -60,9 +82,19 @@ const OrdenCompraList = () => {
   const filteredOrdenes = useMemo(() => {
     return ordenes
       .filter((orden) => {
-        const matchesSearch = Object.values(orden).some((val) =>
-          String(val).toLowerCase().includes(search.toLowerCase())
-        );
+        const lowerCaseSearch = search.toLowerCase();
+        const searchableText = [
+          orden.id,
+          orden.rutProveedor,
+          orden.rutCliente,
+          orden.estado,
+          orden.tipo,
+          formatTotal(orden.total),
+          formatFecha(orden.fechaOrden),
+        ]
+          .join(" ")
+          .toLowerCase();
+        const matchesSearch = searchableText.includes(lowerCaseSearch);
         const matchesEstado =
           estadoFiltro === "todos" || orden.estado === estadoFiltro;
         const matchesTipo = tipoFiltro === "todos" || orden.tipo === tipoFiltro;
@@ -86,10 +118,7 @@ const OrdenCompraList = () => {
       const token = localStorage.getItem("jwtToken");
       const res = await fetch(
         `http://localhost:8080/api/ordenes-compra/${id}`,
-        {
-          method: "DELETE",
-          headers: { Authorization: `Bearer ${token}` },
-        }
+        { method: "DELETE", headers: { Authorization: `Bearer ${token}` } }
       );
       if (res.ok) {
         setOrdenes((prev) => prev.filter((o) => o.id !== id));
@@ -100,22 +129,19 @@ const OrdenCompraList = () => {
   };
 
   const handleOpenModal = (orden, mode) => {
-    if (mode === "new") {
-      setSelectedOrden({
-        rutProveedor: "",
-        rutCliente: "",
-        telefono: "",
-        mail: "",
-        fechaOrden: new Date(),
-        productos: "",
-        total: 0,
-        estado: "Pendiente",
-        tipo: "Cliente",
-        detalle: "",
-      });
-    } else {
-      setSelectedOrden(orden);
-    }
+    const initialData = {
+      rutProveedor: "",
+      rutCliente: "",
+      telefono: "",
+      mail: "",
+      fechaOrden: new Date().toISOString().slice(0, 16),
+      productos: "",
+      total: 0,
+      estado: "Pendiente",
+      tipo: "Cliente",
+      detalle: "",
+    };
+    setSelectedOrden(mode === "new" ? initialData : orden);
     setModalMode(mode);
     setOpenModal(true);
   };
@@ -126,10 +152,7 @@ const OrdenCompraList = () => {
   };
 
   const handleEditChange = (e) => {
-    setSelectedOrden((prev) => ({
-      ...prev,
-      [e.target.name]: e.target.value,
-    }));
+    setSelectedOrden((prev) => ({ ...prev, [e.target.name]: e.target.value }));
   };
 
   const handleSave = async () => {
@@ -140,19 +163,14 @@ const OrdenCompraList = () => {
           ? "http://localhost:8080/api/ordenes-compra"
           : `http://localhost:8080/api/ordenes-compra/${selectedOrden.id}`;
       const method = modalMode === "new" ? "POST" : "PUT";
-
       const res = await fetch(url, {
         method,
         headers: {
           "Content-Type": "application/json",
           Authorization: `Bearer ${token}`,
         },
-        body: JSON.stringify({
-          ...selectedOrden,
-          fechaOrden: new Date(selectedOrden.fechaOrden),
-        }),
+        body: JSON.stringify(selectedOrden),
       });
-
       if (res.ok) {
         await fetchOrdenes();
         handleCloseModal();
@@ -162,15 +180,63 @@ const OrdenCompraList = () => {
     }
   };
 
+  const renderActions = (orden) => (
+    <Box sx={{ display: "flex", justifyContent: "flex-end", flexWrap: "wrap" }}>
+      <Tooltip title="Ver">
+        <IconButton onClick={() => handleOpenModal(orden, "view")}>
+          <VisibilityIcon sx={{ color: "#1976d2" }} />
+        </IconButton>
+      </Tooltip>
+      <Tooltip title="Editar">
+        <IconButton onClick={() => handleOpenModal(orden, "edit")}>
+          <EditIcon sx={{ color: "#f57c00" }} />
+        </IconButton>
+      </Tooltip>
+      <Tooltip title="Eliminar">
+        <IconButton onClick={() => handleDelete(orden.id)}>
+          <DeleteIcon sx={{ color: "#d32f2f" }} />
+        </IconButton>
+      </Tooltip>
+    </Box>
+  );
+
+  const getEstadoColor = (estado) => {
+    switch (estado) {
+      case "Aprobada":
+        return "success";
+      case "Pendiente":
+        return "warning";
+      case "Rechazada":
+        return "error";
+      default:
+        return "default";
+    }
+  };
+
+  const modalStyle = {
+    position: "absolute",
+    top: "50%",
+    left: "50%",
+    transform: "translate(-50%, -50%)",
+    width: { xs: "90%", md: 500 },
+    bgcolor: "background.paper",
+    boxShadow: 24,
+    p: 4,
+    borderRadius: 2,
+    maxHeight: "90vh",
+    overflowY: "auto",
+  };
+
   return (
     <Box>
       <Box
         sx={{
           display: "flex",
           justifyContent: "space-between",
+          alignItems: { xs: "stretch", md: "center" },
+          flexDirection: { xs: "column", md: "row" },
+          gap: 2,
           mb: 2,
-          flexWrap: "wrap",
-          gap: 1,
         }}
       >
         <Typography variant="h5" fontWeight="bold">
@@ -190,13 +256,12 @@ const OrdenCompraList = () => {
               ),
             }}
           />
-          <FormControl size="small">
+          <FormControl size="small" sx={{ minWidth: 120 }}>
             <InputLabel>Estado</InputLabel>
             <Select
               value={estadoFiltro}
               label="Estado"
               onChange={(e) => setEstadoFiltro(e.target.value)}
-              sx={{ minWidth: 120 }}
             >
               <MenuItem value="todos">Todos</MenuItem>
               <MenuItem value="Pendiente">Pendiente</MenuItem>
@@ -204,13 +269,12 @@ const OrdenCompraList = () => {
               <MenuItem value="Rechazada">Rechazada</MenuItem>
             </Select>
           </FormControl>
-          <FormControl size="small">
+          <FormControl size="small" sx={{ minWidth: 120 }}>
             <InputLabel>Tipo</InputLabel>
             <Select
               value={tipoFiltro}
               label="Tipo"
               onChange={(e) => setTipoFiltro(e.target.value)}
-              sx={{ minWidth: 120 }}
             >
               <MenuItem value="todos">Todos</MenuItem>
               <MenuItem value="Cliente">Cliente</MenuItem>
@@ -218,13 +282,12 @@ const OrdenCompraList = () => {
               <MenuItem value="Otros">Otros</MenuItem>
             </Select>
           </FormControl>
-          <FormControl size="small">
+          <FormControl size="small" sx={{ minWidth: 120 }}>
             <InputLabel>Orden</InputLabel>
             <Select
               value={ordenFecha}
               label="Orden"
               onChange={(e) => setOrdenFecha(e.target.value)}
-              sx={{ minWidth: 120 }}
             >
               <MenuItem value="recientes">Más recientes</MenuItem>
               <MenuItem value="antiguos">Más antiguos</MenuItem>
@@ -240,81 +303,103 @@ const OrdenCompraList = () => {
         </Box>
       </Box>
 
-      <Paper>
-        <Table>
-          <TableHead>
-            <TableRow>
-              {paginatedOrdenes[0] &&
-                Object.keys(paginatedOrdenes[0])
-                  .filter((key) => key !== "productos" && key !== "detalle")
-                  .map((key) => <TableCell key={key}>{key}</TableCell>)}
-              <TableCell>Acciones</TableCell>
-            </TableRow>
-          </TableHead>
-          <TableBody>
-            {paginatedOrdenes.map((orden) => (
-              <TableRow key={orden.id}>
-                {Object.entries(orden)
-                  .filter(([k]) => k !== "productos" && k !== "detalle")
-                  .map(([k, v]) => (
-                    <TableCell key={k}>
-                      {k === "fechaOrden"
-                        ? new Date(v).toLocaleString([], {
-                            dateStyle: "short",
-                            timeStyle: "short",
-                          })
-                        : String(v)}
-                    </TableCell>
-                  ))}
-                <TableCell>
-                  <Tooltip title="Ver">
-                    <IconButton onClick={() => handleOpenModal(orden, "view")}>
-                      <VisibilityIcon sx={{ color: "#1976d2" }} />
-                    </IconButton>
-                  </Tooltip>
-                  <Tooltip title="Editar">
-                    <IconButton onClick={() => handleOpenModal(orden, "edit")}>
-                      <EditIcon sx={{ color: "#f57c00" }} />
-                    </IconButton>
-                  </Tooltip>
-                  <Tooltip title="Eliminar">
-                    <IconButton onClick={() => handleDelete(orden.id)}>
-                      <DeleteIcon sx={{ color: "#d32f2f" }} />
-                    </IconButton>
-                  </Tooltip>
-                </TableCell>
+      {isMobile ? (
+        <Box>
+          {paginatedOrdenes.map((orden) => (
+            <Paper key={orden.id} sx={{ p: 2, mb: 2 }}>
+              <Box
+                sx={{
+                  display: "flex",
+                  justifyContent: "space-between",
+                  alignItems: "flex-start",
+                  mb: 1,
+                }}
+              >
+                <Typography variant="subtitle1" fontWeight="bold">
+                  Orden #{orden.id}
+                </Typography>
+                <Chip
+                  label={orden.estado}
+                  color={getEstadoColor(orden.estado)}
+                  size="small"
+                />
+              </Box>
+              <Typography variant="body2" color="text.secondary">
+                {orden.tipo}:{" "}
+                <strong>
+                  {orden.tipo === "Proveedor"
+                    ? orden.rutProveedor
+                    : orden.rutCliente}
+                </strong>
+              </Typography>
+              <Typography variant="body2" color="text.secondary">
+                Fecha: {formatFecha(orden.fechaOrden)}
+              </Typography>
+              <Box
+                sx={{
+                  display: "flex",
+                  justifyContent: "space-between",
+                  alignItems: "center",
+                  mt: 2,
+                }}
+              >
+                <Typography variant="h6">{formatTotal(orden.total)}</Typography>
+                {renderActions(orden)}
+              </Box>
+            </Paper>
+          ))}
+        </Box>
+      ) : (
+        <Paper>
+          <Table>
+            <TableHead>
+              <TableRow>
+                {paginatedOrdenes[0] &&
+                  Object.keys(paginatedOrdenes[0])
+                    .filter((key) => key !== "productos" && key !== "detalle")
+                    .map((key) => (
+                      <TableCell key={key} sx={{ textTransform: "capitalize" }}>
+                        {key}
+                      </TableCell>
+                    ))}
+                <TableCell align="right">Acciones</TableCell>
               </TableRow>
-            ))}
-          </TableBody>
-        </Table>
-        <TablePagination
-          component="div"
-          count={filteredOrdenes.length}
-          page={page}
-          onPageChange={(_, newPage) => setPage(newPage)}
-          rowsPerPage={rowsPerPage}
-          onRowsPerPageChange={(e) =>
-            setRowsPerPage(parseInt(e.target.value, 10))
-          }
-          rowsPerPageOptions={[10, 20, 50]}
-          labelRowsPerPage="Filas por página:"
-        />
-      </Paper>
+            </TableHead>
+            <TableBody>
+              {paginatedOrdenes.map((orden) => (
+                <TableRow key={orden.id}>
+                  {Object.entries(orden)
+                    .filter(([k]) => k !== "productos" && k !== "detalle")
+                    .map(([k, v]) => (
+                      <TableCell key={k}>
+                        {k === "fechaOrden"
+                          ? formatFecha(v)
+                          : k === "total"
+                          ? formatTotal(v)
+                          : String(v)}
+                      </TableCell>
+                    ))}
+                  <TableCell align="right">{renderActions(orden)}</TableCell>
+                </TableRow>
+              ))}
+            </TableBody>
+          </Table>
+        </Paper>
+      )}
+
+      <TablePagination
+        component="div"
+        count={filteredOrdenes.length}
+        page={page}
+        onPageChange={(_, newPage) => setPage(newPage)}
+        rowsPerPage={rowsPerPage}
+        onRowsPerPageChange={(e) =>
+          setRowsPerPage(parseInt(e.target.value, 10))
+        }
+      />
 
       <Modal open={openModal} onClose={handleCloseModal}>
-        <Box
-          sx={{
-            position: "absolute",
-            top: "50%",
-            left: "50%",
-            transform: "translate(-50%, -50%)",
-            width: 400,
-            bgcolor: "background.paper",
-            p: 4,
-            borderRadius: 2,
-            boxShadow: 24,
-          }}
-        >
+        <Box sx={modalStyle}>
           <Typography variant="h6" mb={2}>
             {modalMode === "view"
               ? "Ver Orden"
@@ -323,63 +408,41 @@ const OrdenCompraList = () => {
               : "Nueva Orden"}
           </Typography>
           {selectedOrden &&
-            [
-              "rutProveedor",
-              "rutCliente",
-              "telefono",
-              "mail",
-              "total",
-              "estado",
-              "tipo",
-              "detalle",
-              "fechaOrden",
-            ].map((key) => {
-              const isReadOnly = modalMode === "view" || key === "id";
-
-              if (key === "estado") {
+            Object.keys(selectedOrden).map((key) => {
+              if (key === "id" || key === "productos") return null;
+              const isReadOnly = modalMode === "view";
+              const label = key
+                .replace(/([A-Z])/g, " $1")
+                .replace(/^./, (str) => str.toUpperCase());
+              if (key === "estado" || key === "tipo") {
+                const options =
+                  key === "estado"
+                    ? ["Pendiente", "Aprobada", "Rechazada"]
+                    : ["Cliente", "Proveedor", "Otros"];
                 return (
                   <TextField
                     key={key}
-                    label="Estado"
-                    name="estado"
+                    label={label}
+                    name={key}
                     select
                     fullWidth
                     margin="dense"
-                    value={selectedOrden.estado}
+                    value={selectedOrden[key]}
                     onChange={isReadOnly ? undefined : handleEditChange}
                     InputProps={{ readOnly: isReadOnly }}
                   >
-                    <MenuItem value="Pendiente">Pendiente</MenuItem>
-                    <MenuItem value="Aprobada">Aprobada</MenuItem>
-                    <MenuItem value="Rechazada">Rechazada</MenuItem>
+                    {options.map((opt) => (
+                      <MenuItem key={opt} value={opt}>
+                        {opt}
+                      </MenuItem>
+                    ))}
                   </TextField>
                 );
               }
-
-              if (key === "tipo") {
-                return (
-                  <TextField
-                    key={key}
-                    label="Tipo"
-                    name="tipo"
-                    select
-                    fullWidth
-                    margin="dense"
-                    value={selectedOrden.tipo}
-                    onChange={isReadOnly ? undefined : handleEditChange}
-                    InputProps={{ readOnly: isReadOnly }}
-                  >
-                    <MenuItem value="Cliente">Cliente</MenuItem>
-                    <MenuItem value="Proveedor">Proveedor</MenuItem>
-                    <MenuItem value="Otros">Otros</MenuItem>
-                  </TextField>
-                );
-              }
-
               return (
                 <TextField
                   key={key}
-                  label={key}
+                  label={label}
                   name={key}
                   fullWidth
                   margin="dense"
@@ -389,14 +452,19 @@ const OrdenCompraList = () => {
                       : selectedOrden[key]
                   }
                   onChange={isReadOnly ? undefined : handleEditChange}
-                  type={key === "fechaOrden" ? "datetime-local" : "text"}
+                  type={
+                    key === "fechaOrden"
+                      ? "datetime-local"
+                      : key === "total"
+                      ? "number"
+                      : "text"
+                  }
                   InputProps={{ readOnly: isReadOnly }}
                   multiline={key === "detalle"}
-                  minRows={key === "detalle" ? 3 : undefined}
+                  rows={key === "detalle" ? 3 : 1}
                 />
               );
             })}
-
           {modalMode !== "view" && (
             <Box sx={{ mt: 2, textAlign: "right" }}>
               <Button variant="contained" onClick={handleSave}>

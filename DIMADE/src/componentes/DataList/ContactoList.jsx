@@ -16,9 +16,9 @@ import {
   Modal,
   Button,
   MenuItem,
-  Select,
-  FormControl,
-  InputLabel,
+  Chip,
+  useMediaQuery,
+  useTheme,
 } from "@mui/material";
 import {
   Search as SearchIcon,
@@ -27,6 +27,18 @@ import {
   Edit as EditIcon,
   Add as AddIcon,
 } from "@mui/icons-material";
+
+// Helper para formatear fechas de manera consistente
+const formatFecha = (dateString) => {
+  if (!dateString) return "N/A";
+  return new Date(dateString).toLocaleString("es-CL", {
+    day: "2-digit",
+    month: "2-digit",
+    year: "numeric",
+    hour: "2-digit",
+    minute: "2-digit",
+  });
+};
 
 const ContactoList = () => {
   const [solicitudes, setSolicitudes] = useState([]);
@@ -41,6 +53,9 @@ const ContactoList = () => {
   const [openModal, setOpenModal] = useState(false);
   const [deleteId, setDeleteId] = useState(null);
 
+  const theme = useTheme();
+  const isMobile = useMediaQuery(theme.breakpoints.down("md"));
+
   useEffect(() => {
     fetchSolicitudes();
   }, []);
@@ -50,12 +65,10 @@ const ContactoList = () => {
       const token = localStorage.getItem("jwtToken");
       const res = await fetch(
         "http://localhost:8080/api/solicitudes-contacto",
-        {
-          headers: { Authorization: `Bearer ${token}` },
-        }
+        { headers: { Authorization: `Bearer ${token}` } }
       );
       const data = await res.json();
-      setSolicitudes(Array.isArray(data) ? data : [data]);
+      setSolicitudes(Array.isArray(data) ? data : []);
     } catch (err) {
       console.error("Error al cargar solicitudes:", err);
     }
@@ -72,8 +85,8 @@ const ContactoList = () => {
         return matchSearch && matchAsunto && matchEstado;
       })
       .sort((a, b) => {
-        const fechaA = new Date(a.fechaEnvio);
-        const fechaB = new Date(b.fechaEnvio);
+        const fechaA = new Date(a.fechaEnvio).getTime();
+        const fechaB = new Date(b.fechaEnvio).getTime();
         return orden === "recientes" ? fechaB - fechaA : fechaA - fechaB;
       });
   }, [solicitudes, search, asuntoFiltro, estadoFiltro, orden]);
@@ -108,10 +121,7 @@ const ContactoList = () => {
 
   const handleChange = (e) => {
     const { name, value } = e.target;
-    setSelectedSolicitud((prev) => ({
-      ...prev,
-      [name]: value,
-    }));
+    setSelectedSolicitud((prev) => ({ ...prev, [name]: value }));
   };
 
   const handleSave = async () => {
@@ -122,7 +132,6 @@ const ContactoList = () => {
           ? "http://localhost:8080/api/solicitudes-contacto"
           : `http://localhost:8080/api/solicitudes-contacto/${selectedSolicitud.id}`;
       const method = modalMode === "new" ? "POST" : "PUT";
-
       const res = await fetch(url, {
         method,
         headers: {
@@ -131,7 +140,6 @@ const ContactoList = () => {
         },
         body: JSON.stringify(selectedSolicitud),
       });
-
       if (res.ok) {
         await fetchSolicitudes();
         handleCloseModal();
@@ -142,14 +150,12 @@ const ContactoList = () => {
   };
 
   const handleDelete = async () => {
+    if (!deleteId) return;
     try {
       const token = localStorage.getItem("jwtToken");
       const res = await fetch(
         `http://localhost:8080/api/solicitudes-contacto/${deleteId}`,
-        {
-          method: "DELETE",
-          headers: { Authorization: `Bearer ${token}` },
-        }
+        { method: "DELETE", headers: { Authorization: `Bearer ${token}` } }
       );
       if (res.ok) {
         await fetchSolicitudes();
@@ -160,20 +166,68 @@ const ContactoList = () => {
     }
   };
 
+  const getEstadoColor = (estado) => {
+    switch (estado) {
+      case "Revisado":
+        return "success";
+      case "Pendiente":
+        return "warning";
+      case "Rechazado":
+        return "error";
+      default:
+        return "default";
+    }
+  };
+
+  const renderActions = (s) => (
+    <Box>
+      <Tooltip title="Ver">
+        <IconButton onClick={() => handleOpenModal(s, "view")}>
+          <VisibilityIcon sx={{ color: "#1976d2" }} />
+        </IconButton>
+      </Tooltip>
+      <Tooltip title="Editar">
+        <IconButton onClick={() => handleOpenModal(s, "edit")}>
+          <EditIcon sx={{ color: "#f57c00" }} />
+        </IconButton>
+      </Tooltip>
+      <Tooltip title="Eliminar">
+        <IconButton onClick={() => setDeleteId(s.id)}>
+          <DeleteIcon sx={{ color: "#d32f2f" }} />
+        </IconButton>
+      </Tooltip>
+    </Box>
+  );
+
+  const modalStyle = {
+    position: "absolute",
+    top: "50%",
+    left: "50%",
+    transform: "translate(-50%, -50%)",
+    width: { xs: "90%", md: 500 },
+    bgcolor: "background.paper",
+    p: 4,
+    borderRadius: 2,
+    boxShadow: 24,
+    maxHeight: "90vh",
+    overflowY: "auto",
+  };
+
   return (
     <Box>
-      <Box sx={{ display: "flex", justifyContent: "space-between", mb: 2 }}>
+      <Box
+        sx={{
+          display: "flex",
+          justifyContent: "space-between",
+          mb: 2,
+          flexDirection: { xs: "column", md: "row" },
+          gap: 2,
+        }}
+      >
         <Typography variant="h5" fontWeight="bold">
           Solicitudes de Contacto
         </Typography>
-        <Box
-          sx={{
-            display: "flex",
-            gap: 1,
-            flexWrap: "wrap",
-            alignItems: "center",
-          }}
-        >
+        <Box sx={{ display: "flex", gap: 1, flexWrap: "wrap" }}>
           <TextField
             size="small"
             placeholder="Buscar..."
@@ -237,81 +291,107 @@ const ContactoList = () => {
         </Box>
       </Box>
 
-      <Paper>
-        <Table>
-          <TableHead>
-            <TableRow>
-              <TableCell>ID</TableCell>
-              <TableCell>Nombre</TableCell>
-              <TableCell>Correo</TableCell>
-              <TableCell>Teléfono</TableCell>
-
-              <TableCell>Asunto</TableCell>
-              <TableCell>Estado</TableCell>
-              <TableCell>Fecha de Envío</TableCell>
-              <TableCell>Acciones</TableCell>
-            </TableRow>
-          </TableHead>
-          <TableBody>
-            {paginated.map((s) => (
-              <TableRow key={s.id}>
-                <TableCell>{s.id}</TableCell>
-                <TableCell>{s.nombre}</TableCell>
-                <TableCell>{s.correo}</TableCell>
-                <TableCell>{s.telefono}</TableCell>
-                <TableCell>{s.asunto}</TableCell>
-                <TableCell>{s.estado}</TableCell>
-                <TableCell>{new Date(s.fechaEnvio).toLocaleString()}</TableCell>
-                <TableCell>
-                  <Tooltip title="Ver">
-                    <IconButton onClick={() => handleOpenModal(s, "view")}>
-                      <VisibilityIcon sx={{ color: "#1976d2" }} />
-                    </IconButton>
-                  </Tooltip>
-                  <Tooltip title="Editar">
-                    <IconButton onClick={() => handleOpenModal(s, "edit")}>
-                      <EditIcon sx={{ color: "#f57c00" }} />
-                    </IconButton>
-                  </Tooltip>
-                  <Tooltip title="Eliminar">
-                    <IconButton onClick={() => setDeleteId(s.id)}>
-                      <DeleteIcon sx={{ color: "#d32f2f" }} />
-                    </IconButton>
-                  </Tooltip>
-                </TableCell>
+      {isMobile ? (
+        <Box>
+          {paginated.map((s) => (
+            <Paper key={s.id} sx={{ p: 2, mb: 2 }}>
+              <Box
+                sx={{
+                  display: "flex",
+                  justifyContent: "space-between",
+                  alignItems: "flex-start",
+                  mb: 1,
+                }}
+              >
+                <Typography variant="subtitle1" fontWeight="bold">
+                  Solicitud #{s.id}
+                </Typography>
+                <Chip
+                  label={s.estado}
+                  color={getEstadoColor(s.estado)}
+                  size="small"
+                />
+              </Box>
+              <Typography variant="body2">
+                <strong>{s.nombre}</strong>
+              </Typography>
+              <Typography variant="body2" color="text.secondary">
+                {s.correo}
+              </Typography>
+              <Typography
+                variant="caption"
+                display="block"
+                color="text.secondary"
+                mt={1}
+              >
+                Asunto: {s.asunto}
+              </Typography>
+              <Box
+                sx={{
+                  display: "flex",
+                  justifyContent: "space-between",
+                  alignItems: "center",
+                  mt: 1,
+                }}
+              >
+                <Typography variant="caption" color="text.secondary">
+                  {formatFecha(s.fechaEnvio)}
+                </Typography>
+                {renderActions(s)}
+              </Box>
+            </Paper>
+          ))}
+        </Box>
+      ) : (
+        <Paper>
+          <Table>
+            <TableHead>
+              <TableRow>
+                <TableCell>ID</TableCell>
+                <TableCell>Nombre</TableCell>
+                <TableCell>Correo</TableCell>
+                <TableCell>Asunto</TableCell>
+                <TableCell>Estado</TableCell>
+                <TableCell>Fecha de Envío</TableCell>
+                <TableCell align="right">Acciones</TableCell>
               </TableRow>
-            ))}
-          </TableBody>
-        </Table>
+            </TableHead>
+            <TableBody>
+              {paginated.map((s) => (
+                <TableRow key={s.id}>
+                  <TableCell>{s.id}</TableCell>
+                  <TableCell>{s.nombre}</TableCell>
+                  <TableCell>{s.correo}</TableCell>
+                  <TableCell>{s.asunto}</TableCell>
+                  <TableCell>
+                    <Chip
+                      label={s.estado}
+                      color={getEstadoColor(s.estado)}
+                      size="small"
+                    />
+                  </TableCell>
+                  <TableCell>{formatFecha(s.fechaEnvio)}</TableCell>
+                  <TableCell align="right">{renderActions(s)}</TableCell>
+                </TableRow>
+              ))}
+            </TableBody>
+          </Table>
+        </Paper>
+      )}
 
-        <TablePagination
-          component="div"
-          count={filtered.length}
-          page={page}
-          onPageChange={(_, newPage) => setPage(newPage)}
-          rowsPerPage={rowsPerPage}
-          onRowsPerPageChange={(e) =>
-            setRowsPerPage(parseInt(e.target.value, 10))
-          }
-          rowsPerPageOptions={[10, 20, 50]}
-          labelRowsPerPage="Filas por página:"
-        />
-      </Paper>
+      <TablePagination
+        component="div"
+        count={filtered.length}
+        page={page}
+        onPageChange={(_, newPage) => setPage(newPage)}
+        rowsPerPage={rowsPerPage}
+        onRowsPerPageChange={(e) =>
+          setRowsPerPage(parseInt(e.target.value, 10))
+        }
+      />
 
       <Modal open={openModal} onClose={handleCloseModal}>
-        <Box
-          sx={{
-            position: "absolute",
-            top: "50%",
-            left: "50%",
-            transform: "translate(-50%, -50%)",
-            width: 400,
-            bgcolor: "background.paper",
-            p: 4,
-            borderRadius: 2,
-            boxShadow: 24,
-          }}
-        >
+        <Box sx={modalStyle}>
           <Typography variant="h6" mb={2}>
             {modalMode === "view"
               ? "Ver Solicitud"
@@ -327,7 +407,7 @@ const ContactoList = () => {
                 fullWidth
                 margin="dense"
                 value={selectedSolicitud.nombre}
-                onChange={modalMode === "view" ? undefined : handleChange}
+                onChange={handleChange}
                 InputProps={{ readOnly: modalMode === "view" }}
               />
               <TextField
@@ -336,7 +416,7 @@ const ContactoList = () => {
                 fullWidth
                 margin="dense"
                 value={selectedSolicitud.correo}
-                onChange={modalMode === "view" ? undefined : handleChange}
+                onChange={handleChange}
                 InputProps={{ readOnly: modalMode === "view" }}
               />
               <TextField
@@ -345,7 +425,7 @@ const ContactoList = () => {
                 fullWidth
                 margin="dense"
                 value={selectedSolicitud.telefono}
-                onChange={modalMode === "view" ? undefined : handleChange}
+                onChange={handleChange}
                 InputProps={{ readOnly: modalMode === "view" }}
               />
               <TextField
@@ -354,9 +434,9 @@ const ContactoList = () => {
                 fullWidth
                 margin="dense"
                 multiline
-                minRows={2}
+                minRows={3}
                 value={selectedSolicitud.mensaje}
-                onChange={modalMode === "view" ? undefined : handleChange}
+                onChange={handleChange}
                 InputProps={{ readOnly: modalMode === "view" }}
               />
               <TextField
@@ -366,7 +446,7 @@ const ContactoList = () => {
                 fullWidth
                 margin="dense"
                 value={selectedSolicitud.asunto}
-                onChange={modalMode === "view" ? undefined : handleChange}
+                onChange={handleChange}
                 InputProps={{ readOnly: modalMode === "view" }}
               >
                 <MenuItem value="Consulta">Consulta</MenuItem>
@@ -381,7 +461,7 @@ const ContactoList = () => {
                 fullWidth
                 margin="dense"
                 value={selectedSolicitud.estado}
-                onChange={modalMode === "view" ? undefined : handleChange}
+                onChange={handleChange}
                 InputProps={{ readOnly: modalMode === "view" }}
               >
                 <MenuItem value="Pendiente">Pendiente</MenuItem>
@@ -389,18 +469,6 @@ const ContactoList = () => {
                 <MenuItem value="Rechazado">Rechazado</MenuItem>
                 <MenuItem value="Otro">Otro</MenuItem>
               </TextField>
-              <TextField
-                label="Fecha de Envío"
-                name="fechaEnvio"
-                fullWidth
-                margin="dense"
-                type="datetime-local"
-                value={new Date(selectedSolicitud.fechaEnvio)
-                  .toISOString()
-                  .slice(0, 16)}
-                onChange={modalMode === "view" ? undefined : handleChange}
-                InputProps={{ readOnly: modalMode === "view" }}
-              />
               {modalMode !== "view" && (
                 <Box sx={{ mt: 2, textAlign: "right" }}>
                   <Button variant="contained" onClick={handleSave}>
@@ -420,7 +488,7 @@ const ContactoList = () => {
             top: "50%",
             left: "50%",
             transform: "translate(-50%, -50%)",
-            width: 300,
+            width: { xs: "80%", sm: 350 },
             bgcolor: "background.paper",
             p: 3,
             borderRadius: 2,
@@ -428,11 +496,16 @@ const ContactoList = () => {
             textAlign: "center",
           }}
         >
+          <Typography variant="h6" mb={1}>
+            Confirmar Eliminación
+          </Typography>
           <Typography mb={2}>
             ¿Estás seguro de que deseas eliminar esta solicitud?
           </Typography>
-          <Box sx={{ display: "flex", justifyContent: "center", gap: 1 }}>
-            <Button onClick={() => setDeleteId(null)}>Cancelar</Button>
+          <Box sx={{ display: "flex", justifyContent: "center", gap: 2 }}>
+            <Button variant="outlined" onClick={() => setDeleteId(null)}>
+              Cancelar
+            </Button>
             <Button variant="contained" color="error" onClick={handleDelete}>
               Eliminar
             </Button>

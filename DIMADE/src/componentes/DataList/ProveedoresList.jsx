@@ -17,6 +17,8 @@ import {
   Button,
   MenuItem,
   Chip,
+  useMediaQuery,
+  useTheme,
 } from "@mui/material";
 import SearchIcon from "@mui/icons-material/Search";
 import VisibilityIcon from "@mui/icons-material/Visibility";
@@ -26,6 +28,7 @@ import ToggleOnIcon from "@mui/icons-material/ToggleOn";
 import ToggleOffIcon from "@mui/icons-material/ToggleOff";
 import AddIcon from "@mui/icons-material/Add";
 
+// Se mantiene la función helper para validación
 const isValidEmail = (correo) => /\S+@\S+\.\S+/.test(correo);
 
 const ProveedoresList = () => {
@@ -38,6 +41,9 @@ const ProveedoresList = () => {
   const [modalMode, setModalMode] = useState("view");
   const [openModal, setOpenModal] = useState(false);
 
+  const theme = useTheme();
+  const isMobile = useMediaQuery(theme.breakpoints.down("md"));
+
   useEffect(() => {
     fetchProveedores();
   }, []);
@@ -46,14 +52,22 @@ const ProveedoresList = () => {
     try {
       const token = localStorage.getItem("jwtToken");
       const res = await fetch("http://localhost:8080/api/proveedores", {
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
+        headers: { Authorization: `Bearer ${token}` },
       });
+      if (!res.ok) {
+        console.error(
+          "Respuesta no exitosa de la API:",
+          res.status,
+          res.statusText
+        );
+        setProveedores([]);
+        return;
+      }
       const data = await res.json();
-      setProveedores(data);
+      setProveedores(Array.isArray(data) ? data : []);
     } catch (err) {
       console.error("Error cargando proveedores:", err);
+      setProveedores([]);
     }
   };
 
@@ -108,7 +122,6 @@ const ProveedoresList = () => {
           ? "http://localhost:8080/api/proveedores"
           : `http://localhost:8080/api/proveedores/${selectedProveedor.id}`;
       const method = modalMode === "new" ? "POST" : "PUT";
-
       const res = await fetch(url, {
         method,
         headers: {
@@ -117,10 +130,10 @@ const ProveedoresList = () => {
         },
         body: JSON.stringify(selectedProveedor),
       });
-
       if (res.ok) {
         await fetchProveedores();
         setOpenModal(false);
+        setSelectedProveedor(null);
       }
     } catch (err) {
       console.error("Error al guardar proveedor:", err);
@@ -170,6 +183,11 @@ const ProveedoresList = () => {
     setOpenModal(true);
   };
 
+  const handleCloseModal = () => {
+    setOpenModal(false);
+    setSelectedProveedor(null);
+  };
+
   const handleEditChange = (e) => {
     const { name, value } = e.target;
     setSelectedProveedor((prev) => ({
@@ -178,9 +196,62 @@ const ProveedoresList = () => {
     }));
   };
 
+  const renderActions = (proveedor) => (
+    <Box sx={{ display: "flex", justifyContent: "flex-end", flexWrap: "wrap" }}>
+      <Tooltip title="Ver">
+        <IconButton onClick={() => handleOpenModal(proveedor, "view")}>
+          <VisibilityIcon sx={{ color: "#1976d2" }} />
+        </IconButton>
+      </Tooltip>
+      <Tooltip title="Editar">
+        <IconButton onClick={() => handleOpenModal(proveedor, "edit")}>
+          <EditIcon sx={{ color: "#f57c00" }} />
+        </IconButton>
+      </Tooltip>
+      <Tooltip title="Eliminar">
+        <IconButton onClick={() => handleDelete(proveedor.id)}>
+          <DeleteIcon sx={{ color: "#d32f2f" }} />
+        </IconButton>
+      </Tooltip>
+      {"activo" in proveedor && (
+        <Tooltip title={proveedor.activo ? "Desactivar" : "Activar"}>
+          <IconButton onClick={() => handleToggleActivo(proveedor)}>
+            {proveedor.activo ? (
+              <ToggleOnIcon sx={{ color: "#2e7d32" }} />
+            ) : (
+              <ToggleOffIcon sx={{ color: "#616161" }} />
+            )}
+          </IconButton>
+        </Tooltip>
+      )}
+    </Box>
+  );
+
+  const modalStyle = {
+    position: "absolute",
+    top: "50%",
+    left: "50%",
+    transform: "translate(-50%, -50%)",
+    width: { xs: "90%", md: 500 },
+    bgcolor: "background.paper",
+    p: 4,
+    borderRadius: 2,
+    boxShadow: 24,
+    maxHeight: "90vh",
+    overflowY: "auto",
+  };
+
   return (
     <Box>
-      <Box sx={{ display: "flex", justifyContent: "space-between", mb: 2 }}>
+      <Box
+        sx={{
+          display: "flex",
+          justifyContent: "space-between",
+          mb: 2,
+          flexDirection: { xs: "column", md: "row" },
+          gap: 2,
+        }}
+      >
         <Typography variant="h5" fontWeight="bold">
           Lista de Proveedores
         </Typography>
@@ -204,6 +275,7 @@ const ProveedoresList = () => {
             label="Estado"
             value={estadoFiltro}
             onChange={(e) => setEstadoFiltro(e.target.value)}
+            sx={{ minWidth: 120 }}
           >
             <MenuItem value="todos">Todos</MenuItem>
             <MenuItem value="activo">Activo</MenuItem>
@@ -219,103 +291,99 @@ const ProveedoresList = () => {
         </Box>
       </Box>
 
-      <Paper>
-        <Table>
-          <TableHead>
-            <TableRow>
-              {Object.keys(paginatedProveedores[0] || {})
-                .filter((key) => key !== "direccion")
-                .map((key) => (
-                  <TableCell key={key}>{key}</TableCell>
-                ))}
-              <TableCell>Acciones</TableCell>
-            </TableRow>
-          </TableHead>
-          <TableBody>
-            {paginatedProveedores.map((proveedor) => (
-              <TableRow key={proveedor.id}>
-                {Object.entries(proveedor).map(([k, v]) => {
-                  if (k === "direccion") return null;
-                  return (
-                    <TableCell key={k}>
-                      {k === "activo" ? (
-                        <Chip
-                          label={v ? "Activo" : "Inactivo"}
-                          color={v ? "success" : "default"}
-                          size="small"
-                        />
-                      ) : (
-                        String(v)
-                      )}
-                    </TableCell>
-                  );
-                })}
-                <TableCell>
-                  <Tooltip title="Ver">
-                    <IconButton
-                      onClick={() => handleOpenModal(proveedor, "view")}
-                    >
-                      <VisibilityIcon sx={{ color: "#1976d2" }} />
-                    </IconButton>
-                  </Tooltip>
-                  <Tooltip title="Editar">
-                    <IconButton
-                      onClick={() => handleOpenModal(proveedor, "edit")}
-                    >
-                      <EditIcon sx={{ color: "#f57c00" }} />
-                    </IconButton>
-                  </Tooltip>
-                  <Tooltip title="Eliminar">
-                    <IconButton onClick={() => handleDelete(proveedor.id)}>
-                      <DeleteIcon sx={{ color: "#d32f2f" }} />
-                    </IconButton>
-                  </Tooltip>
-                  {"activo" in proveedor && (
-                    <Tooltip
-                      title={proveedor.activo ? "Desactivar" : "Activar"}
-                    >
-                      <IconButton onClick={() => handleToggleActivo(proveedor)}>
-                        {proveedor.activo ? (
-                          <ToggleOnIcon sx={{ color: "#2e7d32" }} />
-                        ) : (
-                          <ToggleOffIcon sx={{ color: "#616161" }} />
-                        )}
-                      </IconButton>
-                    </Tooltip>
-                  )}
-                </TableCell>
+      {isMobile ? (
+        <Box>
+          {paginatedProveedores.map((p) => (
+            <Paper key={p.id} sx={{ p: 2, mb: 2 }}>
+              <Box
+                sx={{
+                  display: "flex",
+                  justifyContent: "space-between",
+                  alignItems: "flex-start",
+                  mb: 1,
+                }}
+              >
+                <Box>
+                  <Typography variant="subtitle1" fontWeight="bold">
+                    {p.nombre}
+                  </Typography>
+                  <Typography variant="body2" color="text.secondary">
+                    {p.rut}
+                  </Typography>
+                </Box>
+                <Chip
+                  label={p.activo ? "Activo" : "Inactivo"}
+                  color={p.activo ? "success" : "default"}
+                  size="small"
+                />
+              </Box>
+              <Typography variant="body2">{p.giro}</Typography>
+              <Typography variant="caption" color="text.secondary">
+                {p.correo}
+              </Typography>
+              <Box sx={{ mt: 1, display: "flex", justifyContent: "flex-end" }}>
+                {renderActions(p)}
+              </Box>
+            </Paper>
+          ))}
+        </Box>
+      ) : (
+        <Paper>
+          <Table>
+            <TableHead>
+              <TableRow>
+                {proveedores[0] &&
+                  Object.keys(proveedores[0])
+                    .filter((k) => k !== "direccion")
+                    .map((key) => (
+                      <TableCell key={key} sx={{ textTransform: "capitalize" }}>
+                        {key}
+                      </TableCell>
+                    ))}
+                <TableCell align="right">Acciones</TableCell>
               </TableRow>
-            ))}
-          </TableBody>
-        </Table>
-        <TablePagination
-          component="div"
-          count={filteredProveedores.length}
-          page={page}
-          onPageChange={(_, newPage) => setPage(newPage)}
-          rowsPerPage={rowsPerPage}
-          onRowsPerPageChange={(e) =>
-            setRowsPerPage(parseInt(e.target.value, 10))
-          }
-          rowsPerPageOptions={[10, 20, 50]}
-          labelRowsPerPage="Filas por página:"
-        />
-      </Paper>
+            </TableHead>
+            <TableBody>
+              {paginatedProveedores.map((proveedor) => (
+                <TableRow key={proveedor.id}>
+                  {Object.entries(proveedor)
+                    .filter(([k]) => k !== "direccion")
+                    .map(([k, v]) => (
+                      <TableCell key={k}>
+                        {k === "activo" ? (
+                          <Chip
+                            label={v ? "Activo" : "Inactivo"}
+                            color={v ? "success" : "default"}
+                            size="small"
+                          />
+                        ) : (
+                          String(v)
+                        )}
+                      </TableCell>
+                    ))}
+                  <TableCell align="right">
+                    {renderActions(proveedor)}
+                  </TableCell>
+                </TableRow>
+              ))}
+            </TableBody>
+          </Table>
+        </Paper>
+      )}
 
-      <Modal open={openModal} onClose={() => setOpenModal(false)}>
-        <Box
-          sx={{
-            position: "absolute",
-            top: "50%",
-            left: "50%",
-            transform: "translate(-50%, -50%)",
-            width: 400,
-            bgcolor: "background.paper",
-            p: 4,
-            borderRadius: 2,
-            boxShadow: 24,
-          }}
-        >
+      <TablePagination
+        component="div"
+        count={filteredProveedores.length}
+        page={page}
+        onPageChange={(_, newPage) => setPage(newPage)}
+        rowsPerPage={rowsPerPage}
+        onRowsPerPageChange={(e) =>
+          setRowsPerPage(parseInt(e.target.value, 10))
+        }
+      />
+
+      <Modal open={openModal} onClose={handleCloseModal}>
+        <Box sx={modalStyle}>
           <Typography variant="h6" mb={2}>
             {modalMode === "view"
               ? "Ver Proveedor"
@@ -323,7 +391,6 @@ const ProveedoresList = () => {
               ? "Editar Proveedor"
               : "Nuevo Proveedor"}
           </Typography>
-
           {selectedProveedor && (
             <>
               <TextField
@@ -332,7 +399,7 @@ const ProveedoresList = () => {
                 fullWidth
                 margin="dense"
                 value={selectedProveedor.nombre}
-                onChange={modalMode === "view" ? undefined : handleEditChange}
+                onChange={handleEditChange}
                 InputProps={{ readOnly: modalMode === "view" }}
               />
               <TextField
@@ -341,7 +408,7 @@ const ProveedoresList = () => {
                 fullWidth
                 margin="dense"
                 value={selectedProveedor.rut}
-                onChange={modalMode === "view" ? undefined : handleEditChange}
+                onChange={handleEditChange}
                 InputProps={{ readOnly: modalMode === "view" }}
               />
               <TextField
@@ -351,7 +418,7 @@ const ProveedoresList = () => {
                 fullWidth
                 margin="dense"
                 value={selectedProveedor.correo}
-                onChange={modalMode === "view" ? undefined : handleEditChange}
+                onChange={handleEditChange}
                 InputProps={{ readOnly: modalMode === "view" }}
               />
               <TextField
@@ -360,7 +427,7 @@ const ProveedoresList = () => {
                 fullWidth
                 margin="dense"
                 value={selectedProveedor.telefono}
-                onChange={modalMode === "view" ? undefined : handleEditChange}
+                onChange={handleEditChange}
                 InputProps={{ readOnly: modalMode === "view" }}
               />
               <TextField
@@ -369,7 +436,7 @@ const ProveedoresList = () => {
                 fullWidth
                 margin="dense"
                 value={selectedProveedor.giro}
-                onChange={modalMode === "view" ? undefined : handleEditChange}
+                onChange={handleEditChange}
                 InputProps={{ readOnly: modalMode === "view" }}
               />
               <TextField
@@ -378,7 +445,7 @@ const ProveedoresList = () => {
                 fullWidth
                 margin="dense"
                 value={selectedProveedor.direccion}
-                onChange={modalMode === "view" ? undefined : handleEditChange}
+                onChange={handleEditChange}
                 InputProps={{ readOnly: modalMode === "view" }}
               />
               <TextField
@@ -387,8 +454,8 @@ const ProveedoresList = () => {
                 name="activo"
                 fullWidth
                 margin="dense"
-                value={selectedProveedor.activo.toString()}
-                onChange={modalMode === "view" ? undefined : handleEditChange}
+                value={String(selectedProveedor.activo)}
+                onChange={handleEditChange}
                 InputProps={{ readOnly: modalMode === "view" }}
               >
                 <MenuItem value="true">Activo</MenuItem>
@@ -396,7 +463,6 @@ const ProveedoresList = () => {
               </TextField>
             </>
           )}
-
           {modalMode !== "view" && (
             <Box sx={{ mt: 2, textAlign: "right" }}>
               <Button variant="contained" onClick={handleSave}>
