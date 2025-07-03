@@ -1,6 +1,16 @@
+// Tu archivo Backoffice.jsx (versión final simplificada)
+
 import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
-import SideMenu from "../../componentes/Sidemenu";
+import { Box } from "@mui/material";
+import { jwtDecode } from "jwt-decode";
+
+// === CAMBIO 1: Importamos el nuevo componente unificado ===
+import PanelAdministracion from "../../componentes/PanelNavegacion";
+
+// Ya no necesitamos importar SideMenu ni Topbar aquí
+
+// Importas solo las listas de contenido
 import ClientesList from "../../componentes/DataList/ClientesList";
 import UsuariosList from "../../componentes/DataList/UsuariosList";
 import ProveedoresList from "../../componentes/DataList/ProveedoresList";
@@ -8,21 +18,9 @@ import CotizacionesList from "../../componentes/DataList/CotizacionesList";
 import ContactoList from "../../componentes/DataList/ContactoList";
 import RegistrosList from "../../componentes/DataList/RegistrosList";
 import OrdenCompraList from "../../componentes/DataList/OrdenCompraList";
-import { Box } from "@mui/material";
-import Topbar from "../../componentes/Topbar";
-import { jwtDecode } from "jwt-decode";
-
-const sectionTitles = {
-  clientes: "Clientes",
-  usuarios: "Usuarios",
-  proveedores: "Proveedores",
-  ordenesCompra: "Órdenes de Compra",
-  solicitudesCotizacion: "Solicitudes de Cotización",
-  solicitudesContacto: "Solicitudes de Contacto",
-  registrosFinancieros: "Registros Financieros",
-};
 
 const Backoffice = () => {
+  // --- TODA TU LÓGICA Y ESTADOS PERMANECEN EXACTAMENTE IGUAL ---
   const [selectedSection, setSelectedSection] = useState("clientes");
   const [usuarioLogeado, setUsuarioLogeado] = useState(null);
   const navigate = useNavigate();
@@ -33,7 +31,6 @@ const Backoffice = () => {
       navigate("/");
       return;
     }
-
     try {
       const decoded = jwtDecode(token);
       const rol = decoded.rol;
@@ -42,7 +39,6 @@ const Backoffice = () => {
         navigate("/");
         return;
       }
-
       setUsuarioLogeado({
         nombre: decoded.sub,
         email: decoded.sub,
@@ -66,7 +62,6 @@ const Backoffice = () => {
       case "usuarios":
         return <UsuariosList />;
       case "proveedores":
-
         return <ProveedoresList />;
       case "solicitudesCotizacion":
         return <CotizacionesList />;
@@ -81,19 +76,21 @@ const Backoffice = () => {
     }
   };
 
+  // === CAMBIO 2: El return ahora es mucho más limpio y semántico ===
   return (
     <>
       {usuarioLogeado && (
-        <>
-          <Topbar usuario={usuarioLogeado} onLogout={handleLogout} />
-          <Box sx={{ display: "flex", pt: 8 }}>
-            <SideMenu
-              onSelect={setSelectedSection}
-              selected={selectedSection}
-            />
-            <Box sx={{ flexGrow: 1, p: 4 }}>{renderSection()}</Box>
-          </Box>
-        </>
+        <PanelAdministracion
+          usuario={usuarioLogeado}
+          onLogout={handleLogout}
+          selected={selectedSection}
+          onSelect={setSelectedSection}
+        >
+          {/* El contenido principal (tu renderSection) ahora va aquí adentro.
+              He quitado el <Box> extra ya que PanelAdministracion ya
+              maneja el padding y el crecimiento del área de contenido. */}
+          {renderSection()}
+        </PanelAdministracion>
       )}
     </>
   );

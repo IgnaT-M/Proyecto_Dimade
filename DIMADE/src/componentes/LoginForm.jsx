@@ -95,7 +95,7 @@ const LoginForm = () => {
           textAlign="center"
           gutterBottom
         >
-          Iniciar Sesión
+          Panel Administrativo
         </Typography>
 
         <Box component="form" onSubmit={handleSubmit}>
@@ -145,12 +145,6 @@ const LoginForm = () => {
             }}
           />
 
-          <Box textAlign="right" mt={1} mb={2}>
-            <Link href="#" underline="hover" color="primary">
-              ¿Olvidaste tu contraseña?
-            </Link>
-          </Box>
-
           <Button
             type="submit"
             variant="contained"
@@ -171,18 +165,36 @@ const LoginForm = () => {
           >
             Entrar
           </Button>
-        </Box>
 
-        <Snackbar
-          open={openSnackbar}
-          autoHideDuration={3000}
-          onClose={() => setOpenSnackbar(false)}
-          anchorOrigin={{ vertical: "bottom", horizontal: "center" }}
-        >
-          <Alert severity="error" sx={{ width: "100%" }}>
-            {errorMessage}
-          </Alert>
-        </Snackbar>
+          <Box textAlign="center">
+            <Box
+              display="flex"
+              flexDirection="column"
+              alignItems="center"
+              mt={2}
+            >
+              <img
+                src="/imagenes/logo_dimade.png"
+                alt="Logo Dimade"
+                style={{ maxWidth: 120, marginBottom: 5 }}
+              />
+              <Typography variant="body2" color="textSecondary">
+                Solo personal autorizado
+              </Typography>
+            </Box>
+          </Box>
+
+          <Snackbar
+            open={openSnackbar}
+            autoHideDuration={3000}
+            onClose={() => setOpenSnackbar(false)}
+            anchorOrigin={{ vertical: "bottom", horizontal: "center" }}
+          >
+            <Alert severity="error" sx={{ width: "100%" }}>
+              {errorMessage}
+            </Alert>
+          </Snackbar>
+        </Box>
       </Paper>
     </Box>
   );

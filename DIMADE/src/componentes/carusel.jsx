@@ -9,17 +9,20 @@ import { Link } from "react-router-dom";
 const slides = [
   {
     title: "Soluciones eficientes para tu proyecto",
-    Description: "Conectamos a clientes y proveedores del rubro construcción y más",
+    Description:
+      "Conectamos a clientes y proveedores del rubro construcción y más",
     url: "/imagenes/slide1_optimized.webp",
   },
   {
     title: "Ahorra tiempo y cotiza en un solo lugar",
-    Description: "Recibe múltiples ofertas y elige la mejor opción para tu necesidad",
+    Description:
+      "Recibe múltiples ofertas y elige la mejor opción para tu necesidad",
     url: "/imagenes/slide2_optimized.webp",
   },
   {
     title: "Transparencia y confianza en cada gestión",
-    Description: "Nos encargamos de validar proveedores y asegurar un servicio de calidad",
+    Description:
+      "Nos encargamos de validar proveedores y asegurar un servicio de calidad",
     url: "/imagenes/slide3_optimized.webp",
   },
   {
@@ -108,7 +111,7 @@ function Carousel() {
                 <CardMedia
                   component="img"
                   image={slide.url}
-                  alt={slide.title}
+                  alt={slide.title || "imagen de productos Dimade"}
                   sx={{
                     objectFit: "cover",
                     width: "100%",
