@@ -51,6 +51,7 @@ public class SecurityConfig {
                         // Rutas protegidas por token
                         .requestMatchers("/api/registros-financieros/**", "/api/clientes/**", "/api/proveedores/**",
                                 "/api/ordenes-compra/**", "/api/usuarios/**", "/api/solicitudes-contacto/**",
+                                "/api/ordenes-compra/upload", "/api/ordenes-compra/download/**",
                                 "/api/solicitudes-cotizacion/**")
                         .authenticated()
 

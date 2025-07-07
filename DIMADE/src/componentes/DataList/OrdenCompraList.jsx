@@ -26,7 +26,10 @@ import {
   Delete as DeleteIcon,
   Edit as EditIcon,
   Add as AddIcon,
+  Download as DownloadIcon,
 } from "@mui/icons-material";
+import jsPDF from "jspdf";
+import autoTable from "jspdf-autotable";
 
 const OrdenCompraList = () => {
   const [ordenes, setOrdenes] = useState([]);
@@ -80,6 +83,67 @@ const OrdenCompraList = () => {
     return filteredOrdenes.slice(start, start + rowsPerPage);
   }, [filteredOrdenes, page, rowsPerPage]);
 
+  const handleUpload = async (file, ordenId) => {
+    const formData = new FormData();
+    formData.append("file", file);
+    formData.append("nombreOrden", ordenId);
+
+    const token = localStorage.getItem("jwtToken");
+
+    const res = await fetch("http://localhost:8080/api/ordenes-compra/upload", {
+      method: "POST",
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+      body: formData,
+    });
+
+    const pdfId = await res.text();
+
+    await fetch(`http://localhost:8080/api/ordenes-compra/${ordenId}/pdf`, {
+      method: "PUT",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${token}`,
+      },
+      body: JSON.stringify({ pdfId }),
+    });
+
+    console.log("PDF almacenado para orden:", ordenId);
+    await fetchOrdenes();
+  };
+
+  const handleDownload = async (pdfId) => {
+    if (!pdfId) {
+      alert("Esta orden no tiene un PDF asociado.");
+      return;
+    }
+
+    const token = localStorage.getItem("jwtToken");
+
+    const res = await fetch(
+      `http://localhost:8080/api/ordenes-compra/download/${pdfId}`,
+      {
+        method: "GET",
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      }
+    );
+
+    if (!res.ok) {
+      alert("Error al descargar PDF: " + res.status);
+      return;
+    }
+
+    const blob = await res.blob();
+    const url = window.URL.createObjectURL(blob);
+    const link = document.createElement("a");
+    link.href = url;
+    link.download = `orden-${pdfId}.pdf`;
+    link.click();
+  };
+
   const handleDelete = async (id) => {
     if (!window.confirm("¿Eliminar orden de compra?")) return;
     try {
@@ -130,6 +194,52 @@ const OrdenCompraList = () => {
       ...prev,
       [e.target.name]: e.target.value,
     }));
+  };
+
+  const generarPDFOrden = (orden) => {
+    const doc = new jsPDF();
+
+    // Usar autoTable importado directamente
+    autoTable(doc, {
+      startY: 100,
+      head: [["Producto", "Cantidad", "Precio Unitario", "Subtotal"]],
+      body:
+        Array.isArray(orden.productos) && orden.productos.length > 0
+          ? orden.productos.map((p) => [
+              p.nombre || "-",
+              p.cantidad || 0,
+              `$${p.precioUnitario || 0}`,
+              `$${(p.cantidad || 0) * (p.precioUnitario || 0)}`,
+            ])
+          : [["Sin productos", "", "", ""]],
+      styles: { halign: "left" },
+      theme: "grid",
+    });
+
+    doc.setFontSize(16);
+    doc.text("DIMADE - ORDEN DE COMPRA", 14, 20);
+    doc.setFontSize(12);
+    doc.text(
+      `Fecha: ${new Date(orden.fechaOrden).toLocaleDateString()}`,
+      14,
+      30
+    );
+    doc.text(`N° Orden: ${orden.id || "Sin ID"}`, 14, 38);
+
+    doc.text("Cliente / Proveedor:", 14, 50);
+    doc.text(`RUT Cliente: ${orden.rutCliente || "-"}`, 14, 58);
+    doc.text(`RUT Proveedor: ${orden.rutProveedor || "-"}`, 14, 66);
+    doc.text(`Teléfono: ${orden.telefono || "-"}`, 14, 74);
+    doc.text(`Email: ${orden.mail || "-"}`, 14, 82);
+
+    doc.setFontSize(14);
+    doc.text(
+      `TOTAL: $${orden.total || 0}`,
+      14,
+      doc.lastAutoTable?.finalY + 10 || 120
+    );
+
+    doc.save(`orden-${orden.id || "sin-id"}.pdf`);
   };
 
   const handleSave = async () => {
@@ -269,17 +379,46 @@ const OrdenCompraList = () => {
                 <TableCell>
                   <Tooltip title="Ver">
                     <IconButton onClick={() => handleOpenModal(orden, "view")}>
-                      <VisibilityIcon sx={{ color: "#1976d2" }} />
+                      {" "}
+                      <VisibilityIcon sx={{ color: "#1976d2" }} />{" "}
                     </IconButton>
                   </Tooltip>
                   <Tooltip title="Editar">
                     <IconButton onClick={() => handleOpenModal(orden, "edit")}>
-                      <EditIcon sx={{ color: "#f57c00" }} />
+                      {" "}
+                      <EditIcon sx={{ color: "#f57c00" }} />{" "}
                     </IconButton>
                   </Tooltip>
                   <Tooltip title="Eliminar">
                     <IconButton onClick={() => handleDelete(orden.id)}>
-                      <DeleteIcon sx={{ color: "#d32f2f" }} />
+                      {" "}
+                      <DeleteIcon sx={{ color: "#d32f2f" }} />{" "}
+                    </IconButton>
+                  </Tooltip>
+                  <Tooltip title="Subir PDF">
+                    <IconButton component="label">
+                      <input
+                        type="file"
+                        accept="application/pdf"
+                        hidden
+                        onChange={(e) => {
+                          if (e.target.files.length > 0) {
+                            handleUpload(e.target.files[0], orden.id);
+                          }
+                        }}
+                      />
+                      <AddIcon sx={{ color: "#388e3c" }} />
+                    </IconButton>
+                  </Tooltip>
+                  <Tooltip title="Descargar PDF">
+                    <IconButton onClick={() => handleDownload(orden.pdfId)}>
+                      {" "}
+                      <DownloadIcon sx={{ color: "#0288d1" }} />{" "}
+                    </IconButton>
+                  </Tooltip>
+                  <Tooltip title="Generar PDF desde datos">
+                    <IconButton onClick={() => generarPDFOrden(orden)}>
+                      <DownloadIcon sx={{ color: "#6a1b9a" }} />
                     </IconButton>
                   </Tooltip>
                 </TableCell>
