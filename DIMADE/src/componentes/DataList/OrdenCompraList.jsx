@@ -305,8 +305,16 @@ const OrdenCompraList = () => {
 
       {isMobile ? (
         <Box>
-          {paginatedOrdenes.map((orden) => (
-            <Paper key={orden.id} sx={{ p: 2, mb: 2 }}>
+          {paginatedOrdenes.map((orden, index) => (
+            <Paper
+              key={orden.id}
+              sx={{
+                p: 2,
+                mb: 2,
+                backgroundColor:
+                  index % 2 !== 0 ? theme.palette.action.hover : "inherit",
+              }}
+            >
               <Box
                 sx={{
                   display: "flex",
@@ -367,7 +375,14 @@ const OrdenCompraList = () => {
             </TableHead>
             <TableBody>
               {paginatedOrdenes.map((orden) => (
-                <TableRow key={orden.id}>
+                <TableRow
+                  key={orden.id}
+                  sx={{
+                    "&:nth-of-type(even)": {
+                      backgroundColor: theme.palette.action.hover,
+                    },
+                  }}
+                >
                   {Object.entries(orden)
                     .filter(([k]) => k !== "productos" && k !== "detalle")
                     .map(([k, v]) => (

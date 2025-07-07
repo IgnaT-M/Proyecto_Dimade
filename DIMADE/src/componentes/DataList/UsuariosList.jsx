@@ -299,8 +299,16 @@ const UsuariosList = () => {
 
       {isMobile ? (
         <Box>
-          {paginatedUsuarios.map((usuario) => (
-            <Paper key={usuario.id} sx={{ p: 2, mb: 2 }}>
+          {paginatedUsuarios.map((usuario, index) => (
+            <Paper
+              key={usuario.id}
+              sx={{
+                p: 2,
+                mb: 2,
+                backgroundColor:
+                  index % 2 !== 0 ? theme.palette.action.hover : "inherit",
+              }}
+            >
               <Box
                 sx={{
                   display: "flex",
@@ -356,7 +364,14 @@ const UsuariosList = () => {
             </TableHead>
             <TableBody>
               {paginatedUsuarios.map((usuario) => (
-                <TableRow key={usuario.id}>
+                <TableRow
+                  key={usuario.id}
+                  sx={{
+                    "&:nth-of-type(even)": {
+                      backgroundColor: theme.palette.action.hover,
+                    },
+                  }}
+                >
                   {Object.entries(usuario).map(([k, v]) => {
                     if (k === "password") return null;
                     return (

@@ -286,8 +286,16 @@ const ClientesList = () => {
 
       {isMobile ? (
         <Box>
-          {paginatedClientes.map((cliente) => (
-            <Paper key={cliente.id} sx={{ p: 2, mb: 2 }}>
+          {paginatedClientes.map((cliente, index) => (
+            <Paper
+              key={cliente.id}
+              sx={{
+                p: 2,
+                mb: 2,
+                backgroundColor:
+                  index % 2 !== 0 ? theme.palette.action.hover : "inherit",
+              }}
+            >
               <Box
                 sx={{
                   display: "flex",
@@ -336,7 +344,14 @@ const ClientesList = () => {
             </TableHead>
             <TableBody>
               {paginatedClientes.map((cliente) => (
-                <TableRow key={cliente.id}>
+                <TableRow
+                  key={cliente.id}
+                  sx={{
+                    "&:nth-of-type(even)": {
+                      backgroundColor: theme.palette.action.hover,
+                    },
+                  }}
+                >
                   {Object.entries(cliente).map(([k, v]) => (
                     <TableCell key={k}>
                       {k === "activo" ? (

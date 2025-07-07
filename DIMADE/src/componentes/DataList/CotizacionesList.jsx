@@ -335,8 +335,16 @@ const CotizacionesList = () => {
 
       {isMobile ? (
         <Box>
-          {paginated.map((s) => (
-            <Paper key={s.id} sx={{ p: 2, mb: 2 }}>
+          {paginated.map((s, index) => (
+            <Paper
+              key={s.id}
+              sx={{
+                p: 2,
+                mb: 2,
+                backgroundColor:
+                  index % 2 !== 0 ? theme.palette.action.hover : "inherit",
+              }}
+            >
               <Box
                 sx={{
                   display: "flex",
@@ -384,7 +392,14 @@ const CotizacionesList = () => {
             </TableHead>
             <TableBody>
               {paginated.map((s) => (
-                <TableRow key={s.id}>
+                <TableRow
+                  key={s.id}
+                  sx={{
+                    "&:nth-of-type(even)": {
+                      backgroundColor: theme.palette.action.hover,
+                    },
+                  }}
+                >
                   {Object.entries(s)
                     .filter(([k]) => k !== "detalle")
                     .map(([k, v]) => (

@@ -270,8 +270,16 @@ const RegistrosList = () => {
 
       {isMobileLayout ? (
         <Box>
-          {paginatedRegistros.map((r) => (
-            <Paper key={r.id} sx={{ p: 2, mb: 2 }}>
+          {paginatedRegistros.map((r, index) => (
+            <Paper
+              key={r.id}
+              sx={{
+                p: 2,
+                mb: 2,
+                backgroundColor:
+                  index % 2 !== 0 ? theme.palette.action.hover : "inherit",
+              }}
+            >
               <Box
                 sx={{
                   display: "flex",
@@ -331,7 +339,14 @@ const RegistrosList = () => {
             </TableHead>
             <TableBody>
               {paginatedRegistros.map((r) => (
-                <TableRow key={r.id}>
+                <TableRow
+                  key={r.id}
+                  sx={{
+                    "&:nth-of-type(even)": {
+                      backgroundColor: theme.palette.action.hover,
+                    },
+                  }}
+                >
                   <TableCell>{r.id}</TableCell>
                   <TableCell>{formatDate(r.fecha)}</TableCell>
                   <TableCell>

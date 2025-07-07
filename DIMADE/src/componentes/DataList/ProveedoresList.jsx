@@ -293,8 +293,16 @@ const ProveedoresList = () => {
 
       {isMobile ? (
         <Box>
-          {paginatedProveedores.map((p) => (
-            <Paper key={p.id} sx={{ p: 2, mb: 2 }}>
+          {paginatedProveedores.map((p, index) => (
+            <Paper
+              key={p.id}
+              sx={{
+                p: 2,
+                mb: 2,
+                backgroundColor:
+                  index % 2 !== 0 ? theme.palette.action.hover : "inherit",
+              }}
+            >
               <Box
                 sx={{
                   display: "flex",
@@ -345,7 +353,14 @@ const ProveedoresList = () => {
             </TableHead>
             <TableBody>
               {paginatedProveedores.map((proveedor) => (
-                <TableRow key={proveedor.id}>
+                <TableRow
+                  key={proveedor.id}
+                  sx={{
+                    "&:nth-of-type(even)": {
+                      backgroundColor: theme.palette.action.hover,
+                    },
+                  }}
+                >
                   {Object.entries(proveedor)
                     .filter(([k]) => k !== "direccion")
                     .map(([k, v]) => (
