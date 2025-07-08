@@ -3,9 +3,6 @@
 import { BrowserRouter, Routes, Route, Outlet } from "react-router-dom";
 import { Box } from "@mui/material";
 
-// --- RUTAS CORREGIDAS ---
-// Antes: ../componentes/...
-// Ahora, como App.jsx y la carpeta "componentes" son hermanos, usamos "./"
 import { CustomThemeProvider } from "./componentes/BtnClarOscuro.jsx";
 import ThemeToggleButton from "./componentes/ToggleButtonDiaNoche.jsx";
 
@@ -17,6 +14,8 @@ import Cotizar from "./vistas/vistas_front/Cotizador.jsx";
 import Productos from "./vistas/vistas_front/Productos.jsx";
 import Login from "./vistas/vistas_back/Login.jsx";
 import Backoffice from "./vistas/vistas_back/Backoffice.jsx";
+import RecuperarContrasena from "../src/componentes/RecuperarContrasena.jsx";
+import ResetearContrasena from "../src/componentes/NuevaContrasena.jsx";
 
 function App() {
   return (
@@ -33,6 +32,12 @@ function App() {
           {/* Rutas que no usan el layout principal */}
           <Route path="/Login" element={<Login />} />
           <Route path="/Backoffice" element={<Backoffice />} />
+          <Route
+            path="/RecuperarContrasena"
+            element={<RecuperarContrasena />}
+          />
+
+          <Route path="ResetearContrasena" element={<ResetearContrasena />} />
         </Routes>
       </BrowserRouter>
     </CustomThemeProvider>

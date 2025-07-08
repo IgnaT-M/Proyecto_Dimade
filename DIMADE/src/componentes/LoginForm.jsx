@@ -7,9 +7,9 @@ import {
   Paper,
   InputAdornment,
   IconButton,
-  Link,
   Snackbar,
   Alert,
+  Link,
 } from "@mui/material";
 import EmailIcon from "@mui/icons-material/Email";
 import LockIcon from "@mui/icons-material/Lock";
@@ -23,30 +23,44 @@ const LoginForm = () => {
   const [showPassword, setShowPassword] = useState(false);
   const [openSnackbar, setOpenSnackbar] = useState(false);
   const [errorMessage, setErrorMessage] = useState("");
+  // --- 1. NUEVO ESTADO PARA ERRORES ---
+  const [errors, setErrors] = useState({ email: false, password: false });
   const navigate = useNavigate();
 
-  const handleChange = (e) =>
-    setForm({ ...form, [e.target.name]: e.target.value });
+  // --- 2. MANEJO DE CAMBIOS ACTUALIZADO ---
+  const handleChange = (e) => {
+    const { name, value } = e.target;
+    setForm({ ...form, [name]: value });
 
+    // Limpia el error del campo en cuanto el usuario empieza a escribir
+    if (value) {
+      setErrors((prevErrors) => ({ ...prevErrors, [name]: false }));
+    }
+  };
+
+  // --- 3. MANEJO DE SUBMIT ACTUALIZADO ---
   const handleSubmit = async (e) => {
     e.preventDefault();
 
-    if (!form.email || !form.password) {
+    const newErrors = {
+      email: !form.email,
+      password: !form.password,
+    };
+
+    setErrors(newErrors);
+
+    if (newErrors.email || newErrors.password) {
       setErrorMessage("Por favor completa todos los campos");
       setOpenSnackbar(true);
       return;
     }
 
+    // El resto de la lógica de submit permanece igual
     try {
       const response = await fetch("http://localhost:8080/api/auth/login", {
         method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          email: form.email,
-          password: form.password,
-        }),
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ email: form.email, password: form.password }),
       });
 
       if (!response.ok) {
@@ -61,10 +75,7 @@ const LoginForm = () => {
 
       const data = await response.json();
       const token = data.token;
-
       localStorage.setItem("jwtToken", token);
-
-      // Redirige directamente sin importar el rol
       navigate("/backoffice");
     } catch (err) {
       console.error("Error en login:", err);
@@ -98,7 +109,8 @@ const LoginForm = () => {
           Panel Administrativo
         </Typography>
 
-        <Box component="form" onSubmit={handleSubmit}>
+        <Box component="form" onSubmit={handleSubmit} noValidate>
+          {/* --- 4. TEXTFIELD DE EMAIL MODIFICADO --- */}
           <TextField
             fullWidth
             name="email"
@@ -106,8 +118,11 @@ const LoginForm = () => {
             type="email"
             value={form.email}
             onChange={handleChange}
-            required
             margin="normal"
+            // Props para la validación visual
+            error={errors.email}
+            helperText={errors.email ? "Este campo es requerido" : ""}
+            color={errors.email ? "warning" : "primary"}
             InputProps={{
               startAdornment: (
                 <InputAdornment position="start">
@@ -117,6 +132,7 @@ const LoginForm = () => {
             }}
           />
 
+          {/* --- 5. TEXTFIELD DE CONTRASEÑA MODIFICADO --- */}
           <TextField
             fullWidth
             name="password"
@@ -124,8 +140,11 @@ const LoginForm = () => {
             type={showPassword ? "text" : "password"}
             value={form.password}
             onChange={handleChange}
-            required
             margin="normal"
+            // Props para la validación visual
+            error={errors.password}
+            helperText={errors.password ? "Este campo es requerido" : ""}
+            color={errors.password ? "warning" : "primary"}
             InputProps={{
               startAdornment: (
                 <InputAdornment position="start">
@@ -135,8 +154,10 @@ const LoginForm = () => {
               endAdornment: (
                 <InputAdornment position="end">
                   <IconButton
+                    aria-label="toggle password visibility"
                     onClick={() => setShowPassword(!showPassword)}
                     edge="end"
+                    sx={{ color: "action.active" }}
                   >
                     {showPassword ? <VisibilityOff /> : <Visibility />}
                   </IconButton>
@@ -145,12 +166,22 @@ const LoginForm = () => {
             }}
           />
 
+          <Box textAlign="right" sx={{ my: 1 }}>
+            <Link
+              component="button"
+              variant="body2"
+              onClick={() => navigate("/RecuperarContrasena")}
+              sx={{ cursor: "pointer" }}
+            >
+              ¿Olvidaste tu contraseña?
+            </Link>
+          </Box>
+
           <Button
             type="submit"
             variant="contained"
             fullWidth
             sx={{
-              mt: 1,
               fontWeight: "bold",
               borderRadius: 2,
               py: 1.5,
@@ -166,6 +197,7 @@ const LoginForm = () => {
             Entrar
           </Button>
 
+          {/* El resto del componente permanece igual... */}
           <Box textAlign="center">
             <Box
               display="flex"
@@ -190,7 +222,11 @@ const LoginForm = () => {
             onClose={() => setOpenSnackbar(false)}
             anchorOrigin={{ vertical: "bottom", horizontal: "center" }}
           >
-            <Alert severity="error" sx={{ width: "100%" }}>
+            <Alert
+              onClose={() => setOpenSnackbar(false)}
+              severity="error"
+              sx={{ width: "100%" }}
+            >
               {errorMessage}
             </Alert>
           </Snackbar>

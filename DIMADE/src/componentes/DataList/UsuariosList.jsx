@@ -42,6 +42,16 @@ const UsuariosList = () => {
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down("md"));
 
+  const formatUserName = (name) => {
+    if (!name) return "";
+    // Asume que el nombre de usuario puede ser 'nombre.apellido' o 'nombre_apellido'
+    // y lo convierte a 'Nombre Apellido'.
+    return name
+      .split(/[\._-]/) // Divide por punto, guion bajo o guion
+      .map((part) => part.charAt(0).toUpperCase() + part.slice(1))
+      .join(" ");
+  };
+
   const fetchUsuarios = async () => {
     try {
       const token = localStorage.getItem("jwtToken");
@@ -318,7 +328,7 @@ const UsuariosList = () => {
               >
                 <Box>
                   <Typography variant="subtitle1" fontWeight="bold">
-                    {usuario.nombre}
+                    {formatUserName(usuario.nombre)}
                   </Typography>
                   <Typography variant="body2" color="text.secondary">
                     {usuario.email}
@@ -382,6 +392,8 @@ const UsuariosList = () => {
                             color={v ? "success" : "default"}
                             size="small"
                           />
+                        ) : k === "nombre" ? (
+                          formatUserName(v)
                         ) : (
                           String(v)
                         )}
