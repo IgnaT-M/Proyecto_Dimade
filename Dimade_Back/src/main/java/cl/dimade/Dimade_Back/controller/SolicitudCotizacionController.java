@@ -23,7 +23,7 @@ import cl.dimade.Dimade_Back.service.SolicitudCotizacionService;
 
 @RestController
 @RequestMapping("/api/solicitudes-cotizacion")
-@CrossOrigin(origins = "http://localhost:5173")
+@CrossOrigin(origins = "${frontend.url}")
 public class SolicitudCotizacionController {
 
     @Autowired
