@@ -73,7 +73,7 @@ public ResponseEntity<?> register(@RequestBody Map<String, String> request) {
 
     Usuario nuevoUsuario = new Usuario();
     nuevoUsuario.setEmail(email);
-    nuevoUsuario.setPassword(passwordEncoder.encode(password)); // encripta
+    nuevoUsuario.setPassword(passwordEncoder.encode(password)); 
     nuevoUsuario.setNombre(nombre);
     nuevoUsuario.setRol(rol);
     nuevoUsuario.setActivo(true);
