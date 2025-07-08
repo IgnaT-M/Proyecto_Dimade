@@ -30,6 +30,7 @@ import {
 } from "@mui/icons-material";
 import jsPDF from "jspdf";
 import autoTable from "jspdf-autotable";
+import BASE_URL from "../../config/apiConfig";
 
 const OrdenCompraList = () => {
   const [ordenes, setOrdenes] = useState([]);
@@ -50,7 +51,7 @@ const OrdenCompraList = () => {
   const fetchOrdenes = async () => {
     try {
       const token = localStorage.getItem("jwtToken");
-      const res = await fetch("http://localhost:8080/api/ordenes-compra", {
+      const res = await fetch(`${BASE_URL}/api/ordenes-compra`, {
         headers: { Authorization: `Bearer ${token}` },
       });
       const data = await res.json();
@@ -90,7 +91,7 @@ const OrdenCompraList = () => {
 
     const token = localStorage.getItem("jwtToken");
 
-    const res = await fetch("http://localhost:8080/api/ordenes-compra/upload", {
+    const res = await fetch(`${BASE_URL}/api/ordenes-compra/upload`, {
       method: "POST",
       headers: {
         Authorization: `Bearer ${token}`,
@@ -100,7 +101,7 @@ const OrdenCompraList = () => {
 
     const pdfId = await res.text();
 
-    await fetch(`http://localhost:8080/api/ordenes-compra/${ordenId}/pdf`, {
+    await fetch(`${BASE_URL}/api/ordenes-compra/${ordenId}/pdf`, {
       method: "PUT",
       headers: {
         "Content-Type": "application/json",
@@ -122,7 +123,7 @@ const OrdenCompraList = () => {
     const token = localStorage.getItem("jwtToken");
 
     const res = await fetch(
-      `http://localhost:8080/api/ordenes-compra/download/${pdfId}`,
+      `${BASE_URL}/api/ordenes-compra/download/${pdfId}`,
       {
         method: "GET",
         headers: {
@@ -148,13 +149,10 @@ const OrdenCompraList = () => {
     if (!window.confirm("¿Eliminar orden de compra?")) return;
     try {
       const token = localStorage.getItem("jwtToken");
-      const res = await fetch(
-        `http://localhost:8080/api/ordenes-compra/${id}`,
-        {
-          method: "DELETE",
-          headers: { Authorization: `Bearer ${token}` },
-        }
-      );
+      const res = await fetch(`${BASE_URL}/api/ordenes-compra/${id}`, {
+        method: "DELETE",
+        headers: { Authorization: `Bearer ${token}` },
+      });
       if (res.ok) {
         setOrdenes((prev) => prev.filter((o) => o.id !== id));
       }
@@ -247,8 +245,8 @@ const OrdenCompraList = () => {
       const token = localStorage.getItem("jwtToken");
       const url =
         modalMode === "new"
-          ? "http://localhost:8080/api/ordenes-compra"
-          : `http://localhost:8080/api/ordenes-compra/${selectedOrden.id}`;
+          ? `${BASE_URL}/api/ordenes-compra`
+          : `${BASE_URL}/api/ordenes-compra/${selectedOrden.id}`;
       const method = modalMode === "new" ? "POST" : "PUT";
 
       const res = await fetch(url, {

@@ -16,6 +16,7 @@ import PhoneIcon from "@mui/icons-material/Phone";
 import ListAltIcon from "@mui/icons-material/ListAlt";
 
 import ModalCubitaje from "./ModalCubicador";
+import BASE_URL from "../config/apiConfig";
 
 const CotizaForm = () => {
   // Estado para manejar los datos del formulario
@@ -67,14 +68,11 @@ const CotizaForm = () => {
     };
 
     try {
-      const response = await fetch(
-        "http://localhost:8080/api/solicitudes-cotizacion",
-        {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify(payload),
-        }
-      );
+      const response = await fetch(`${BASE_URL}/api/solicitudes-cotizacion`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(payload),
+      });
 
       if (!response.ok) throw new Error("Error al enviar la solicitud");
 

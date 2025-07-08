@@ -25,6 +25,7 @@ import ToggleOnIcon from "@mui/icons-material/ToggleOn";
 import ToggleOffIcon from "@mui/icons-material/ToggleOff";
 import AddIcon from "@mui/icons-material/Add";
 import { Chip } from "@mui/material";
+import BASE_URL from "../../config/apiConfig";
 
 const ClientesList = () => {
   const [clientes, setClientes] = useState([]);
@@ -43,7 +44,7 @@ const ClientesList = () => {
   const fetchClientes = async () => {
     try {
       const token = localStorage.getItem("jwtToken");
-      const res = await fetch("http://localhost:8080/api/clientes", {
+      const res = await fetch(`${BASE_URL}/api/clientes`, {
         headers: { Authorization: `Bearer ${token}` },
       });
       const data = await res.json();
@@ -76,7 +77,7 @@ const ClientesList = () => {
     if (!window.confirm("¿Eliminar cliente?")) return;
     try {
       const token = localStorage.getItem("jwtToken");
-      const res = await fetch(`http://localhost:8080/api/clientes/${id}`, {
+      const res = await fetch(`${BASE_URL}/api/clientes/${id}`, {
         method: "DELETE",
         headers: { Authorization: `Bearer ${token}` },
       });
@@ -92,17 +93,14 @@ const ClientesList = () => {
     try {
       const token = localStorage.getItem("jwtToken");
       const updated = { ...cliente, activo: !cliente.activo };
-      const res = await fetch(
-        `http://localhost:8080/api/clientes/${cliente.id}`,
-        {
-          method: "PUT",
-          headers: {
-            "Content-Type": "application/json",
-            Authorization: `Bearer ${token}`,
-          },
-          body: JSON.stringify(updated),
-        }
-      );
+      const res = await fetch(`${BASE_URL}/api/clientes/${cliente.id}`, {
+        method: "PUT",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
+        },
+        body: JSON.stringify(updated),
+      });
       if (res.ok) {
         setClientes((prev) =>
           prev.map((c) => (c.id === cliente.id ? updated : c))
@@ -149,8 +147,8 @@ const ClientesList = () => {
       const token = localStorage.getItem("jwtToken");
       const url =
         modalMode === "new"
-          ? "http://localhost:8080/api/clientes"
-          : `http://localhost:8080/api/clientes/${selectedCliente.id}`;
+          ? `${BASE_URL}/api/clientes`
+          : `${BASE_URL}/api/clientes/${selectedCliente.id}`;
       const method = modalMode === "new" ? "POST" : "PUT";
 
       const res = await fetch(url, {
