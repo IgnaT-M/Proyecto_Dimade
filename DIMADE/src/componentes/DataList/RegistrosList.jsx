@@ -33,6 +33,7 @@ import EditIcon from "@mui/icons-material/Edit";
 import ToggleOnIcon from "@mui/icons-material/ToggleOn";
 import ToggleOffIcon from "@mui/icons-material/ToggleOff";
 import AddIcon from "@mui/icons-material/Add";
+import BASE_URL from "../../config/apiConfig";
 
 const RegistrosList = () => {
   const [registros, setRegistros] = useState([]);
@@ -51,12 +52,9 @@ const RegistrosList = () => {
   const fetchRegistros = async () => {
     try {
       const token = localStorage.getItem("jwtToken");
-      const res = await fetch(
-        "http://localhost:8080/api/registros-financieros",
-        {
-          headers: { Authorization: `Bearer ${token}` },
-        }
-      );
+      const res = await fetch(`${BASE_URL}/api/registros-financieros`, {
+        headers: { Authorization: `Bearer ${token}` },
+      });
       const data = await res.json();
       setRegistros(data);
     } catch (err) {
@@ -94,13 +92,10 @@ const RegistrosList = () => {
     if (!window.confirm("¿Eliminar registro financiero?")) return;
     try {
       const token = localStorage.getItem("jwtToken");
-      const res = await fetch(
-        `http://localhost:8080/api/registros-financieros/${id}`,
-        {
-          method: "DELETE",
-          headers: { Authorization: `Bearer ${token}` },
-        }
-      );
+      const res = await fetch(`${BASE_URL}/api/registros-financieros/${id}`, {
+        method: "DELETE",
+        headers: { Authorization: `Bearer ${token}` },
+      });
       if (res.ok) {
         setRegistros((prev) => prev.filter((r) => r.id !== id));
       }
@@ -115,8 +110,8 @@ const RegistrosList = () => {
       const method = modalMode === "edit" ? "PUT" : "POST";
       const url =
         modalMode === "edit"
-          ? `http://localhost:8080/api/registros-financieros/${modalRegistro.datos.id}`
-          : "http://localhost:8080/api/registros-financieros";
+          ? `${BASE_URL}/api/registros-financieros/${modalRegistro.datos.id}`
+          : `${BASE_URL}/api/registros-financieros`;
 
       const res = await fetch(url, {
         method,
