@@ -21,7 +21,7 @@ import cl.dimade.Dimade_Back.service.OrdenCompraService;
 
 @RestController
 @RequestMapping("/api/ordenes-compra")
-@CrossOrigin(origins = "http://localhost:5173")
+@CrossOrigin(origins = "${frontend.url}")
 public class OrdenCompraController {
 
     @Autowired
