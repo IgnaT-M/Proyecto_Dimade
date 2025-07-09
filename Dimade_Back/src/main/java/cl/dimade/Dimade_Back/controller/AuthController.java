@@ -93,10 +93,12 @@ public class AuthController {
         return ResponseEntity.status(HttpStatus.CREATED).body("Usuario registrado exitosamente");
     }
 
+
     @PostMapping("/forgot-password")
     public ResponseEntity<?> forgotPassword(@RequestBody Map<String, String> request) {
         String email = request.get("email");
         Optional<Usuario> usuarioOpt = usuarioRepository.findByEmail(email);
+
 
         if (usuarioOpt.isEmpty()) {
             // Para evitar exponer si el correo existe, devolvemos OK igual

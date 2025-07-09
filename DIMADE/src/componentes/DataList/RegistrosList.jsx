@@ -25,13 +25,13 @@ import {
   Snackbar,
   Alert,
   Chip,
+  useMediaQuery,
+  useTheme,
 } from "@mui/material";
 import SearchIcon from "@mui/icons-material/Search";
 import VisibilityIcon from "@mui/icons-material/Visibility";
 import DeleteIcon from "@mui/icons-material/Delete";
 import EditIcon from "@mui/icons-material/Edit";
-import ToggleOnIcon from "@mui/icons-material/ToggleOn";
-import ToggleOffIcon from "@mui/icons-material/ToggleOff";
 import AddIcon from "@mui/icons-material/Add";
 import BASE_URL from "../../config/apiConfig";
 
@@ -49,22 +49,31 @@ const RegistrosList = () => {
   const [openSnackbar, setOpenSnackbar] = useState(false);
   const [modalMode, setModalMode] = useState("view");
 
-  const fetchRegistros = async () => {
-    try {
-      const token = localStorage.getItem("jwtToken");
-      const res = await fetch(`${BASE_URL}/api/registros-financieros`, {
-        headers: { Authorization: `Bearer ${token}` },
-      });
-      const data = await res.json();
-      setRegistros(data);
-    } catch (err) {
-      console.error("Error cargando registros:", err);
-    }
-  };
+  const theme = useTheme();
+  // Media query para cambiar a vista de tarjetas en tablets y móviles
+  const isMobileLayout = useMediaQuery(theme.breakpoints.down("md"));
+  // Media query para hacer el Dialog a pantalla completa solo en móviles
+  const isFullScreenDialog = useMediaQuery(theme.breakpoints.down("sm"));
 
   useEffect(() => {
     fetchRegistros();
   }, []);
+
+  const fetchRegistros = async () => {
+    try {
+      const token = localStorage.getItem("jwtToken");
+
+      const res = await fetch(`${BASE_URL}/api/registros-financieros`, {
+        headers: { Authorization: `Bearer ${token}` },
+      });
+
+      const data = await res.json();
+      setRegistros(Array.isArray(data) ? data : []);
+    } catch (err) {
+      console.error("Error cargando registros:", err);
+      setRegistros([]);
+    }
+  };
 
   const filteredRegistros = useMemo(() => {
     return registros
@@ -77,8 +86,8 @@ const RegistrosList = () => {
         tipoFiltro ? r.tipo?.toLowerCase() === tipoFiltro.toLowerCase() : true
       )
       .sort((a, b) => {
-        const fechaA = new Date(a.fecha);
-        const fechaB = new Date(b.fecha);
+        const fechaA = new Date(a.fecha).getTime();
+        const fechaB = new Date(b.fecha).getTime();
         return fechaOrden === "asc" ? fechaA - fechaB : fechaB - fechaA;
       });
   }, [registros, search, tipoFiltro, fechaOrden]);
@@ -107,11 +116,13 @@ const RegistrosList = () => {
   const handleGuardarCambios = async () => {
     try {
       const token = localStorage.getItem("jwtToken");
-      const method = modalMode === "edit" ? "PUT" : "POST";
+      const method = modalMode === "new" ? "POST" : "PUT";
       const url =
+
         modalMode === "edit"
           ? `${BASE_URL}/api/registros-financieros/${modalRegistro.datos.id}`
           : `${BASE_URL}/api/registros-financieros`;
+
 
       const res = await fetch(url, {
         method,
@@ -121,7 +132,6 @@ const RegistrosList = () => {
         },
         body: JSON.stringify(modalRegistro.datos),
       });
-
       if (res.ok) {
         fetchRegistros();
         setModalRegistro({ open: false, datos: null });
@@ -148,14 +158,48 @@ const RegistrosList = () => {
     setModalMode(mode);
   };
 
-  const formatDate = (dateString) => {
-    const d = new Date(dateString);
-    return d.toLocaleDateString("es-CL", {
+  const handleCloseModal = () => setModalRegistro({ open: false, datos: null });
+
+  const handleModalChange = (e) => {
+    const { name, value } = e.target;
+    setModalRegistro((prev) => ({
+      ...prev,
+      datos: { ...prev.datos, [name]: value },
+    }));
+  };
+
+  const formatDate = (dateString) =>
+    new Date(dateString).toLocaleDateString("es-CL", {
       day: "2-digit",
       month: "2-digit",
       year: "numeric",
     });
-  };
+
+  const formatCurrency = (amount) =>
+    new Intl.NumberFormat("es-CL", {
+      style: "currency",
+      currency: "CLP",
+    }).format(amount);
+
+  const renderActions = (registro) => (
+    <Box>
+      <Tooltip title="Ver">
+        <IconButton onClick={() => handleOpenModal(registro, "view")}>
+          <VisibilityIcon sx={{ color: "#1976d2" }} />
+        </IconButton>
+      </Tooltip>
+      <Tooltip title="Editar">
+        <IconButton onClick={() => handleOpenModal(registro, "edit")}>
+          <EditIcon sx={{ color: "#f57c00" }} />
+        </IconButton>
+      </Tooltip>
+      <Tooltip title="Eliminar">
+        <IconButton onClick={() => handleDelete(registro.id)}>
+          <DeleteIcon sx={{ color: "#d32f2f" }} />
+        </IconButton>
+      </Tooltip>
+    </Box>
+  );
 
   return (
     <Box>
@@ -166,136 +210,182 @@ const RegistrosList = () => {
           flexWrap: "wrap",
           gap: 2,
           mb: 2,
+          alignItems: "center",
         }}
       >
         <Typography variant="h5" fontWeight="bold">
           Registros Financieros
         </Typography>
-
-        <TextField
-          size="small"
-          placeholder="Buscar..."
-          value={search}
-          onChange={(e) => setSearch(e.target.value)}
-          InputProps={{
-            startAdornment: (
-              <InputAdornment position="start">
-                <SearchIcon />
-              </InputAdornment>
-            ),
-          }}
-        />
-
-        <FormControl size="small" sx={{ minWidth: 160 }}>
-          <InputLabel>Filtrar por tipo</InputLabel>
-          <Select
-            value={tipoFiltro}
-            label="Filtrar por tipo"
-            onChange={(e) => setTipoFiltro(e.target.value)}
+        <Box sx={{ display: "flex", gap: 1, flexWrap: "wrap" }}>
+          <TextField
+            size="small"
+            placeholder="Buscar..."
+            value={search}
+            onChange={(e) => setSearch(e.target.value)}
+            InputProps={{
+              startAdornment: (
+                <InputAdornment position="start">
+                  <SearchIcon />
+                </InputAdornment>
+              ),
+            }}
+          />
+          <FormControl size="small" sx={{ minWidth: 160 }}>
+            <InputLabel>Tipo</InputLabel>
+            <Select
+              value={tipoFiltro}
+              label="Tipo"
+              onChange={(e) => setTipoFiltro(e.target.value)}
+            >
+              <MenuItem value="">Todos</MenuItem>
+              <MenuItem value="ingreso">Ingreso</MenuItem>
+              <MenuItem value="egreso">Egreso</MenuItem>
+            </Select>
+          </FormControl>
+          <FormControl size="small" sx={{ minWidth: 160 }}>
+            <InputLabel>Orden por fecha</InputLabel>
+            <Select
+              value={fechaOrden}
+              label="Orden por fecha"
+              onChange={(e) => setFechaOrden(e.target.value)}
+            >
+              <MenuItem value="desc">Más recientes</MenuItem>
+              <MenuItem value="asc">Más antiguos</MenuItem>
+            </Select>
+          </FormControl>
+          <Button
+            variant="contained"
+            startIcon={<AddIcon />}
+            onClick={() => handleOpenModal(null, "new")}
           >
-            <MenuItem value="">Todos</MenuItem>
-            <MenuItem value="ingreso">Ingreso</MenuItem>
-            <MenuItem value="egreso">Egreso</MenuItem>
-          </Select>
-        </FormControl>
-
-        <FormControl size="small" sx={{ minWidth: 160 }}>
-          <InputLabel>Orden por fecha</InputLabel>
-          <Select
-            value={fechaOrden}
-            label="Orden por fecha"
-            onChange={(e) => setFechaOrden(e.target.value)}
-          >
-            <MenuItem value="desc">Más recientes</MenuItem>
-            <MenuItem value="asc">Más antiguos</MenuItem>
-          </Select>
-        </FormControl>
-
-        <Button
-          variant="contained"
-          startIcon={<AddIcon />}
-          onClick={() => handleOpenModal(null, "new")}
-        >
-          Agregar
-        </Button>
+            Agregar
+          </Button>
+        </Box>
       </Box>
 
-      <Paper>
-        <Table>
-          <TableHead>
-            <TableRow>
-              <TableCell>ID</TableCell>
-              <TableCell>Fecha</TableCell>
-              <TableCell>Tipo</TableCell>
-              <TableCell>Concepto</TableCell>
-              <TableCell>Observaciones</TableCell>
-              <TableCell>Monto</TableCell>
-              <TableCell>Acciones</TableCell>
-            </TableRow>
-          </TableHead>
-          <TableBody>
-            {paginatedRegistros.map((r) => (
-              <TableRow key={r.id}>
-                <TableCell>{r.id}</TableCell>
-                <TableCell>{formatDate(r.fecha)}</TableCell>
-                <TableCell>
-                  <Chip
-                    label={r.tipo.charAt(0).toUpperCase() + r.tipo.slice(1)}
-                    color={r.tipo === "ingreso" ? "success" : "error"}
-                    size="small"
-                  />
-                </TableCell>
-                <TableCell>{r.concepto}</TableCell>
-                <TableCell>{r.observaciones}</TableCell>
-                <TableCell>${r.monto.toLocaleString("es-CL")}</TableCell>
-                <TableCell>
-                  <Tooltip title="Ver">
-                    <IconButton onClick={() => handleOpenModal(r, "view")}>
-                      <VisibilityIcon sx={{ color: "#1976d2" }} />
-                    </IconButton>
-                  </Tooltip>
-                  <Tooltip title="Editar">
-                    <IconButton onClick={() => handleOpenModal(r, "edit")}>
-                      <EditIcon sx={{ color: "#f57c00" }} />
-                    </IconButton>
-                  </Tooltip>
-                  <Tooltip title="Eliminar">
-                    <IconButton onClick={() => handleDelete(r.id)}>
-                      <DeleteIcon sx={{ color: "#d32f2f" }} />
-                    </IconButton>
-                  </Tooltip>
-                </TableCell>
-              </TableRow>
-            ))}
-            {paginatedRegistros.length === 0 && (
+      {isMobileLayout ? (
+        <Box>
+          {paginatedRegistros.map((r, index) => (
+            <Paper
+              key={r.id}
+              sx={{
+                p: 2,
+                mb: 2,
+                backgroundColor:
+                  index % 2 !== 0 ? theme.palette.action.hover : "inherit",
+              }}
+            >
+              <Box
+                sx={{
+                  display: "flex",
+                  justifyContent: "space-between",
+                  alignItems: "flex-start",
+                  mb: 1,
+                }}
+              >
+                <Typography
+                  variant="subtitle1"
+                  fontWeight="bold"
+                  sx={{ mr: 1, flexGrow: 1 }}
+                >
+                  {r.concepto}
+                </Typography>
+                <Typography
+                  variant="h6"
+                  color={r.tipo === "ingreso" ? "success.main" : "error.main"}
+                >
+                  {formatCurrency(r.monto)}
+                </Typography>
+              </Box>
+              <Typography variant="body2" color="text.secondary">
+                {r.observaciones}
+              </Typography>
+              <Box
+                sx={{
+                  display: "flex",
+                  justifyContent: "space-between",
+                  alignItems: "center",
+                  mt: 2,
+                }}
+              >
+                <Chip
+                  label={r.tipo}
+                  color={r.tipo === "ingreso" ? "success" : "error"}
+                  size="small"
+                />
+                {renderActions(r)}
+              </Box>
+            </Paper>
+          ))}
+        </Box>
+      ) : (
+        <Paper>
+          <Table>
+            <TableHead>
               <TableRow>
-                <TableCell colSpan={7} align="center">
-                  No se encontraron registros
-                </TableCell>
+                <TableCell>ID</TableCell>
+                <TableCell>Fecha</TableCell>
+                <TableCell>Tipo</TableCell>
+                <TableCell>Concepto</TableCell>
+                <TableCell>Observaciones</TableCell>
+                <TableCell align="right">Monto</TableCell>
+                <TableCell align="right">Acciones</TableCell>
               </TableRow>
-            )}
-          </TableBody>
-        </Table>
+            </TableHead>
+            <TableBody>
+              {paginatedRegistros.map((r) => (
+                <TableRow
+                  key={r.id}
+                  sx={{
+                    "&:nth-of-type(even)": {
+                      backgroundColor: theme.palette.action.hover,
+                    },
+                  }}
+                >
+                  <TableCell>{r.id}</TableCell>
+                  <TableCell>{formatDate(r.fecha)}</TableCell>
+                  <TableCell>
+                    <Chip
+                      label={r.tipo}
+                      color={r.tipo === "ingreso" ? "success" : "error"}
+                      size="small"
+                    />
+                  </TableCell>
+                  <TableCell>{r.concepto}</TableCell>
+                  <TableCell>{r.observaciones}</TableCell>
+                  <TableCell align="right">{formatCurrency(r.monto)}</TableCell>
+                  <TableCell align="right">{renderActions(r)}</TableCell>
+                </TableRow>
+              ))}
+              {paginatedRegistros.length === 0 && (
+                <TableRow>
+                  <TableCell colSpan={7} align="center">
+                    No se encontraron registros
+                  </TableCell>
+                </TableRow>
+              )}
+            </TableBody>
+          </Table>
+        </Paper>
+      )}
 
-        <TablePagination
-          component="div"
-          count={filteredRegistros.length}
-          page={page}
-          onPageChange={(_, newPage) => setPage(newPage)}
-          rowsPerPage={rowsPerPage}
-          onRowsPerPageChange={(e) =>
-            setRowsPerPage(parseInt(e.target.value, 10))
-          }
-          rowsPerPageOptions={[10, 20, 50]}
-          labelRowsPerPage="Filas por página:"
-        />
-      </Paper>
+      <TablePagination
+        component="div"
+        count={filteredRegistros.length}
+        page={page}
+        onPageChange={(_, newPage) => setPage(newPage)}
+        rowsPerPage={rowsPerPage}
+        onRowsPerPageChange={(e) =>
+          setRowsPerPage(parseInt(e.target.value, 10))
+        }
+      />
 
       <Dialog
         open={modalRegistro.open}
-        onClose={() => setModalRegistro({ open: false, datos: null })}
+        onClose={handleCloseModal}
         maxWidth="sm"
         fullWidth
+        fullScreen={isFullScreenDialog}
       >
         <DialogTitle>
           {modalMode === "edit"
@@ -307,58 +397,42 @@ const RegistrosList = () => {
         <DialogContent dividers>
           <TextField
             label="Monto"
+            name="monto"
             type="number"
             value={modalRegistro.datos?.monto || ""}
             fullWidth
             margin="normal"
-            onChange={(e) =>
-              setModalRegistro((prev) => ({
-                ...prev,
-                datos: { ...prev.datos, monto: parseFloat(e.target.value) },
-              }))
-            }
+            onChange={handleModalChange}
             InputProps={{ readOnly: modalMode === "view" }}
           />
           <TextField
             label="Concepto"
+            name="concepto"
             value={modalRegistro.datos?.concepto || ""}
             fullWidth
             margin="normal"
-            onChange={(e) =>
-              setModalRegistro((prev) => ({
-                ...prev,
-                datos: { ...prev.datos, concepto: e.target.value },
-              }))
-            }
+            onChange={handleModalChange}
             InputProps={{ readOnly: modalMode === "view" }}
           />
           <TextField
             label="Observaciones"
+            name="observaciones"
             value={modalRegistro.datos?.observaciones || ""}
             fullWidth
             multiline
             rows={2}
             margin="normal"
-            onChange={(e) =>
-              setModalRegistro((prev) => ({
-                ...prev,
-                datos: { ...prev.datos, observaciones: e.target.value },
-              }))
-            }
+            onChange={handleModalChange}
             InputProps={{ readOnly: modalMode === "view" }}
           />
           <FormControl fullWidth margin="normal">
             <InputLabel>Tipo</InputLabel>
             <Select
-              value={modalRegistro.datos?.tipo || ""}
+              name="tipo"
+              value={modalRegistro.datos?.tipo || "ingreso"}
               label="Tipo"
-              onChange={(e) =>
-                setModalRegistro((prev) => ({
-                  ...prev,
-                  datos: { ...prev.datos, tipo: e.target.value },
-                }))
-              }
-              disabled={modalMode === "view"}
+              onChange={handleModalChange}
+              readOnly={modalMode === "view"}
             >
               <MenuItem value="ingreso">Ingreso</MenuItem>
               <MenuItem value="egreso">Egreso</MenuItem>
@@ -366,33 +440,25 @@ const RegistrosList = () => {
           </FormControl>
           <TextField
             label="Fecha"
+            name="fecha"
             type="date"
             value={modalRegistro.datos?.fecha?.substring(0, 10) || ""}
             fullWidth
             margin="normal"
             InputLabelProps={{ shrink: true }}
-            onChange={(e) =>
-              setModalRegistro((prev) => ({
-                ...prev,
-                datos: { ...prev.datos, fecha: e.target.value },
-              }))
-            }
+            onChange={handleModalChange}
             InputProps={{ readOnly: modalMode === "view" }}
           />
         </DialogContent>
         <DialogActions>
-          <Button
-            onClick={() => setModalRegistro({ open: false, datos: null })}
-          >
-            Cancelar
-          </Button>
+          <Button onClick={handleCloseModal}>Cancelar</Button>
           {modalMode !== "view" && (
             <Button
               variant="contained"
               color="primary"
               onClick={handleGuardarCambios}
             >
-              Guardar Cambios
+              Guardar
             </Button>
           )}
         </DialogActions>
@@ -409,7 +475,7 @@ const RegistrosList = () => {
           severity="success"
           variant="filled"
         >
-          Registro actualizado correctamente
+          Registro guardado correctamente
         </Alert>
       </Snackbar>
     </Box>

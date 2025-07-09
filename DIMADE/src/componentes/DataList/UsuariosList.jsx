@@ -17,6 +17,8 @@ import {
   Button,
   MenuItem,
   Chip,
+  useMediaQuery,
+  useTheme,
 } from "@mui/material";
 import SearchIcon from "@mui/icons-material/Search";
 import VisibilityIcon from "@mui/icons-material/Visibility";
@@ -38,6 +40,19 @@ const UsuariosList = () => {
   const [modalMode, setModalMode] = useState("view");
   const [openModal, setOpenModal] = useState(false);
 
+  const theme = useTheme();
+  const isMobile = useMediaQuery(theme.breakpoints.down("md"));
+
+  const formatUserName = (name) => {
+    if (!name) return "";
+    // Asume que el nombre de usuario puede ser 'nombre.apellido' o 'nombre_apellido'
+    // y lo convierte a 'Nombre Apellido'.
+    return name
+      .split(/[\._-]/) // Divide por punto, guion bajo o guion
+      .map((part) => part.charAt(0).toUpperCase() + part.slice(1))
+      .join(" ");
+  };
+
   const fetchUsuarios = async () => {
     try {
       const token = localStorage.getItem("jwtToken");
@@ -47,7 +62,7 @@ const UsuariosList = () => {
         },
       });
       const data = await res.json();
-      setUsuarios(data);
+      setUsuarios(Array.isArray(data) ? data : []);
     } catch (err) {
       console.error("Error cargando usuarios:", err);
     }
@@ -175,13 +190,74 @@ const UsuariosList = () => {
     }
   };
 
+  const modalStyle = {
+    position: "absolute",
+    top: "50%",
+    left: "50%",
+    transform: "translate(-50%, -50%)",
+    width: { xs: "90%", md: 400 },
+    bgcolor: "background.paper",
+    p: 4,
+    borderRadius: 2,
+    boxShadow: 24,
+    maxHeight: "90vh",
+    overflowY: "auto",
+  };
+
+  const renderActions = (usuario) => (
+    <Box sx={{ display: "flex", justifyContent: "flex-end", flexWrap: "wrap" }}>
+      <Tooltip title="Ver">
+        <IconButton onClick={() => handleOpenModal(usuario, "view")}>
+          <VisibilityIcon sx={{ color: "#1976d2" }} />
+        </IconButton>
+      </Tooltip>
+      <Tooltip title="Editar">
+        <IconButton onClick={() => handleOpenModal(usuario, "edit")}>
+          <EditIcon sx={{ color: "#f57c00" }} />
+        </IconButton>
+      </Tooltip>
+      <Tooltip title="Eliminar">
+        <IconButton onClick={() => handleDelete(usuario.id)}>
+          <DeleteIcon sx={{ color: "#d32f2f" }} />
+        </IconButton>
+      </Tooltip>
+      {"activo" in usuario && (
+        <Tooltip title={usuario.activo ? "Desactivar" : "Activar"}>
+          <IconButton onClick={() => handleToggleActivo(usuario)}>
+            {usuario.activo ? (
+              <ToggleOnIcon sx={{ color: "#2e7d32" }} />
+            ) : (
+              <ToggleOffIcon sx={{ color: "#616161" }} />
+            )}
+          </IconButton>
+        </Tooltip>
+      )}
+    </Box>
+  );
+
   return (
     <Box>
-      <Box sx={{ display: "flex", justifyContent: "space-between", mb: 2 }}>
+      <Box
+        sx={{
+          display: "flex",
+          justifyContent: "space-between",
+          alignItems: { xs: "stretch", md: "center" },
+          flexDirection: { xs: "column", md: "row" },
+          gap: 2,
+          mb: 2,
+        }}
+      >
         <Typography variant="h5" fontWeight="bold">
           Lista de Usuarios
         </Typography>
-        <Box sx={{ display: "flex", gap: 1, flexWrap: "wrap" }}>
+        <Box
+          sx={{
+            display: "flex",
+            gap: 1,
+            flexDirection: { xs: "column", sm: "row" },
+            flexWrap: "wrap",
+          }}
+        >
           <TextField
             size="small"
             placeholder="Buscar..."
@@ -201,6 +277,7 @@ const UsuariosList = () => {
             label="Estado"
             value={estadoFiltro}
             onChange={(e) => setEstadoFiltro(e.target.value)}
+            sx={{ minWidth: 120 }}
           >
             <MenuItem value="todos">Todos</MenuItem>
             <MenuItem value="activo">Activo</MenuItem>
@@ -212,6 +289,7 @@ const UsuariosList = () => {
             label="Rol"
             value={rolFiltro}
             onChange={(e) => setRolFiltro(e.target.value)}
+            sx={{ minWidth: 120 }}
           >
             <MenuItem value="todos">Todos</MenuItem>
             <MenuItem value="ADMIN">ADMIN</MenuItem>
@@ -227,102 +305,120 @@ const UsuariosList = () => {
         </Box>
       </Box>
 
-      <Paper>
-        <Table>
-          <TableHead>
-            <TableRow>
-              {Object.keys(paginatedUsuarios[0] || {})
-                .filter((key) => key !== "password")
-                .map((key) => (
-                  <TableCell key={key}>{key}</TableCell>
-                ))}
-              <TableCell>Acciones</TableCell>
-            </TableRow>
-          </TableHead>
-          <TableBody>
-            {paginatedUsuarios.map((usuario) => (
-              <TableRow key={usuario.id}>
-                {Object.entries(usuario).map(([k, v]) => {
-                  if (k === "password") return null;
-                  return (
-                    <TableCell key={k}>
-                      {k === "activo" ? (
-                        <Chip
-                          label={v ? "Activo" : "Inactivo"}
-                          color={v ? "success" : "default"}
-                          size="small"
-                        />
-                      ) : (
-                        String(v)
-                      )}
-                    </TableCell>
-                  );
-                })}
-                <TableCell>
-                  <Tooltip title="Ver">
-                    <IconButton
-                      onClick={() => handleOpenModal(usuario, "view")}
-                    >
-                      <VisibilityIcon sx={{ color: "#1976d2" }} />
-                    </IconButton>
-                  </Tooltip>
-                  <Tooltip title="Editar">
-                    <IconButton
-                      onClick={() => handleOpenModal(usuario, "edit")}
-                    >
-                      <EditIcon sx={{ color: "#f57c00" }} />
-                    </IconButton>
-                  </Tooltip>
-                  <Tooltip title="Eliminar">
-                    <IconButton onClick={() => handleDelete(usuario.id)}>
-                      <DeleteIcon sx={{ color: "#d32f2f" }} />
-                    </IconButton>
-                  </Tooltip>
-                  {"activo" in usuario && (
-                    <Tooltip title={usuario.activo ? "Desactivar" : "Activar"}>
-                      <IconButton onClick={() => handleToggleActivo(usuario)}>
-                        {usuario.activo ? (
-                          <ToggleOnIcon sx={{ color: "#2e7d32" }} />
-                        ) : (
-                          <ToggleOffIcon sx={{ color: "#616161" }} />
-                        )}
-                      </IconButton>
-                    </Tooltip>
-                  )}
-                </TableCell>
+      {isMobile ? (
+        <Box>
+          {paginatedUsuarios.map((usuario, index) => (
+            <Paper
+              key={usuario.id}
+              sx={{
+                p: 2,
+                mb: 2,
+                backgroundColor:
+                  index % 2 !== 0 ? theme.palette.action.hover : "inherit",
+              }}
+            >
+              <Box
+                sx={{
+                  display: "flex",
+                  justifyContent: "space-between",
+                  alignItems: "flex-start",
+                }}
+              >
+                <Box>
+                  <Typography variant="subtitle1" fontWeight="bold">
+                    {formatUserName(usuario.nombre)}
+                  </Typography>
+                  <Typography variant="body2" color="text.secondary">
+                    {usuario.email}
+                  </Typography>
+                </Box>
+                <Chip
+                  label={usuario.activo ? "Activo" : "Inactivo"}
+                  color={usuario.activo ? "success" : "default"}
+                  size="small"
+                />
+              </Box>
+              <Box
+                sx={{
+                  display: "flex",
+                  justifyContent: "space-between",
+                  alignItems: "center",
+                  mt: 1,
+                }}
+              >
+                <Typography variant="body2">
+                  Rol: <strong>{usuario.rol}</strong>
+                </Typography>
+                {renderActions(usuario)}
+              </Box>
+            </Paper>
+          ))}
+        </Box>
+      ) : (
+        <Paper>
+          <Table>
+            <TableHead>
+              <TableRow>
+                {paginatedUsuarios[0] &&
+                  Object.keys(paginatedUsuarios[0])
+                    .filter((key) => key !== "password")
+                    .map((key) => (
+                      <TableCell key={key} sx={{ textTransform: "capitalize" }}>
+                        {key}
+                      </TableCell>
+                    ))}
+                <TableCell align="right">Acciones</TableCell>
               </TableRow>
-            ))}
-          </TableBody>
-        </Table>
+            </TableHead>
+            <TableBody>
+              {paginatedUsuarios.map((usuario) => (
+                <TableRow
+                  key={usuario.id}
+                  sx={{
+                    "&:nth-of-type(even)": {
+                      backgroundColor: theme.palette.action.hover,
+                    },
+                  }}
+                >
+                  {Object.entries(usuario).map(([k, v]) => {
+                    if (k === "password") return null;
+                    return (
+                      <TableCell key={k}>
+                        {k === "activo" ? (
+                          <Chip
+                            label={v ? "Activo" : "Inactivo"}
+                            color={v ? "success" : "default"}
+                            size="small"
+                          />
+                        ) : k === "nombre" ? (
+                          formatUserName(v)
+                        ) : (
+                          String(v)
+                        )}
+                      </TableCell>
+                    );
+                  })}
+                  <TableCell align="right">{renderActions(usuario)}</TableCell>
+                </TableRow>
+              ))}
+            </TableBody>
+          </Table>
+        </Paper>
+      )}
 
-        <TablePagination
-          component="div"
-          count={filteredUsuarios.length}
-          page={page}
-          onPageChange={(_, newPage) => setPage(newPage)}
-          rowsPerPage={rowsPerPage}
-          onRowsPerPageChange={(e) =>
-            setRowsPerPage(parseInt(e.target.value, 10))
-          }
-          rowsPerPageOptions={[10, 20, 50]}
-          labelRowsPerPage="Filas por página:"
-        />
-      </Paper>
+      <TablePagination
+        component="div"
+        count={filteredUsuarios.length}
+        page={page}
+        onPageChange={(_, newPage) => setPage(newPage)}
+        rowsPerPage={rowsPerPage}
+        onRowsPerPageChange={(e) =>
+          setRowsPerPage(parseInt(e.target.value, 10))
+        }
+      />
 
       <Modal open={openModal} onClose={handleCloseModal}>
-        <Box
-          sx={{
-            position: "absolute",
-            top: "50%",
-            left: "50%",
-            transform: "translate(-50%, -50%)",
-            width: 400,
-            bgcolor: "background.paper",
-            p: 4,
-            borderRadius: 2,
-            boxShadow: 24,
-          }}
-        >
+        <Box sx={modalStyle}>
           <Typography variant="h6" mb={2}>
             {modalMode === "view"
               ? "Ver Usuario"
@@ -357,8 +453,13 @@ const UsuariosList = () => {
                   type="password"
                   fullWidth
                   margin="dense"
-                  value={selectedUsuario.password}
+                  value={selectedUsuario.password || ""}
                   onChange={handleEditChange}
+                  placeholder={
+                    modalMode === "edit"
+                      ? "Dejar en blanco para no cambiar"
+                      : ""
+                  }
                 />
               )}
               <TextField
@@ -380,7 +481,7 @@ const UsuariosList = () => {
                 name="activo"
                 fullWidth
                 margin="dense"
-                value={selectedUsuario.activo.toString()}
+                value={String(selectedUsuario.activo)}
                 onChange={modalMode === "view" ? undefined : handleEditChange}
                 InputProps={{ readOnly: modalMode === "view" }}
               >
