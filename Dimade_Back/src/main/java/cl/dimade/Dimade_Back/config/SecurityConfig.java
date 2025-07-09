@@ -21,6 +21,7 @@ import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 
 import cl.dimade.Dimade_Back.service.CustomUserDetailsService;
 import cl.dimade.Dimade_Back.service.JwtUtil;
+import org.springframework.beans.factory.annotation.Value;
 
 @Configuration
 public class SecurityConfig {
@@ -30,6 +31,9 @@ public class SecurityConfig {
 
     @Autowired
     private CustomUserDetailsService customUserDetailsService;
+
+    @Value("${frontend.url}")
+    private String frontendUrl;
 
     @Bean
     PasswordEncoder passwordEncoder() {
@@ -51,6 +55,7 @@ public class SecurityConfig {
                         // Rutas protegidas por token
                         .requestMatchers("/api/registros-financieros/**", "/api/clientes/**", "/api/proveedores/**",
                                 "/api/ordenes-compra/**", "/api/usuarios/**", "/api/solicitudes-contacto/**",
+                                "/api/ordenes-compra/upload", "/api/ordenes-compra/download/**",
                                 "/api/solicitudes-cotizacion/**")
                         .authenticated()
 
@@ -64,7 +69,7 @@ public class SecurityConfig {
     @Bean
     CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration configuration = new CorsConfiguration();
-        configuration.setAllowedOrigins(List.of("http://localhost:5173"));
+        configuration.setAllowedOrigins(List.of(frontendUrl));
         configuration.setAllowedMethods(List.of("GET", "POST", "PUT", "DELETE", "OPTIONS"));
         configuration.setAllowedHeaders(List.of("*"));
         configuration.setAllowCredentials(true);

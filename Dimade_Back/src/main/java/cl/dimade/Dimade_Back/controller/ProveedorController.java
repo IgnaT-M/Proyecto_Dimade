@@ -6,14 +6,22 @@ import java.util.Optional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.CrossOrigin;
+import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
 
 import cl.dimade.Dimade_Back.model.Proveedor;
 import cl.dimade.Dimade_Back.service.ProveedorService;
 
 @RestController
 @RequestMapping("/api/proveedores")
-@CrossOrigin(origins = "http://localhost:5173")
+@CrossOrigin(origins = "${frontend.url}")
 public class ProveedorController {
 
     @Autowired
@@ -28,9 +36,7 @@ public class ProveedorController {
     // Obtener proveedor por ID
     @GetMapping("/{id}")
     public ResponseEntity<Proveedor> obtenerPorId(@PathVariable String id) {
-        return service.obtenerPorId(id)
-                .map(ResponseEntity::ok)
-                .orElse(ResponseEntity.notFound().build());
+        return service.obtenerPorId(id).map(ResponseEntity::ok).orElse(ResponseEntity.notFound().build());
     }
 
     // Obtener proveedor por RUT
@@ -49,9 +55,7 @@ public class ProveedorController {
     // Actualizar proveedor
     @PutMapping("/{id}")
     public ResponseEntity<Proveedor> actualizar(@PathVariable String id, @RequestBody Proveedor proveedor) {
-        return service.actualizar(id, proveedor)
-                .map(ResponseEntity::ok)
-                .orElse(ResponseEntity.notFound().build());
+        return service.actualizar(id, proveedor).map(ResponseEntity::ok).orElse(ResponseEntity.notFound().build());
     }
 
     // Eliminar proveedor

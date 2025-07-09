@@ -27,4 +27,5 @@ public class OrdenCompra {
     private String estado; // Ej: Pendiente, Aprobada, Rechazada
     private String tipo; // Ej: Cliente, Proveedor, Interna, etc...
     private String detalle;
+    private String pdfId;
 }

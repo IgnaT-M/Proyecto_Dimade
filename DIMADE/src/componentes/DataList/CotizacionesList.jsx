@@ -28,6 +28,7 @@ import {
   Add as AddIcon,
   ShoppingCartCheckout as ShoppingCartCheckoutIcon,
 } from "@mui/icons-material";
+import BASE_URL from "../../config/apiConfig";
 
 const formatFecha = (dateString) => {
   if (!dateString) return "N/A";
@@ -61,10 +62,11 @@ const CotizacionesList = () => {
   const fetchSolicitudes = async () => {
     try {
       const token = localStorage.getItem("jwtToken");
-      const res = await fetch(
-        "http://localhost:8080/api/solicitudes-cotizacion",
-        { headers: { Authorization: `Bearer ${token}` } }
-      );
+
+      const res = await fetch(`${BASE_URL}/api/solicitudes-cotizacion`, {
+        headers: { Authorization: `Bearer ${token}` },
+      });
+
       const data = await res.json();
       setSolicitudes(Array.isArray(data) ? data : []);
     } catch (err) {
@@ -99,7 +101,7 @@ const CotizacionesList = () => {
     if (!window.confirm("¿Eliminar solicitud?")) return;
     try {
       const token = localStorage.getItem("jwtToken");
-      await fetch(`http://localhost:8080/api/solicitudes-cotizacion/${id}`, {
+      await fetch(`${BASE_URL}/api/solicitudes-cotizacion/${id}`, {
         method: "DELETE",
         headers: { Authorization: `Bearer ${token}` },
       });
@@ -164,8 +166,8 @@ const CotizacionesList = () => {
       const token = localStorage.getItem("jwtToken");
       const url =
         modalMode === "new"
-          ? "http://localhost:8080/api/solicitudes-cotizacion"
-          : `http://localhost:8080/api/solicitudes-cotizacion/${selected.id}`;
+          ? `${BASE_URL}/api/solicitudes-cotizacion`
+          : `${BASE_URL}/api/solicitudes-cotizacion/${selected.id}`;
       const method = modalMode === "new" ? "POST" : "PUT";
       await fetch(url, {
         method,
@@ -189,7 +191,7 @@ const CotizacionesList = () => {
     if (!ordenData) return;
     try {
       const token = localStorage.getItem("jwtToken");
-      const res = await fetch("http://localhost:8080/api/ordenes-compra", {
+      const res = await fetch(`${BASE_URL}/api/ordenes-compra`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",

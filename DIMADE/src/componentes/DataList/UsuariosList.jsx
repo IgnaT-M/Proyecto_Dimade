@@ -27,6 +27,7 @@ import EditIcon from "@mui/icons-material/Edit";
 import ToggleOnIcon from "@mui/icons-material/ToggleOn";
 import ToggleOffIcon from "@mui/icons-material/ToggleOff";
 import AddIcon from "@mui/icons-material/Add";
+import BASE_URL from "../../config/apiConfig";
 
 const UsuariosList = () => {
   const [usuarios, setUsuarios] = useState([]);
@@ -55,7 +56,7 @@ const UsuariosList = () => {
   const fetchUsuarios = async () => {
     try {
       const token = localStorage.getItem("jwtToken");
-      const res = await fetch("http://localhost:8080/api/usuarios", {
+      const res = await fetch(`${BASE_URL}/api/usuarios`, {
         headers: {
           Authorization: `Bearer ${token}`,
         },
@@ -97,7 +98,7 @@ const UsuariosList = () => {
     if (!window.confirm("¿Eliminar usuario?")) return;
     try {
       const token = localStorage.getItem("jwtToken");
-      const res = await fetch(`http://localhost:8080/api/usuarios/${id}`, {
+      const res = await fetch(`${BASE_URL}/api/usuarios/${id}`, {
         method: "DELETE",
         headers: {
           Authorization: `Bearer ${token}`,
@@ -115,17 +116,14 @@ const UsuariosList = () => {
     try {
       const token = localStorage.getItem("jwtToken");
       const updated = { ...usuario, activo: !usuario.activo };
-      const res = await fetch(
-        `http://localhost:8080/api/usuarios/${usuario.id}`,
-        {
-          method: "PUT",
-          headers: {
-            "Content-Type": "application/json",
-            Authorization: `Bearer ${token}`,
-          },
-          body: JSON.stringify(updated),
-        }
-      );
+      const res = await fetch(`${BASE_URL}/api/usuarios/${usuario.id}`, {
+        method: "PUT",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
+        },
+        body: JSON.stringify(updated),
+      });
       if (res.ok) {
         setUsuarios((prev) =>
           prev.map((u) => (u.id === usuario.id ? updated : u))
@@ -170,8 +168,8 @@ const UsuariosList = () => {
       const token = localStorage.getItem("jwtToken");
       const url =
         modalMode === "new"
-          ? "http://localhost:8080/api/usuarios"
-          : `http://localhost:8080/api/usuarios/${selectedUsuario.id}`;
+          ? `${BASE_URL}/api/usuarios`
+          : `${BASE_URL}/api/usuarios/${selectedUsuario.id}`;
       const method = modalMode === "new" ? "POST" : "PUT";
 
       const res = await fetch(url, {

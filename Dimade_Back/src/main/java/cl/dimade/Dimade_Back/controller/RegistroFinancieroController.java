@@ -7,14 +7,23 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.CrossOrigin;
+import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RestController;
 
 import cl.dimade.Dimade_Back.model.RegistroFinanciero;
 import cl.dimade.Dimade_Back.service.RegistroFinancieroService;
 
 @RestController
 @RequestMapping("/api/registros-financieros")
-@CrossOrigin(origins = "http://localhost:5173")
+@CrossOrigin(origins = "${frontend.url}")
 public class RegistroFinancieroController {
 
     @Autowired
@@ -27,9 +36,7 @@ public class RegistroFinancieroController {
 
     @GetMapping("/{id}")
     public ResponseEntity<RegistroFinanciero> obtener(@PathVariable String id) {
-        return service.obtenerPorId(id)
-                .map(ResponseEntity::ok)
-                .orElse(ResponseEntity.notFound().build());
+        return service.obtenerPorId(id).map(ResponseEntity::ok).orElse(ResponseEntity.notFound().build());
     }
 
     @PostMapping
@@ -40,8 +47,7 @@ public class RegistroFinancieroController {
     @PutMapping("/{id}")
     public ResponseEntity<RegistroFinanciero> actualizar(@PathVariable String id,
             @RequestBody RegistroFinanciero registroActualizado) {
-        return service.actualizar(id, registroActualizado)
-                .map(ResponseEntity::ok)
+        return service.actualizar(id, registroActualizado).map(ResponseEntity::ok)
                 .orElse(ResponseEntity.notFound().build());
     }
 
