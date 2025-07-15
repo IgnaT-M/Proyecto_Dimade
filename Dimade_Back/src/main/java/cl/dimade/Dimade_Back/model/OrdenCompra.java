@@ -24,6 +24,8 @@ public class OrdenCompra {
     private Date fechaOrden;
     private String productos; // Lista de IDs o nombres de productos
     private Double total;
+    private Double iva;
+    private Double modificador;
     private String estado; // Ej: Pendiente, Aprobada, Rechazada
     private String tipo; // Ej: Cliente, Proveedor, Interna, etc...
     private String detalle;

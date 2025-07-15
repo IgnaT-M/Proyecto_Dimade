@@ -76,7 +76,7 @@ function NextArrow(props) {
 
 function Carousel() {
   const settings = {
-    dots: false, // 👈 desactivado
+    dots: false,
     infinite: true,
     speed: 800,
     slidesToShow: 1,
@@ -91,10 +91,11 @@ function Carousel() {
       sx={{
         width: "100%",
         margin: "0 auto",
-        height: { xs: "35vh", sm: "45vh", md: "60vh" },
+        height: { xs: "auto", sm: "auto", md: "40vh", lg: "60vh" },
+        minHeight: { xs: "180px", sm: "250px", md: "450px" }, // ← 🔧 MÁS PEQUEÑO EN MOBILE
         position: "relative",
         overflow: "hidden",
-        pb: 0, // ya no es necesario espacio para los dots
+        pb: 0,
       }}
     >
       <Slider {...settings}>
@@ -111,7 +112,7 @@ function Carousel() {
                 <CardMedia
                   component="img"
                   image={slide.url}
-                  alt={slide.title || "imagen de productos Dimade"}
+                  alt={slide.title}
                   sx={{
                     objectFit: "cover",
                     width: "100%",
@@ -136,7 +137,7 @@ function Carousel() {
               <Box
                 sx={{
                   position: "absolute",
-                  top: "30%",
+                  top: { xs: "50%", sm: "35%" }, // ✅ texto mejor centrado en móvil
                   left: "10%",
                   transform: "translateY(-50%)",
                   zIndex: 2,
@@ -148,27 +149,37 @@ function Carousel() {
                   variant="h3"
                   gutterBottom
                   sx={{
-                    fontSize: { xs: "2rem", sm: "2.8rem", md: "3.4rem" },
+                    fontSize: {
+                      xs: "1.6rem",
+                      sm: "2rem",
+                      md: "2.8rem",
+                      lg: "4rem",
+                    },
                     fontWeight: "bold",
-                    WebkitTextStroke: "0.4px black",
-                    textShadow: "2px 2px 6px rgba(0,0,0,0.85)",
-                    lineHeight: 1.2,
-                    maxWidth: { xs: "90%", sm: "70%", md: "60%" },
+                    textShadow: "2px 2px 8px rgba(0,0,0,0.9)",
+                    lineHeight: 1.3,
+                    maxWidth: { xs: "90%", sm: "80%", md: "65%" },
                     textAlign: "left",
-                    whiteSpace: "normal",
+                    wordBreak: "break-word",
                   }}
                 >
                   {slide.title}
                 </Typography>
+
                 <Typography
                   variant="h6"
                   sx={{
-                    fontSize: { xs: "1.2rem", sm: "1.6rem", md: "1.8rem" },
-                    WebkitTextStroke: "0.3px black",
-                    textShadow: "1px 1px 4px rgba(0,0,0,0.7)",
-                    lineHeight: 1.3,
-                    maxWidth: { xs: "90%", sm: "70%", md: "60%" },
+                    fontSize: {
+                      xs: "0.9rem",
+                      sm: "1.1rem",
+                      md: "1.3rem",
+                      lg: "2rem",
+                    },
+                    textShadow: "1px 1px 6px rgba(0,0,0,0.7)",
+                    lineHeight: 1.4,
+                    maxWidth: { xs: "90%", sm: "80%", md: "65%" },
                     textAlign: "left",
+                    wordBreak: "break-word",
                   }}
                 >
                   {slide.Description}

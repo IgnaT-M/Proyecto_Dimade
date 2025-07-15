@@ -8,6 +8,7 @@ import {
   Alert,
   MenuItem,
 } from "@mui/material";
+import BASE_URL from "../config/apiConfig";
 
 const ContactForm = () => {
   const [formData, setFormData] = useState({
@@ -26,11 +27,9 @@ const ContactForm = () => {
   const [touched, setTouched] = useState({});
   const [submitAttempted, setSubmitAttempted] = useState(false);
 
-
   const handleChange = (e) => {
     setFormData((prev) => ({ ...prev, [e.target.name]: e.target.value }));
   };
-
 
   const handleBlur = (e) => {
     setTouched((prev) => ({ ...prev, [e.target.name]: true }));
@@ -48,7 +47,6 @@ const ContactForm = () => {
     );
     if (camposVacios.length > 0) return;
 
-
     const payload = {
       nombre: formData.nombre,
       correo: formData.correo,
@@ -58,19 +56,15 @@ const ContactForm = () => {
       mensaje: formData.mensaje,
     };
 
-
     try {
-      const response = await fetch(
-        "http://localhost:8080/api/solicitudes-contacto",
-        {
-          method: "POST",
+      const response = await fetch(`${BASE_URL}/api/solicitudes-contacto`, {
+        method: "POST",
 
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify(payload),
-        }
-      );
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(payload),
+      });
 
       if (!response.ok) throw new Error("Error en el envío");
 
@@ -85,7 +79,6 @@ const ContactForm = () => {
       });
       setTouched({});
       setSubmitAttempted(false);
-
     } catch (err) {
       console.error(err);
       setError(true);
@@ -101,7 +94,6 @@ const ContactForm = () => {
   ];
 
   return (
-
     <Box sx={{ maxWidth: 600, mx: "auto", py: 2 }}>
       <Typography variant="h4" gutterBottom>
         Déjanos tu mensaje
@@ -164,9 +156,7 @@ const ContactForm = () => {
           onChange={handleChange}
           onBlur={handleBlur}
           error={isEmpty("asunto")}
-          helperText={
-            isEmpty("asunto") ? "Selecciona una de las opciones" : ""
-          }
+          helperText={isEmpty("asunto") ? "Selecciona una de las opciones" : ""}
         >
           {asuntos.map((option, index) => (
             <MenuItem key={index} value={option}>
@@ -207,7 +197,6 @@ const ContactForm = () => {
         >
           Enviar
         </Button>
-
       </Box>
 
       <Snackbar
@@ -239,9 +228,7 @@ const ContactForm = () => {
           Error al enviar el mensaje.
         </Alert>
       </Snackbar>
-
     </Box>
-
   );
 };
 

@@ -37,7 +37,7 @@ function App() {
             element={<RecuperarContrasena />}
           />
 
-          <Route path="ResetearContrasena" element={<ResetearContrasena />} />
+          <Route path="/reset-password" element={<ResetearContrasena />} />
         </Routes>
       </BrowserRouter>
     </CustomThemeProvider>

@@ -28,9 +28,7 @@ import ToggleOnIcon from "@mui/icons-material/ToggleOn";
 import ToggleOffIcon from "@mui/icons-material/ToggleOff";
 import AddIcon from "@mui/icons-material/Add";
 
-import { Chip } from "@mui/material";
 import BASE_URL from "../../config/apiConfig";
-
 
 const ClientesList = () => {
   const [clientes, setClientes] = useState([]);

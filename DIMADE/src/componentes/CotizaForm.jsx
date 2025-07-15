@@ -19,17 +19,15 @@ import ModalCubitaje from "./ModalCubicador";
 import BASE_URL from "../config/apiConfig";
 
 const CotizaForm = () => {
-  // Estado para manejar los datos del formulario
   const [formData, setFormData] = useState({
     rut: "",
     nombre: "",
     email: "",
     telefono: "",
-    tipoProducto: "",
+    direccion: "", // ← nuevo campo
     mensaje: "",
   });
 
-  // Manejo de los cambios en los campos del formulario
   const [open, setOpen] = useState(false);
   const [error, setError] = useState(null);
   const [touched, setTouched] = useState({});
@@ -42,25 +40,25 @@ const CotizaForm = () => {
   const handleBlur = (e) => {
     setTouched((prev) => ({ ...prev, [e.target.name]: true }));
   };
+
   const isEmpty = (field) =>
     (touched[field] || submitAttempted) && !formData[field];
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    setSubmitAttempted(true); //valida si el campo esta vacio
+    setSubmitAttempted(true);
 
     const camposVacios = Object.keys(formData).filter(
       (campo) => !formData[campo]
     );
-    if (camposVacios.length > 0) {
-      return;
-    }
+    if (camposVacios.length > 0) return;
 
     const payload = {
       rutSolicitante: formData.rut,
       nombreSolicitante: formData.nombre,
       correo: formData.email,
       telefono: formData.telefono,
+      direccion: formData.direccion, // ← se envía
       fechaSolicitud: new Date(),
       productosSolicitados: [formData.tipoProducto],
       estado: "Pendiente",
@@ -82,6 +80,7 @@ const CotizaForm = () => {
         nombre: "",
         email: "",
         telefono: "",
+        direccion: "", // ← limpiar
         tipoProducto: "",
         mensaje: "",
       });
@@ -107,7 +106,6 @@ const CotizaForm = () => {
       <Box component="form" onSubmit={handleSubmit}>
         <TextField
           fullWidth
-          //required
           margin="normal"
           name="nombre"
           label="Nombre"
@@ -119,7 +117,6 @@ const CotizaForm = () => {
         />
         <TextField
           fullWidth
-          //required
           margin="normal"
           name="rut"
           label="RUT"
@@ -131,7 +128,6 @@ const CotizaForm = () => {
         />
         <TextField
           fullWidth
-          //required
           margin="normal"
           name="email"
           label="Correo electrónico"
@@ -146,7 +142,6 @@ const CotizaForm = () => {
         />
         <TextField
           fullWidth
-          //required
           margin="normal"
           name="telefono"
           label="Teléfono"
@@ -159,27 +154,16 @@ const CotizaForm = () => {
         />
         <TextField
           fullWidth
-          //required
-          select
           margin="normal"
-          name="tipoProducto"
-          label="Producto requerido"
-          value={formData.tipoProducto}
+          name="direccion"
+          label="Dirección"
+          value={formData.direccion}
           onChange={handleChange}
           onBlur={handleBlur}
-          error={isEmpty("tipoProducto")}
-          helperText={
-            isEmpty("tipoProducto")
-              ? "Por favor, Selecciona una de las Opciones"
-              : ""
-          }
-        >
-          {productos.map((prod) => (
-            <MenuItem key={prod} value={prod}>
-              {prod}
-            </MenuItem>
-          ))}
-        </TextField>
+          error={isEmpty("direccion")}
+          helperText={isEmpty("direccion") ? "La Dirección es obligatoria" : ""}
+        />
+
         <TextField
           fullWidth
           multiline
@@ -211,7 +195,6 @@ const CotizaForm = () => {
         >
           Enviar solicitud
         </Button>
-        <ModalCubitaje />
       </Box>
 
       <Snackbar
