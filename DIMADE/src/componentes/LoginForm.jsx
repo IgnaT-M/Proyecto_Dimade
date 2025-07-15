@@ -168,14 +168,24 @@ const LoginForm = () => {
           />
 
           <Box textAlign="right" sx={{ my: 1 }}>
-            <Link
-              component="button"
-              variant="body2"
+            <Button
               onClick={() => navigate("/RecuperarContrasena")}
-              sx={{ cursor: "pointer" }}
+              variant="text"
+              size="small"
+              sx={{
+                textTransform: "none",
+                fontSize: "0.875rem",
+                padding: 0,
+                minWidth: "auto",
+                color: "secondary", // azul tipo enlace
+                "&:hover": {
+                  textDecoration: "underline",
+                  backgroundColor: "transparent",
+                },
+              }}
             >
               ¿Olvidaste tu contraseña?
-            </Link>
+            </Button>
           </Box>
 
           <Button

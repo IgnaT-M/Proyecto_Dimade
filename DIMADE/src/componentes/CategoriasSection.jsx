@@ -22,88 +22,285 @@ const categorias = [
   {
     titulo: "Construcción",
     descripcion: "Todo lo necesario para construir con solidez y eficiencia.",
-    imagen: "/construccion.jpg",
+    imagen: "/construccion.webp",
+    productosDestacados: [
+      "Tubo corrugado",
+      "Herramienta manual",
+      "Cemento de contacto",
+      "Panel modular",
+      "Material aislante",
+      "Conector universal",
+      "Producto resistente",
+      "Válvula de presión",
+      "Accesorio industrial",
+      "Iluminación LED",
+    ],
   },
   {
     titulo: "Pinturas, Adhesivos y Aditivos",
     descripcion: "Colores, fijación y protección para cada superficie.",
-    imagen: "/pinturas.jpg",
+    imagen: "/pinturas.webp",
+    productosDestacados: [
+      "Pintura látex interior",
+      "Pintura esmalte sintético",
+      "Pintura antihongos",
+      "Primer o sellador",
+      "Barniz poliuretano",
+      "Removedor de pintura",
+      "Spray acrílico",
+      "Adhesivo de contacto",
+      "Silicona sellante",
+      "Cinta adhesiva de enmascarar",
+      "Enduido interior",
+      "Pasta muro lista",
+      "Aditivo impermeabilizante",
+      "Resina epóxica",
+      "Malla para juntas",
+    ],
   },
   {
     titulo: "Herramientas y Maquinaria",
     descripcion: "Maquinaria y herramientas listas para cualquier desafío.",
-    imagen: "/herramientas.jpg",
+    imagen: "/herramientas.webp",
+    productosDestacados: [
+      "Taladro percutor",
+      "Amoladora angular",
+      "Sierra circular",
+      "Lijadora orbital",
+      "Atornillador eléctrico",
+      "Generador eléctrico",
+      "Compresor de aire",
+      "Martillo demoledor",
+      "Soldadora inverter",
+      "Carretilla de obra",
+    ],
   },
   {
     titulo: "Ferretería",
     descripcion: "Todo en fijaciones, herrajes y accesorios para tu proyecto.",
-    imagen: "/ferreteria.jpg",
+    imagen: "/ferreteria.webp",
+    productosDestacados: [
+      "Tornillos para madera",
+      "Clavos acero",
+      "Bisagras reforzadas",
+      "Chapas y cerraduras",
+      "Tarugos plásticos",
+      "Candado de seguridad",
+      "Escuadras metálicas",
+      "Pernos y tuercas",
+      "Manillas para puertas",
+      "Soportes para repisas",
+    ],
   },
   {
     titulo: "Maderas y Tableros",
     descripcion: "Variedad en maderas para estructuras y terminaciones.",
-    gambar: "/madera.jpg", // Corrección: 'gambar' a 'imagen'
+    imagen: "/madera.webp",
+    productosDestacados: [
+      "Tablero OSB 18 mm 122×244 cm",
+      "Pino cepillado 2″×4″",
+      "Contrachapado fenólico 15 mm",
+      "Madera terciada 18 mm",
+      "Bastidor de madera para puertas",
+      "Listones de pino 1″×2″",
+      "Melamina blanca 16 mm",
+      "Madera machihembrada pino Oregón",
+      "Panel finger joint 18 mm",
+      "Caña para construcción estructural",
+    ],
   },
   {
     titulo: "Pisos y Revestimientos",
     descripcion: "Revestimientos que transforman tus espacios.",
-    imagen: "/pisos.jpg",
+    imagen: "/pisos.webp",
+    productosDestacados: [
+      "Porcelanato 60x60 cm",
+      "Laminado AC4 8 mm",
+      "Vinílico autoadhesivo",
+      "Porcelanato tipo madera 15×90 cm",
+      "Cerámica esmaltada 30×30 cm",
+      "Rodapié MDF 12×240 cm",
+      "Adhesivo para cerámica 25 kg",
+      "Rejilla para juntas cerámicas",
+      "Membrana líquida impermeable",
+      "Junta de dilatación",
+    ],
   },
   {
     titulo: "Electricidad e Iluminación",
     descripcion: "Soluciones eléctricas seguras y modernas.",
-    imagen: "/electricidad.jpg",
+    imagen: "/electricidad.webp",
+    productosDestacados: [
+      "Iluminación LED",
+      "Conector universal",
+      "Tubo corrugado",
+      "Producto resistente",
+      "Accesorio industrial",
+      "Panel modular",
+      "Filtro de aire",
+      "Elemento decorativo",
+      "Material aislante",
+      "Cemento de contacto",
+    ],
   },
   {
     titulo: "Puertas y Ventanas",
     descripcion: "Accesos y terminaciones que combinan seguridad y diseño.",
-    imagen: "/puertasyventanas.jpg",
+    imagen: "/puertasyventanas.webp",
+    productosDestacados: [
+      "Puerta MDF",
+      "Ventana aluminio",
+      "Herrajes corrediza",
+      "Jaladeras barra",
+      "Burlete silicona",
+      "Cerradura multipunto",
+      "Marco metálico",
+      "Bisagra hidráulica",
+      "Vidrio templado",
+      "Mosquitera enrollable",
+    ],
   },
   {
     titulo: "Electrohogar",
     descripcion: "Tecnología eficiente para facilitar tu vida en el hogar.",
-    imagen: "/electrohogar.jpg",
+    imagen: "/electrohogar.webp",
+    productosDestacados: [
+      "Extractor aire",
+      "Campana cocina",
+      "Microondas 25 L",
+      "Refrigerador 250 L",
+      "Lavadora 8 kg",
+      "Estufa eléctrica",
+      "Plancha vapor",
+      "Aspiradora ciclónica",
+      "Cafetera cápsulas",
+      "Ventilador torre",
+    ],
   },
   {
     titulo: "Aseo",
     descripcion:
       "Productos que garantizan limpieza, frescura y bienestar en cada rincón.",
-    imagen: "/aseo.jpg",
+    imagen: "/aseo.webp",
+    productosDestacados: [
+      "Limpiador multiuso",
+      "Desinfectante",
+      "Jabón industrial",
+      "Toallas jumbo",
+      "Guantes nitrilo",
+      "Escoba sintética",
+      "Fregona industrial",
+      "Cubeta con escurridor",
+      "Ambientador",
+      "Bolsa basura 100 L",
+    ],
   },
   {
     titulo: "Baño y Cocina",
     descripcion:
       "Funcionalidad y estilo para los espacios más usados de tu hogar.",
-    imagen: "/bañoycocina.jpg",
+    imagen: "/bañoycocina.webp",
+    productosDestacados: [
+      "Grifería monomando",
+      "Ducha cromada",
+      "Pila acero",
+      "Inodoro ergonómico",
+      "Vanitory 60 cm",
+      "Tapa WC",
+      "Extractor baño",
+      "Espejo anti‑vaho",
+      "Porta‑rollo acero",
+      "Junta goma lavabo",
+    ],
   },
   {
     titulo: "Gasfitería",
     descripcion: "Soluciones seguras y duraderas para tu red de agua y gas.",
-    imagen: "/gasfiteria.jpg",
+    imagen: "/gasfiteria.webp",
+    productosDestacados: [
+      "Tubo cobre",
+      "Válvula paso",
+      "Flexo inoxidable",
+      "Filtro cerámico",
+      "Llave paso metálica",
+      "Boquilla soplador",
+      "Conexión PPR",
+      "Manguera aspersión",
+      "Cople PVC",
+      "Asiento WC universal",
+    ],
   },
   {
     titulo: "Muebles y Organización",
     descripcion:
       "Diseño inteligente para ordenar, decorar y optimizar cada espacio.",
-    imagen: "/muebles.jpg",
+    imagen: "/muebles.webp",
+    productosDestacados: [
+      "Riel clóset",
+      "Perchero pie",
+      "Cajonera móvil",
+      "Estantería metálica",
+      "Organizador plástico",
+      "Zapatero 3 niveles",
+      "Perchero pared",
+      "Canasto tela",
+      "Revistero aluminio",
+      "Cubiertero cocina",
+    ],
   },
   {
     titulo: "Decoración y Menaje",
     descripcion:
       "Detalles que transforman tu casa en un hogar acogedor y con estilo.",
-    imagen: "/decoracion.jpg",
+    imagen: "/decoracion.webp",
+    productosDestacados: [
+      "Cuadro decorativo",
+      "Espejo rústico",
+      "Alfombra 120×180",
+      "Lámpara cerámica",
+      "Centro mesa vidrio",
+      "Portavelas hierro",
+      "Vajilla 16 piezas",
+      "Cortina blackout",
+      "Toallas baño",
+      "Floreros decorativos",
+    ],
   },
   {
     titulo: "Climatización",
     descripcion:
       "Confort en cualquier estación con sistemas eficientes de temperatura.",
-    imagen: "/climatizacion.jpg",
+    imagen: "/climatizacion.webp",
+    productosDestacados: [
+      "Aire split 12 k",
+      "Ventilador techo",
+      "Calefactor cerámico",
+      "Humidificador",
+      "Deshumidificador",
+      "Termostato Wi‑Fi",
+      "Filtro HEPA",
+      "Mica calefactor",
+      "Purificador aire",
+      "Mini split inverter",
+    ],
   },
   {
     titulo: "Aire Libre",
     descripcion:
       "Disfruta del exterior con productos ideales para patios, terrazas y jardines.",
-    imagen: "/airelibre.jpg",
+    imagen: "/airelibre.webp",
+    productosDestacados: [
+      "Parrilla carbón",
+      "Set jardín",
+      "Toldo retráctil",
+      "Manguera riego",
+      "Macetero barro",
+      "Carpa camping",
+      "Repuesto manguera",
+      "Sombrilla playera",
+      "Columpio madera",
+      "Luz solar jardín",
+    ],
   },
 ];
 
@@ -116,7 +313,6 @@ const CategoriasSection = () => {
   const isMobile = useMediaQuery(theme.breakpoints.down("md"));
   const [openCotizar, setOpenCotizar] = useState(false);
 
-  // Estilos del modal que ahora usarán el tema
   const styleModal = {
     position: "absolute",
     top: "50%",
@@ -126,8 +322,8 @@ const CategoriasSection = () => {
     p: 4,
     borderRadius: 3,
     boxShadow: 24,
-    bgcolor: theme.palette.modalBg, // Usa el color del modal del tema
-    color: theme.palette.text.primary, // El texto del modal según el tema
+    bgcolor: theme.palette.modalBg,
+    color: theme.palette.text.primary,
     maxHeight: "90vh",
     overflowY: "auto",
   };
@@ -136,7 +332,7 @@ const CategoriasSection = () => {
     <Box
       sx={{
         width: isMobile ? "100%" : "20%",
-        backgroundColor: theme.palette.categoryMenuBg, // Usa el color de fondo del menú de categorías del tema
+        backgroundColor: theme.palette.categoryMenuBg,
         display: "flex",
         flexDirection: "column",
         overflow: "hidden",
@@ -147,21 +343,16 @@ const CategoriasSection = () => {
         variant="h6"
         id="productos"
         sx={{
-          color: theme.palette.categoryMenuText, // Usa el color de texto del menú de categorías
+          color: theme.palette.categoryMenuText,
           px: 2,
           py: 2,
           fontWeight: "bold",
-          borderBottom: `1px solid ${theme.palette.categoryMenuDivider}`, // Usa el color del divisor
+          borderBottom: `1px solid ${theme.palette.categoryMenuDivider}`,
         }}
       >
         Categorías
       </Typography>
-      <List
-        disablePadding
-        sx={{
-          overflowY: categoriasMenu.length > 8 ? "auto" : "visible",
-        }}
-      >
+      <List disablePadding>
         {categoriasMenu.map((cat, index) => {
           const selected = categoriaSeleccionada.titulo === cat.titulo;
           return (
@@ -171,12 +362,12 @@ const CategoriasSection = () => {
                 sx={{
                   py: 0,
                   backgroundColor: selected
-                    ? theme.palette.categoryMenuSelectedBg // Color de fondo de categoría seleccionada
+                    ? theme.palette.categoryMenuSelectedBg
                     : "transparent",
-                  color: theme.palette.categoryMenuText, // Color del texto de las categorías (siempre blanco)
+                  color: theme.palette.categoryMenuText,
                   fontWeight: selected ? "bold" : "normal",
                   "&:hover": {
-                    backgroundColor: theme.palette.categoryMenuHoverBg, // Color de fondo en hover
+                    backgroundColor: theme.palette.categoryMenuHoverBg,
                   },
                 }}
               >
@@ -184,8 +375,7 @@ const CategoriasSection = () => {
               </ListItemButton>
               <Divider
                 sx={{ borderColor: theme.palette.categoryMenuDivider }}
-              />{" "}
-              {/* Usa el color del divisor */}
+              />
             </React.Fragment>
           );
         })}
@@ -198,8 +388,8 @@ const CategoriasSection = () => {
       <Box
         sx={{
           px: 2,
-          py: 4,
-          backgroundColor: theme.palette.background.default, // Fondo exterior de la sección (el color por defecto del tema)
+          py: { xs: 0, md: 4 },
+          backgroundColor: theme.palette.background.default,
           display: "flex",
           justifyContent: "center",
         }}
@@ -219,7 +409,7 @@ const CategoriasSection = () => {
           <Box
             sx={{
               flexGrow: 1,
-              backgroundColor: theme.palette.categoryContentBg, // Fondo del contenido principal de la categoría
+              backgroundColor: theme.palette.categoryContentBg,
               p: 4,
               display: "flex",
               flexDirection: isMobile ? "column" : "row",
@@ -244,32 +434,80 @@ const CategoriasSection = () => {
                 >
                   {categoriaSeleccionada.titulo}
                 </Typography>
+
                 <Typography
                   variant="body1"
+                  fontWeight="bold"
                   mb={2}
-                  color={theme.palette.text.primary}
+                  color={theme.palette.text.secondary}
                 >
                   {categoriaSeleccionada.descripcion}
                 </Typography>
-                <Typography
-                  variant="body2"
-                  color={theme.palette.text.secondary}
-                >
-                  Productos destacados próximamente...
-                </Typography>
+
+                {/* ✅ Sección de productos destacados en 2 columnas */}
+                {categoriaSeleccionada.productosDestacados && (
+                  <>
+                    <Box sx={{ mt: { xs: 3, md: 6 }, mb: { xs: 3, md: 6 } }}>
+                      <Typography
+                        variant="subtitle2"
+                        color={theme.palette.text.secondary}
+                        sx={{ fontWeight: "bold", fontSize: "0.95rem" }}
+                      >
+                        Estos son solo algunos de los productos que puedes
+                        solicitar:
+                      </Typography>
+                    </Box>
+
+                    <Box
+                      sx={{
+                        display: "flex",
+                        gap: 4,
+                        flexWrap: "wrap",
+                        mb: 2,
+                      }}
+                    >
+                      {[0, 1].map((colIndex) => (
+                        <Box key={colIndex} sx={{ flex: 1 }}>
+                          {categoriaSeleccionada.productosDestacados
+                            .slice(colIndex * 5, colIndex * 5 + 5)
+                            .map((producto, idx) => (
+                              <Typography
+                                key={idx}
+                                variant="body2"
+                                color={theme.palette.text.secondary}
+                                sx={{ mb: 0.5 }}
+                              >
+                                • {producto}
+                              </Typography>
+                            ))}
+                        </Box>
+                      ))}
+                    </Box>
+                  </>
+                )}
+                <Box sx={{ mt: { xs: 3, md: 6 }, mb: { xs: 3, md: 6 } }}>
+                  <Typography
+                    variant="body1"
+                    color={theme.palette.text.secondary}
+                    sx={{ fontWeight: "bold" }}
+                  >
+                    ¿Estás buscando algo específico? ¡Envíanos tu requerimiento
+                    y te ayudamos a encontrarlo!
+                  </Typography>
+                </Box>
               </Box>
               <Box textAlign="right" mt={4}>
                 <Button
                   variant="contained"
                   size="large"
-                  color="primary" // El botón "Cotizar ahora" usa el color primary del tema
+                  color="primary"
                   onClick={() => setOpenCotizar(true)}
                 >
                   Cotizar ahora
                 </Button>
               </Box>
             </Box>
-            {/* Solo se muestra la imagen si no es móvil */}
+
             {!isMobile && (
               <CardMedia
                 component="img"
@@ -287,7 +525,6 @@ const CategoriasSection = () => {
         </Paper>
       </Box>
 
-      {/* Modal Cotizar */}
       <Modal
         open={openCotizar}
         onClose={() => setOpenCotizar(false)}

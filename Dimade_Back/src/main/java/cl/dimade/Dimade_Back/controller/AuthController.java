@@ -6,6 +6,7 @@ import java.util.Optional;
 import java.util.UUID;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -25,8 +26,10 @@ import cl.dimade.Dimade_Back.repository.UsuarioRepository;
 import cl.dimade.Dimade_Back.service.CustomUserDetailsService;
 import cl.dimade.Dimade_Back.service.EmailService;
 import cl.dimade.Dimade_Back.service.JwtUtil;
+import cl.dimade.Dimade_Back.service.UsuarioService;
 
 @RestController
+
 @RequestMapping("/api/auth")
 public class AuthController {
 
@@ -49,6 +52,12 @@ public class AuthController {
 
     @Autowired
     private EmailService emailService;
+
+    @Autowired
+    private UsuarioService usuarioService;
+
+    @Value("${frontend.url}")
+    private String frontendUrl;
 
     @PostMapping("/login")
     public ResponseEntity<?> login(@RequestBody Map<String, String> loginData) {
@@ -82,23 +91,20 @@ public class AuthController {
 
         Usuario nuevoUsuario = new Usuario();
         nuevoUsuario.setEmail(email);
-        nuevoUsuario.setPassword(passwordEncoder.encode(password)); // encripta
+        nuevoUsuario.setPassword(password); // Se codifica dentro de UsuarioService
         nuevoUsuario.setNombre(nombre);
         nuevoUsuario.setRol(rol);
         nuevoUsuario.setActivo(true);
 
-        usuarioRepository.save(nuevoUsuario);
-        System.out.println("Usuario guardado en MongoDB: " + nuevoUsuario.getEmail());
+        usuarioService.guardar(nuevoUsuario); // Aquí aplica la secuencia y codifica si es necesario
 
         return ResponseEntity.status(HttpStatus.CREATED).body("Usuario registrado exitosamente");
     }
-
 
     @PostMapping("/forgot-password")
     public ResponseEntity<?> forgotPassword(@RequestBody Map<String, String> request) {
         String email = request.get("email");
         Optional<Usuario> usuarioOpt = usuarioRepository.findByEmail(email);
-
 
         if (usuarioOpt.isEmpty()) {
             // Para evitar exponer si el correo existe, devolvemos OK igual
@@ -112,7 +118,7 @@ public class AuthController {
         PasswordResetToken resetToken = new PasswordResetToken(token, usuario, expiry);
         passwordResetTokenRepository.save(resetToken);
 
-        String link = "http://localhost:5173/reset-password?token=" + token; // Cambia por tu frontend
+        String link = frontendUrl + "/reset-password?token=" + token; // Cambia por tu frontend
         String mensaje = "Haz clic en este enlace para restablecer tu contraseña:\n" + link;
 
         emailService.enviarCorreo(email, "Recupera tu contraseña", mensaje);

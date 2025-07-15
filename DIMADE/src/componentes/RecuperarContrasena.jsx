@@ -11,6 +11,7 @@ import {
 } from "@mui/material";
 import EmailIcon from "@mui/icons-material/Email";
 import { useNavigate } from "react-router-dom";
+import BASE_URL from "../config/apiConfig";
 
 const RecuperarContrasena = () => {
   const [email, setEmail] = useState("");
@@ -44,7 +45,7 @@ const RecuperarContrasena = () => {
     }
 
     try {
-      await fetch("http://localhost:8080/api/auth/forgot-password", {
+      await fetch(`${BASE_URL}/api/auth/forgot-password`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
