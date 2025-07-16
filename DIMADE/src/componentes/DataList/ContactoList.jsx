@@ -49,7 +49,7 @@ const ContactoList = () => {
   const [orden, setOrden] = useState("recientes");
   const [page, setPage] = useState(0);
   const [rowsPerPage, setRowsPerPage] = useState(10);
-  const [selectedSolicitud, setSelectedSolicitud] = useState(null);
+  const [selected, setSelected] = useState(null);
   const [modalMode, setModalMode] = useState("view");
   const [openModal, setOpenModal] = useState(false);
   const [deleteId, setDeleteId] = useState(null);
@@ -64,11 +64,9 @@ const ContactoList = () => {
   const fetchSolicitudes = async () => {
     try {
       const token = localStorage.getItem("jwtToken");
-
       const res = await fetch(`${BASE_URL}/api/solicitudes-contacto`, {
         headers: { Authorization: `Bearer ${token}` },
       });
-
       const data = await res.json();
       setSolicitudes(Array.isArray(data) ? data : []);
     } catch (err) {
@@ -98,32 +96,33 @@ const ContactoList = () => {
     return filtered.slice(start, start + rowsPerPage);
   }, [filtered, page, rowsPerPage]);
 
-  const handleOpenModal = (solicitud, mode) => {
-    if (mode === "new") {
-      setSelectedSolicitud({
-        nombre: "",
-        correo: "",
-        telefono: "",
-        mensaje: "",
-        asunto: "Consulta",
-        estado: "Pendiente",
-        fechaEnvio: new Date().toISOString(),
-      });
-    } else {
-      setSelectedSolicitud(solicitud);
-    }
+  const handleOpenModal = (item, mode) => {
+    const inicial = {
+      nombre: "",
+      correo: "",
+      telefono: "",
+      mensaje: "",
+      asunto: "Consulta",
+      estado: "Pendiente",
+      fechaEnvio: new Date().toISOString(),
+    };
+
+    // Esto asegura que si item viene incompleto, se rellena
+    const datosCompletos = mode === "new" ? inicial : { ...inicial, ...item };
+
+    setSelected(datosCompletos);
     setModalMode(mode);
     setOpenModal(true);
   };
 
   const handleCloseModal = () => {
-    setSelectedSolicitud(null);
+    setSelected(null);
     setOpenModal(false);
   };
 
   const handleChange = (e) => {
     const { name, value } = e.target;
-    setSelectedSolicitud((prev) => ({ ...prev, [name]: value }));
+    setSelected((prev) => ({ ...prev, [name]: value }));
   };
 
   const handleSave = async () => {
@@ -132,16 +131,25 @@ const ContactoList = () => {
       const url =
         modalMode === "new"
           ? `${BASE_URL}/api/solicitudes-contacto`
-          : `${BASE_URL}/api/solicitudes-contacto/${selectedSolicitud.id}`;
+          : `${BASE_URL}/api/solicitudes-contacto/${selected.id}`;
       const method = modalMode === "new" ? "POST" : "PUT";
+
+      const { id, ...payload } = selected;
+      const finalData = {
+        ...payload,
+        fechaEnvio:
+          modalMode === "new" ? new Date().toISOString() : selected.fechaEnvio,
+      };
+
       const res = await fetch(url, {
         method,
         headers: {
           "Content-Type": "application/json",
           Authorization: `Bearer ${token}`,
         },
-        body: JSON.stringify(selectedSolicitud),
+        body: JSON.stringify(finalData),
       });
+
       if (res.ok) {
         await fetchSolicitudes();
         handleCloseModal();
@@ -156,13 +164,11 @@ const ContactoList = () => {
     try {
       const token = localStorage.getItem("jwtToken");
       const res = await fetch(
-
         `${BASE_URL}/api/solicitudes-contacto/${deleteId}`,
         {
           method: "DELETE",
           headers: { Authorization: `Bearer ${token}` },
         }
-
       );
       if (res.ok) {
         await fetchSolicitudes();
@@ -186,6 +192,20 @@ const ContactoList = () => {
     }
   };
 
+  const modalStyle = {
+    position: "absolute",
+    top: "50%",
+    left: "50%",
+    transform: "translate(-50%, -50%)",
+    width: { xs: "90%", md: 500 },
+    bgcolor: "background.paper",
+    p: 4,
+    borderRadius: 2,
+    boxShadow: 24,
+    maxHeight: "90vh",
+    overflowY: "auto",
+  };
+
   const renderActions = (s) => (
     <Box>
       <Tooltip title="Ver">
@@ -205,20 +225,6 @@ const ContactoList = () => {
       </Tooltip>
     </Box>
   );
-
-  const modalStyle = {
-    position: "absolute",
-    top: "50%",
-    left: "50%",
-    transform: "translate(-50%, -50%)",
-    width: { xs: "90%", md: 500 },
-    bgcolor: "background.paper",
-    p: 4,
-    borderRadius: 2,
-    boxShadow: 24,
-    maxHeight: "90vh",
-    overflowY: "auto",
-  };
 
   return (
     <Box>
@@ -421,88 +427,89 @@ const ContactoList = () => {
               ? "Editar Solicitud"
               : "Nueva Solicitud"}
           </Typography>
-          {selectedSolicitud && (
-            <>
-              <TextField
-                label="Nombre"
-                name="nombre"
-                fullWidth
-                margin="dense"
-                value={selectedSolicitud.nombre}
-                onChange={handleChange}
-                InputProps={{ readOnly: modalMode === "view" }}
-              />
-              <TextField
-                label="Correo"
-                name="correo"
-                fullWidth
-                margin="dense"
-                value={selectedSolicitud.correo}
-                onChange={handleChange}
-                InputProps={{ readOnly: modalMode === "view" }}
-              />
-              <TextField
-                label="Teléfono"
-                name="telefono"
-                fullWidth
-                margin="dense"
-                value={selectedSolicitud.telefono}
-                onChange={handleChange}
-                InputProps={{ readOnly: modalMode === "view" }}
-              />
-              <TextField
-                label="Mensaje"
-                name="mensaje"
-                fullWidth
-                margin="dense"
-                multiline
-                minRows={3}
-                value={selectedSolicitud.mensaje}
-                onChange={handleChange}
-                InputProps={{ readOnly: modalMode === "view" }}
-              />
-              <TextField
-                select
-                label="Asunto"
-                name="asunto"
-                fullWidth
-                margin="dense"
-                value={selectedSolicitud.asunto}
-                onChange={handleChange}
-                InputProps={{ readOnly: modalMode === "view" }}
-              >
-                <MenuItem value="Consulta">Consulta</MenuItem>
-                <MenuItem value="Reclamo">Reclamo</MenuItem>
-                <MenuItem value="Sugerencia">Sugerencia</MenuItem>
-                <MenuItem value="Otro">Otro</MenuItem>
-              </TextField>
-              <TextField
-                select
-                label="Estado"
-                name="estado"
-                fullWidth
-                margin="dense"
-                value={selectedSolicitud.estado}
-                onChange={handleChange}
-                InputProps={{ readOnly: modalMode === "view" }}
-              >
-                <MenuItem value="Pendiente">Pendiente</MenuItem>
-                <MenuItem value="Revisado">Revisado</MenuItem>
-                <MenuItem value="Rechazado">Rechazado</MenuItem>
-                <MenuItem value="Otro">Otro</MenuItem>
-              </TextField>
-              {modalMode !== "view" && (
-                <Box sx={{ mt: 2, textAlign: "right" }}>
-                  <Button variant="contained" onClick={handleSave}>
-                    Guardar
-                  </Button>
-                </Box>
-              )}
-            </>
+          {selected &&
+            Object.keys(selected).map((key) => {
+              if (key === "id" || key === "fechaEnvio") return null;
+              const isReadOnly = modalMode === "view";
+              const label = key
+                .replace(/([A-Z])/g, " $1")
+                .replace(/^./, (str) => str.toUpperCase());
+
+              if (key === "estado") {
+                return (
+                  <TextField
+                    key={key}
+                    label="Estado"
+                    name={key}
+                    select
+                    fullWidth
+                    margin="dense"
+                    value={selected[key]}
+                    onChange={isReadOnly ? undefined : handleChange}
+                    InputProps={{ readOnly: isReadOnly }}
+                  >
+                    <MenuItem value="Pendiente">Pendiente</MenuItem>
+                    <MenuItem value="Revisado">Revisado</MenuItem>
+                    <MenuItem value="Rechazado">Rechazado</MenuItem>
+                  </TextField>
+                );
+              }
+
+              if (key === "asunto") {
+                return (
+                  <TextField
+                    key={key}
+                    label="Asunto"
+                    name={key}
+                    select
+                    fullWidth
+                    margin="dense"
+                    value={selected[key]}
+                    onChange={isReadOnly ? undefined : handleChange}
+                    InputProps={{ readOnly: isReadOnly }}
+                  >
+                    <MenuItem value="Consulta">Consulta</MenuItem>
+                    <MenuItem value="Reclamo">Reclamo</MenuItem>
+                    <MenuItem value="Sugerencia">Sugerencia</MenuItem>
+                    <MenuItem value="Otro">Otro</MenuItem>
+                  </TextField>
+                );
+              }
+
+              return (
+                <TextField
+                  key={key}
+                  label={label}
+                  name={key}
+                  fullWidth
+                  margin="dense"
+                  value={selected[key]}
+                  onChange={isReadOnly ? undefined : handleChange}
+                  multiline={key === "mensaje"}
+                  rows={key === "mensaje" ? 3 : 1}
+                  InputProps={{ readOnly: isReadOnly }}
+                />
+              );
+            })}
+
+          {modalMode === "view" && (
+            <Box mt={2}>
+              <Button variant="contained" onClick={handleCloseModal}>
+                Cerrar
+              </Button>
+            </Box>
+          )}
+          {modalMode !== "view" && (
+            <Box sx={{ mt: 2, textAlign: "right" }}>
+              <Button variant="contained" onClick={handleSave}>
+                Guardar
+              </Button>
+            </Box>
           )}
         </Box>
       </Modal>
 
+      {/* Modal de eliminación igual que antes */}
       <Modal open={!!deleteId} onClose={() => setDeleteId(null)}>
         <Box
           sx={{

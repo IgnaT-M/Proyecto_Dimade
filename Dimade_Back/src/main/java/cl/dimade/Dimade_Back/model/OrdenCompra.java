@@ -23,6 +23,7 @@ public class OrdenCompra {
     private String telefono;
     private String email; // ✅ Campo renombrado de 'mail' a 'email'
     private Date fechaOrden;
+
     private List<Object> productos; // ✅ Tipo cambiado a Lista para coincidir con el frontend
     private String direccion;
     
@@ -34,10 +35,8 @@ public class OrdenCompra {
     
     private String estado;
     private String tipo;
+
     private String detalle;
-<<<<<<< HEAD
-}
-=======
+
     private String pdfId;
-}
->>>>>>> e8aa16ed00c4ff87d8239d92399067968fa540d0
+

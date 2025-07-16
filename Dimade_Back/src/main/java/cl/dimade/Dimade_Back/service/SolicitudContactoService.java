@@ -54,8 +54,11 @@ public class SolicitudContactoService {
             contactoExistente.setCorreo(nuevosDatos.getCorreo());
             contactoExistente.setTelefono(nuevosDatos.getTelefono());
             contactoExistente.setMensaje(nuevosDatos.getMensaje());
+            contactoExistente.setAsunto(nuevosDatos.getAsunto()); // 💥 AGREGAR ESTO
+            contactoExistente.setEstado(nuevosDatos.getEstado()); // 💥 AGREGAR ESTO
             contactoExistente.setFechaEnvio(nuevosDatos.getFechaEnvio());
             return repository.save(contactoExistente);
         });
     }
+
 }

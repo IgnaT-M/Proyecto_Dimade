@@ -13,10 +13,14 @@ import {
 import LockIcon from "@mui/icons-material/Lock";
 import Visibility from "@mui/icons-material/Visibility";
 import VisibilityOff from "@mui/icons-material/VisibilityOff";
-import { useNavigate, useParams } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
+import { useLocation } from "react-router-dom";
+import BASE_URL from "../config/apiConfig";
 
 const ResetearContrasena = () => {
-  const { token } = useParams();
+  const location = useLocation();
+  const searchParams = new URLSearchParams(location.search);
+  const token = searchParams.get("token");
   const navigate = useNavigate();
 
   const [passwords, setPasswords] = useState({
@@ -72,16 +76,16 @@ const ResetearContrasena = () => {
     }
 
     try {
-      const response = await fetch(
-        "http://localhost:8080/api/auth/reset-password",
-        {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify({ token: token, password: passwords.password }),
-        }
-      );
+      const response = await fetch(`${BASE_URL}/api/auth/reset-password`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          token: token,
+          nuevaPassword: passwords.password,
+        }),
+      });
 
       if (!response.ok) {
         const errorData = await response.json();

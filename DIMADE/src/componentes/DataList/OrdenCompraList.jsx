@@ -34,19 +34,15 @@ import {
   Add as AddIcon,
   Download as DownloadIcon,
 } from "@mui/icons-material";
-<<<<<<< HEAD
 import UploadFileIcon from "@mui/icons-material/UploadFile";
 import PictureAsPdfIcon from "@mui/icons-material/PictureAsPdf";
 import DescriptionIcon from "@mui/icons-material/Description";
+
 import jsPDF from "jspdf";
 import autoTable from "jspdf-autotable";
 import BASE_URL from "../../config/apiConfig";
 import logoDimade from "../../../public/imagenes/logo_dimade.png";
-=======
-import jsPDF from "jspdf";
-import autoTable from "jspdf-autotable";
-import BASE_URL from "../../config/apiConfig";
->>>>>>> e8aa16ed00c4ff87d8239d92399067968fa540d0
+
 
 const formatFecha = (dateString) => {
   if (!dateString) return "N/A";
@@ -145,7 +141,7 @@ export const OrdenCompraList = () => {
     return filteredOrdenes.slice(start, start + rowsPerPage);
   }, [filteredOrdenes, page, rowsPerPage]);
 
-<<<<<<< HEAD
+
   const handleMenuClick = (event) => setAnchorEl(event.currentTarget);
 
   const handleMenuClose = () => setAnchorEl(null);
@@ -155,19 +151,13 @@ export const OrdenCompraList = () => {
     handleOpenModal(null, "new", orderType);
   };
 
-=======
->>>>>>> e8aa16ed00c4ff87d8239d92399067968fa540d0
   const handleUpload = async (file, ordenId) => {
     const formData = new FormData();
     formData.append("file", file);
     formData.append("nombreOrden", ordenId);
-<<<<<<< HEAD
-    const token = localStorage.getItem("jwtToken");
-=======
 
     const token = localStorage.getItem("jwtToken");
 
->>>>>>> e8aa16ed00c4ff87d8239d92399067968fa540d0
     const res = await fetch(`${BASE_URL}/api/ordenes-compra/upload`, {
       method: "POST",
       headers: {
@@ -175,13 +165,11 @@ export const OrdenCompraList = () => {
       },
       body: formData,
     });
-<<<<<<< HEAD
-    const pdfId = await res.text();
-=======
+
 
     const pdfId = await res.text();
 
->>>>>>> e8aa16ed00c4ff87d8239d92399067968fa540d0
+
     await fetch(`${BASE_URL}/api/ordenes-compra/${ordenId}/pdf`, {
       method: "PUT",
       headers: {
@@ -190,10 +178,7 @@ export const OrdenCompraList = () => {
       },
       body: JSON.stringify({ pdfId }),
     });
-<<<<<<< HEAD
-=======
 
->>>>>>> e8aa16ed00c4ff87d8239d92399067968fa540d0
     console.log("PDF almacenado para orden:", ordenId);
     await fetchOrdenes();
   };
@@ -203,13 +188,9 @@ export const OrdenCompraList = () => {
       alert("Esta orden no tiene un PDF asociado.");
       return;
     }
-<<<<<<< HEAD
-    const token = localStorage.getItem("jwtToken");
-=======
 
     const token = localStorage.getItem("jwtToken");
 
->>>>>>> e8aa16ed00c4ff87d8239d92399067968fa540d0
     const res = await fetch(
       `${BASE_URL}/api/ordenes-compra/download/${pdfId}`,
       {
@@ -219,18 +200,12 @@ export const OrdenCompraList = () => {
         },
       }
     );
-<<<<<<< HEAD
-=======
 
->>>>>>> e8aa16ed00c4ff87d8239d92399067968fa540d0
     if (!res.ok) {
       alert("Error al descargar PDF: " + res.status);
       return;
     }
-<<<<<<< HEAD
-=======
 
->>>>>>> e8aa16ed00c4ff87d8239d92399067968fa540d0
     const blob = await res.blob();
     const url = window.URL.createObjectURL(blob);
     const link = document.createElement("a");
@@ -243,18 +218,12 @@ export const OrdenCompraList = () => {
     if (!window.confirm("¿Eliminar orden de compra?")) return;
     try {
       const token = localStorage.getItem("jwtToken");
-<<<<<<< HEAD
-=======
 
->>>>>>> e8aa16ed00c4ff87d8239d92399067968fa540d0
       const res = await fetch(`${BASE_URL}/api/ordenes-compra/${id}`, {
         method: "DELETE",
         headers: { Authorization: `Bearer ${token}` },
       });
-<<<<<<< HEAD
-=======
 
->>>>>>> e8aa16ed00c4ff87d8239d92399067968fa540d0
       if (res.ok) {
         setOrdenes((prev) => prev.filter((o) => o.id !== id));
       }
@@ -312,6 +281,7 @@ export const OrdenCompraList = () => {
       dataForModal = ordenCorregida;
     }
     setSelectedOrden(dataForModal);
+
     setModalMode(mode);
     setOpenModal(true);
   };
@@ -723,46 +693,139 @@ export const OrdenCompraList = () => {
 
   const generarPDFOrden = (orden) => {
     const doc = new jsPDF();
+    const pageWidth = doc.internal.pageSize.width;
 
-    // Usar autoTable importado directamente
-    autoTable(doc, {
-      startY: 100,
-      head: [["Producto", "Cantidad", "Precio Unitario", "Subtotal"]],
-      body:
-        Array.isArray(orden.productos) && orden.productos.length > 0
-          ? orden.productos.map((p) => [
-              p.nombre || "-",
-              p.cantidad || 0,
-              `$${p.precioUnitario || 0}`,
-              `$${(p.cantidad || 0) * (p.precioUnitario || 0)}`,
-            ])
-          : [["Sin productos", "", "", ""]],
-      styles: { halign: "left" },
-      theme: "grid",
+    // --- Logo ---
+    try {
+      doc.addImage(logoDimade, "PNG", 14, 12, 25, 25);
+    } catch (err) {
+      console.error("Error cargando logo:", err);
+      doc.setFontSize(12);
+      doc.text("[Logo]", 14, 20);
+    }
+
+    // --- Empresa info ---
+    doc.setFontSize(8);
+    doc.text("Rut: 16.458.963-4", 14, 40);
+    doc.text("Dirección: Dirección Dimade 35", 14, 45);
+    doc.text("Teléfono: +56-9-6523-7854", 14, 50);
+    doc.text("Correo: correo@dimade.cl", 14, 55);
+    doc.text("Sitio Web: www.dimade.cl", 14, 60);
+
+    // --- Título principal ---
+    doc.setFontSize(16);
+    doc.setFont("helvetica", "bold");
+    doc.text("ORDEN DE COMPRA", pageWidth - 14, 20, { align: "right" });
+
+    // --- Fecha y número OC ---
+    doc.setFontSize(10);
+    const fechaY = 30;
+    doc.text("Fecha", pageWidth - 64, fechaY);
+    doc.rect(pageWidth - 64, fechaY + 2, 50, 8);
+    doc.text(formatFecha(orden.fechaOrden), pageWidth - 39, fechaY + 7, {
+      align: "center",
     });
 
-    doc.setFontSize(16);
-    doc.text("DIMADE - ORDEN DE COMPRA", 14, 20);
-    doc.setFontSize(12);
-    doc.text(
-      `Fecha: ${new Date(orden.fechaOrden).toLocaleDateString()}`,
-      14,
-      30
-    );
-    doc.text(`N° Orden: ${orden.id || "Sin ID"}`, 14, 38);
+    const ordenY = fechaY + 14;
+    doc.text("Número de Orden de Compra", pageWidth - 64, ordenY);
+    doc.rect(pageWidth - 64, ordenY + 2, 50, 8);
+    doc.text(orden.id || "N/A", pageWidth - 39, ordenY + 7, {
+      align: "center",
+    });
 
-    doc.text("Cliente / Proveedor:", 14, 50);
-    doc.text(`RUT Cliente: ${orden.rutCliente || "-"}`, 14, 58);
-    doc.text(`RUT Proveedor: ${orden.rutProveedor || "-"}`, 14, 66);
-    doc.text(`Teléfono: ${orden.telefono || "-"}`, 14, 74);
-    doc.text(`Email: ${orden.mail || "-"}`, 14, 82);
+    // --- Datos cliente/proveedor ---
+    let infoY = 75;
+    doc.setFontSize(10);
+    doc.setFont("helvetica", "bold");
+    doc.text("SEÑORES:", 14, infoY);
 
-    doc.setFontSize(14);
-    doc.text(
-      `TOTAL: $${orden.total || 0}`,
-      14,
-      doc.lastAutoTable?.finalY + 10 || 120
-    );
+    doc.setFont("helvetica", "normal");
+    infoY += 7;
+    doc.text(orden.nombreEmpresa || "[Nombre de empresa]", 16, infoY);
+    infoY += 5;
+    doc.text(orden.contacto || "[Contacto o Departamento]", 16, infoY);
+    infoY += 5;
+    doc.text(orden.direccion || "[Dirección]", 16, infoY);
+    infoY += 5;
+    doc.text(`Rut: ${orden.rutCliente || "N/A"}`, 16, infoY);
+    infoY += 5;
+    doc.text(`Teléfono: ${orden.telefono || "-"}`, 16, infoY);
+    infoY += 5;
+    doc.text(`Correo: ${orden.mail || "-"}`, 16, infoY);
+
+    // --- Tabla productos ---
+    const productos = (orden.productos || "").split(",").map((item) => {
+      const match = item.match(/^(.*?)\s*\*\s*(\d+)\s*:\s*\$(\d+)/);
+      if (!match) return ["-", "-", "-"];
+      const [_, nombre, cantidad, total] = match;
+      return [nombre.trim(), cantidad, `$${total}`];
+    });
+
+    autoTable(doc, {
+      startY: 120,
+      head: [["DETALLE", "CANTIDAD", "TOTAL"]],
+      body: productos.length ? productos : [["Sin productos", "", ""]],
+      theme: "grid",
+      headStyles: { fillColor: "#10567E", textColor: 255, halign: "center" },
+      columnStyles: {
+        0: { halign: "left" },
+        1: { halign: "right" },
+        2: { halign: "right" },
+      },
+    });
+
+    // --- Totales ---
+    const finalY = doc.lastAutoTable.finalY + 10;
+
+    const modificador = parseFloat(orden.modificador) || 0; // % de descuento
+    const ivaPorcentaje = parseFloat(orden.iva) || 0;
+    const subtotal = parseFloat(orden.total) || 0; // Subtotal = bruto
+
+    // 1. IVA
+    const iva = subtotal * (ivaPorcentaje / 100);
+
+    // 2. NETO
+    const neto = subtotal - iva;
+
+    // 3. DESCUENTO
+    const descuento = subtotal * (modificador / 100);
+
+    // 4. TOTAL FINAL
+    const totalFinal = subtotal - descuento;
+
+    // --- Redondeo limpio para PDF ---
+    const round = (n) => Math.round(n);
+
+    // --- Fila de totales ---
+    const drawBoxRow = (y, label, value, isTotal = false) => {
+      const boxX = pageWidth - 80;
+      const boxWidth = 60;
+      doc.setFont("helvetica", isTotal ? "bold" : "normal");
+      if (isTotal) {
+        doc.setFillColor(220);
+        doc.rect(boxX, y, boxWidth, 7, "F");
+      } else {
+        doc.rect(boxX, y, boxWidth, 7);
+      }
+      doc.text(label, boxX - 2, y + 5, { align: "right" });
+      const monto = formatTotal(round(value));
+      doc.text("$", boxX + 2, y + 5);
+      doc.text(monto.replace("$", ""), boxX + boxWidth - 2, y + 5, {
+        align: "right",
+      });
+    };
+
+    // --- Impresión final en el PDF ---
+    let currentY = finalY;
+    drawBoxRow(currentY, "NETO", neto);
+    currentY += 7;
+    drawBoxRow(currentY, `IVA ${ivaPorcentaje}%`, iva);
+    currentY += 7;
+    drawBoxRow(currentY, "SUBTOTAL", subtotal);
+    currentY += 7;
+    drawBoxRow(currentY, `DESCUENTO (${modificador}%)`, descuento);
+    currentY += 7;
+    drawBoxRow(currentY, "TOTAL", totalFinal, true);
 
     doc.save(`orden-${orden.id || "sin-id"}.pdf`);
   };
@@ -848,6 +911,30 @@ export const OrdenCompraList = () => {
       <Tooltip title="Eliminar">
         <IconButton onClick={() => handleDelete(orden.id)}>
           <DeleteIcon color="error" />
+        </IconButton>
+      </Tooltip>
+      <Tooltip title="Subir PDF">
+        <IconButton component="label">
+          <input
+            type="file"
+            hidden
+            accept="application/pdf"
+            onChange={(e) => {
+              const file = e.target.files[0];
+              if (file) handleUpload(file, orden.id);
+            }}
+          />
+          <UploadFileIcon sx={{ color: "#4caf50" }} />
+        </IconButton>
+      </Tooltip>
+      <Tooltip title="Descargar PDF">
+        <IconButton onClick={() => handleDownload(orden.pdfId)}>
+          <PictureAsPdfIcon sx={{ color: "#0288d1" }} />
+        </IconButton>
+      </Tooltip>
+      <Tooltip title="Generar PDF desde datos">
+        <IconButton onClick={() => generarPDFOrden(orden)}>
+          <DescriptionIcon sx={{ color: "#7b1fa2" }} />
         </IconButton>
       </Tooltip>
       <Tooltip title="Subir PDF">
@@ -1061,6 +1148,7 @@ export const OrdenCompraList = () => {
               <Typography variant="body2" color="text.secondary">
                 Fecha: {formatFecha(orden.fechaOrden)}
               </Typography>
+
               <Box
                 sx={{
                   display: "flex",
@@ -1073,6 +1161,7 @@ export const OrdenCompraList = () => {
                   {formatTotal(orden.totalAPagar || orden.totalConIva)}
                 </Typography>
                 {renderActions(orden)}
+
               </Box>
             </Paper>
           ))}
@@ -1082,11 +1171,12 @@ export const OrdenCompraList = () => {
           <Table>
             <TableHead>
               <TableRow>
+
                 {tableColumns.map((column) => (
                   <TableCell key={column.id}>{column.label}</TableCell>
                 ))}
-                <TableCell align="right">Acciones</TableCell>
 
+                <TableCell align="right">Acciones</TableCell>
               </TableRow>
             </TableHead>
             <TableBody>
@@ -1100,6 +1190,7 @@ export const OrdenCompraList = () => {
                     },
                   }}
                 >
+
                   {tableColumns.map((column) => {
                     let value;
                     if (column.id === "rut") {
@@ -1126,6 +1217,7 @@ export const OrdenCompraList = () => {
                         ) : (
                           value || ""
                         )}
+
                       </TableCell>
                     );
                   })}
@@ -1157,6 +1249,7 @@ export const OrdenCompraList = () => {
               ? "Editar Orden"
               : "Nueva Orden"}
           </Typography>
+
 
           {selectedOrden && (
             <>
@@ -1438,6 +1531,7 @@ export const OrdenCompraList = () => {
                 </Box>
               )}
             </>
+
           )}
         </Box>
       </Modal>

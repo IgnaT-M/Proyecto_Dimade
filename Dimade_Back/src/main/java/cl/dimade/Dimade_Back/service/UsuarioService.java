@@ -4,6 +4,7 @@ import java.util.List;
 import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import cl.dimade.Dimade_Back.model.Usuario;
@@ -18,6 +19,9 @@ public class UsuarioService {
     @Autowired
     private SequenceGeneratorService sequenceGenerator;
 
+    @Autowired
+    private PasswordEncoder passwordEncoder;
+
     public List<Usuario> obtenerTodos() {
         return repository.findAll();
     }
@@ -30,6 +34,12 @@ public class UsuarioService {
         if (usuario.getId() == null) {
             usuario.setId(sequenceGenerator.generateStringSequence("usuario_sequence", "US"));
         }
+
+        // Hashear si viene en texto plano
+        if (usuario.getPassword() != null && !usuario.getPassword().startsWith("$2")) {
+            usuario.setPassword(passwordEncoder.encode(usuario.getPassword()));
+        }
+
         return repository.save(usuario);
     }
 
@@ -44,6 +54,12 @@ public class UsuarioService {
     public Optional<Usuario> actualizar(String id, Usuario usuarioActualizado) {
         return repository.findById(id).map(usuarioExistente -> {
             usuarioActualizado.setId(id);
+
+            // Solo hashear si la password fue cambiada (y no ya codificada)
+            if (usuarioActualizado.getPassword() != null && !usuarioActualizado.getPassword().startsWith("$2")) {
+                usuarioActualizado.setPassword(passwordEncoder.encode(usuarioActualizado.getPassword()));
+            }
+
             return repository.save(usuarioActualizado);
         });
     }

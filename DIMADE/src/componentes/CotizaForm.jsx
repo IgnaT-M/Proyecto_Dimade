@@ -22,8 +22,10 @@ const CotizaForm = () => {
     nombre: "",
     email: "",
     telefono: "",
+
     direccion: "",
     productosSolicitados: [{ detalle: "", cantidad: "" }], // <--- SIN precioUnitario aquí
+
     mensaje: "",
     tipo: "Cliente",
   });
@@ -51,12 +53,14 @@ const CotizaForm = () => {
     setTouched((prev) => ({ ...prev, [e.target.name]: true }));
   };
 
+
   const handleProductBlur = (index, fieldName) => {
     setTouched((prev) => ({
       ...prev,
       [`producto-${index}-${fieldName}`]: true,
     }));
   };
+
 
   const isEmpty = (field) =>
     (touched[field] || submitAttempted) && !formData[field];
@@ -103,6 +107,7 @@ const CotizaForm = () => {
         !prod.detalle || prod.cantidad === "" || parseFloat(prod.cantidad) <= 0
     );
 
+
     if (camposVacios.length > 0 || productosVacios) {
       setError(
         "Por favor, completa todos los campos obligatorios y los productos."
@@ -110,12 +115,15 @@ const CotizaForm = () => {
       return;
     }
 
+
     const payload = {
       rutSolicitante: formData.rut,
       nombreSolicitante: formData.nombre,
       correo: formData.email,
       telefono: formData.telefono,
+
       direccion: formData.direccion,
+
       fechaSolicitud: new Date(),
       productosSolicitados: formData.productosSolicitados, // Los productos se envían sin precio unitario
       estado: "Pendiente",
@@ -138,8 +146,10 @@ const CotizaForm = () => {
         nombre: "",
         email: "",
         telefono: "",
+
         direccion: "",
         productosSolicitados: [{ detalle: "", cantidad: "" }],
+
         mensaje: "",
         tipo: "Cliente",
       });
@@ -212,11 +222,14 @@ const CotizaForm = () => {
           margin="normal"
           name="direccion"
           label="Dirección"
+
           type="text"
+
           value={formData.direccion}
           onChange={handleChange}
           onBlur={handleBlur}
           error={isEmpty("direccion")}
+
           helperText={
             isEmpty("direccion") ? "Debes Ingresar una Dirección." : ""
           }
@@ -318,6 +331,7 @@ const CotizaForm = () => {
           AGREGAR PRODUCTO
         </Button>
 
+
         <TextField
           fullWidth
           multiline
@@ -345,7 +359,6 @@ const CotizaForm = () => {
         >
           Enviar solicitud
         </Button>
-        <ModalCubitaje />
       </Box>
 
       <Snackbar
