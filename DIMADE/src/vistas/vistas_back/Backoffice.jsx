@@ -1,26 +1,18 @@
-// Tu archivo Backoffice.jsx (versión final simplificada)
-
 import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { Box } from "@mui/material";
 import { jwtDecode } from "jwt-decode";
 
-// === CAMBIO 1: Importamos el nuevo componente unificado ===
-import PanelAdministracion from "../../componentes/PanelNavegacion";
-
-// Ya no necesitamos importar SideMenu ni Topbar aquí
-
-// Importas solo las listas de contenido
+import PanelAdministracion from "../../componentes/PanelNavegacion.jsx";
 import ClientesList from "../../componentes/DataList/ClientesList";
 import UsuariosList from "../../componentes/DataList/UsuariosList";
 import ProveedoresList from "../../componentes/DataList/ProveedoresList";
 import CotizacionesList from "../../componentes/DataList/CotizacionesList";
 import ContactoList from "../../componentes/DataList/ContactoList";
 import RegistrosList from "../../componentes/DataList/RegistrosList";
-import OrdenCompraList from "../../componentes/DataList/OrdenCompraList";
+import { OrdenCompraList } from "../../componentes/DataList/OrdenCompraList.jsx";
 
 const Backoffice = () => {
-  // --- TODA TU LÓGICA Y ESTADOS PERMANECEN EXACTAMENTE IGUAL ---
   const [selectedSection, setSelectedSection] = useState("clientes");
   const [usuarioLogeado, setUsuarioLogeado] = useState(null);
   const navigate = useNavigate();
@@ -76,7 +68,6 @@ const Backoffice = () => {
     }
   };
 
-  // === CAMBIO 2: El return ahora es mucho más limpio y semántico ===
   return (
     <>
       {usuarioLogeado && (
@@ -86,9 +77,6 @@ const Backoffice = () => {
           selected={selectedSection}
           onSelect={setSelectedSection}
         >
-          {/* El contenido principal (tu renderSection) ahora va aquí adentro.
-              He quitado el <Box> extra ya que PanelAdministracion ya
-              maneja el padding y el crecimiento del área de contenido. */}
           {renderSection()}
         </PanelAdministracion>
       )}
