@@ -43,7 +43,6 @@ import autoTable from "jspdf-autotable";
 import BASE_URL from "../../config/apiConfig";
 import logoDimade from "../../../public/imagenes/logo_dimade.png";
 
-
 const formatFecha = (dateString) => {
   if (!dateString) return "N/A";
   return new Date(dateString).toLocaleString("es-CL", {
@@ -141,7 +140,6 @@ export const OrdenCompraList = () => {
     return filteredOrdenes.slice(start, start + rowsPerPage);
   }, [filteredOrdenes, page, rowsPerPage]);
 
-
   const handleMenuClick = (event) => setAnchorEl(event.currentTarget);
 
   const handleMenuClose = () => setAnchorEl(null);
@@ -166,9 +164,7 @@ export const OrdenCompraList = () => {
       body: formData,
     });
 
-
     const pdfId = await res.text();
-
 
     await fetch(`${BASE_URL}/api/ordenes-compra/${ordenId}/pdf`, {
       method: "PUT",
@@ -339,158 +335,6 @@ export const OrdenCompraList = () => {
       }));
     }
   }, [selectedOrden?.productos, selectedOrden?.descuento]);
-
-  const generarPDFOrden = (orden) => {
-    if (!orden) {
-      console.error(
-        "No se pueden generar el PDF: los datos de la orden son nulos."
-      );
-      alert("No se pueden generar el PDF porque no hay datos de la orden.");
-      return;
-    }
-
-    const doc = new jsPDF();
-    const pageWidth =
-      doc.internal.pageSize.width || doc.internal.pageSize.getWidth();
-
-    try {
-      doc.addImage(logoDimade, "PNG", 14, 12, 25, 27);
-    } catch (e) {
-      console.error("Error al cargar el logo importado:", e);
-      doc.text("[Logo]", 14, 20);
-    }
-
-    const infoStartY = 45;
-    doc.setFontSize(8);
-    doc.setFont("helvetica", "normal");
-    doc.text("Rut: 16.458.963-4", 14, infoStartY);
-    doc.text("Dirección: Dirección Dimade 35", 14, infoStartY + 5);
-    doc.text("Teléfono: +56-9-6523-7854", 14, infoStartY + 10);
-    doc.text("Correo: correo@dimade.cl", 14, infoStartY + 15);
-    doc.text("Sitio Web: www.dimade.cl", 14, infoStartY + 20);
-
-    doc.setFontSize(18);
-    doc.setFont("helvetica", "bold");
-    doc.text("ORDEN DE COMPRA", pageWidth - 14, 20, { align: "right" });
-
-    doc.setFontSize(10);
-    doc.setDrawColor(0);
-    doc.setLineWidth(0.5);
-
-    const firstBlockY = 30;
-    doc.setFont("helvetica", "bold");
-    doc.text("Fecha", pageWidth - 64, firstBlockY);
-    doc.setFont("helvetica", "normal");
-    doc.rect(pageWidth - 64, firstBlockY + 2, 50, 8);
-    doc.text(
-      formatFecha(orden.fechaOrden) || "N/A",
-      pageWidth - 39,
-      firstBlockY + 7,
-      { align: "center" }
-    );
-
-    const secondBlockY = firstBlockY + 14;
-    doc.setFont("helvetica", "bold");
-    doc.text("Número de Orden de Compra", pageWidth - 64, secondBlockY);
-    doc.setFont("helvetica", "normal");
-    doc.rect(pageWidth - 64, secondBlockY + 2, 50, 8);
-    doc.text(`${orden.id || "N/A"}`, pageWidth - 39, secondBlockY + 7, {
-      align: "center",
-    });
-
-    doc.setFontSize(10);
-    doc.setFont("helvetica", "bold");
-    doc.text("SEÑORES:", 14, 75);
-
-    // Ajuste: Usa orden.nombre para el campo de nombre de la empresa/contacto
-    doc.setFont("helvetica", "normal");
-    doc.text(orden.nombre || "N/A", 16, 82);
-    // Eliminado el campo de contacto duplicado que causaba la línea vacía
-    doc.text(orden.direccion || "N/A", 16, 87);
-    doc.text(`Rut: ${orden.rutCliente || orden.rutProveedor || "N/A"}`, 16, 92);
-    doc.text(`Teléfono: ${orden.telefono || "N/A"}`, 16, 97);
-    doc.text(`Correo: ${orden.email || "N/A"}`, 16, 102);
-
-    const tableHeaders = [["Detalle", "Cantidad", "Precio Unitario", "Total"]];
-    const tableBody =
-      Array.isArray(orden.productos) && orden.productos.length > 0
-        ? orden.productos.map((p) => [
-            p?.nombre || "-",
-            p?.cantidad || 0,
-            formatTotal(p?.precioUnitario || 0),
-            formatTotal((p?.cantidad || 0) * (p?.precioUnitario || 0)),
-          ])
-        : [["Sin productos", "", "", ""]];
-
-    autoTable(doc, {
-      startY: 115,
-      head: tableHeaders,
-      body: tableBody,
-      theme: "grid",
-      headStyles: { fillColor: "#10567E", textColor: 255, halign: "center" },
-      columnStyles: {
-        0: { halign: "left" },
-        1: { halign: "right" },
-        2: { halign: "right" },
-        3: { halign: "right" },
-      },
-    });
-
-    // Calcular totales para el PDF, incluyendo el descuento
-    const currentTableBottomY = doc.lastAutoTable.finalY;
-    let currentY = currentTableBottomY + 10;
-    const startX = pageWidth - 84;
-
-    const totalBruto = orden.productos.reduce(
-      (acc, curr) => acc + (curr.cantidad || 0) * (curr.precioUnitario || 0),
-      0
-    );
-    const netoOrden = totalBruto / 1.19;
-    const iva = totalBruto - netoOrden;
-    const descuentoPorcentaje =
-      typeof orden.descuento === "number" ? orden.descuento : 0;
-    const descuentoMonto = totalBruto * (descuentoPorcentaje / 100);
-    const totalAPagarConDescuento = totalBruto - descuentoMonto;
-
-    const drawTotalRow = (y, label, value, isTotal = false) => {
-      const boxX = startX;
-      const boxWidth = 60;
-      doc.rect(boxX, y, boxWidth, 7);
-      doc.text(label, boxX - 2, y + 5, { align: "right" });
-
-      if (isTotal) {
-        doc.setFillColor(200, 200, 200);
-        doc.rect(boxX, y, boxWidth, 7, "F");
-        doc.setFont("helvetica", "bold");
-      }
-
-      const currencyText = formatTotal(typeof value === "number" ? value : 0);
-      const symbol = currencyText.charAt(0);
-      const numberText = currencyText.substring(1).trim();
-
-      doc.text(symbol, boxX + 2, y + 5);
-      doc.text(numberText, boxX + boxWidth - 2, y + 5, { align: "right" });
-
-      doc.setFont("helvetica", "normal");
-    };
-
-    drawTotalRow(currentY, "NETO", netoOrden);
-    currentY += 7;
-    drawTotalRow(currentY, "IVA 19%", iva);
-    currentY += 7;
-    // Agregar fila de Descuento si aplica
-    if (descuentoMonto > 0) {
-      drawTotalRow(
-        currentY,
-        `Descuento (${descuentoPorcentaje}%)`,
-        -descuentoMonto
-      ); // Muestra el descuento como negativo
-      currentY += 7;
-    }
-    drawTotalRow(currentY, "TOTAL", totalAPagarConDescuento, true); // Usar el total con descuento
-
-    doc.save(`orden-${orden.id || "sin-id"}.pdf`);
-  };
 
   const phonePrefixes = {
     "+1": "Estados Unidos / Canadá",
@@ -1161,7 +1005,6 @@ export const OrdenCompraList = () => {
                   {formatTotal(orden.totalAPagar || orden.totalConIva)}
                 </Typography>
                 {renderActions(orden)}
-
               </Box>
             </Paper>
           ))}
@@ -1171,7 +1014,6 @@ export const OrdenCompraList = () => {
           <Table>
             <TableHead>
               <TableRow>
-
                 {tableColumns.map((column) => (
                   <TableCell key={column.id}>{column.label}</TableCell>
                 ))}
@@ -1190,7 +1032,6 @@ export const OrdenCompraList = () => {
                     },
                   }}
                 >
-
                   {tableColumns.map((column) => {
                     let value;
                     if (column.id === "rut") {
@@ -1217,7 +1058,6 @@ export const OrdenCompraList = () => {
                         ) : (
                           value || ""
                         )}
-
                       </TableCell>
                     );
                   })}
@@ -1249,7 +1089,6 @@ export const OrdenCompraList = () => {
               ? "Editar Orden"
               : "Nueva Orden"}
           </Typography>
-
 
           {selectedOrden && (
             <>
@@ -1531,7 +1370,6 @@ export const OrdenCompraList = () => {
                 </Box>
               )}
             </>
-
           )}
         </Box>
       </Modal>
