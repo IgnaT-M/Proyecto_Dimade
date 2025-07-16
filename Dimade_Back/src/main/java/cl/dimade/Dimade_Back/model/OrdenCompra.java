@@ -1,7 +1,7 @@
 package cl.dimade.Dimade_Back.model;
 
 import java.util.Date;
-import java.util.List; 
+import java.util.List;
 
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
@@ -26,17 +26,17 @@ public class OrdenCompra {
 
     private List<Object> productos; // ✅ Tipo cambiado a Lista para coincidir con el frontend
     private String direccion;
-    
+
     // ✅ Se reemplaza 'total' por los nuevos campos
     private Double totalSinIva;
     private Double totalConIva;
     private Double descuento;
     private Double totalAPagar;
-    
+
     private String estado;
     private String tipo;
 
     private String detalle;
 
     private String pdfId;
-
+}
