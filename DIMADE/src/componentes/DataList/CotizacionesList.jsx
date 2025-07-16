@@ -620,10 +620,7 @@ const CotizacionesList = () => {
     try {
       const payload = { ...ordenToSave, total: ordenData.totalAPagar };
       const token = localStorage.getItem("jwtToken");
-<<<<<<< HEAD
-      const BASE_URL = "http://localhost:8080";
-=======
->>>>>>> e8aa16ed00c4ff87d8239d92399067968fa540d0
+
       const res = await fetch(`${BASE_URL}/api/ordenes-compra`, {
         method: "POST",
         headers: {
