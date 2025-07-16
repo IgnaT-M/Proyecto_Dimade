@@ -6,14 +6,12 @@ import {
   Typography,
   Snackbar,
   Alert,
-  MenuItem,
+  IconButton,
+  Tooltip,
 } from "@mui/material";
 
-import BadgeIcon from "@mui/icons-material/Badge";
-import PersonIcon from "@mui/icons-material/Person";
-import EmailIcon from "@mui/icons-material/Email";
-import PhoneIcon from "@mui/icons-material/Phone";
-import ListAltIcon from "@mui/icons-material/ListAlt";
+import AddCircleOutlineIcon from "@mui/icons-material/AddCircleOutline";
+import DeleteOutlineIcon from "@mui/icons-material/DeleteOutline";
 
 import ModalCubitaje from "./ModalCubicador";
 import BASE_URL from "../config/apiConfig";
@@ -24,8 +22,12 @@ const CotizaForm = () => {
     nombre: "",
     email: "",
     telefono: "",
-    direccion: "", // ← nuevo campo
+
+    direccion: "",
+    productosSolicitados: [{ detalle: "", cantidad: "" }], // <--- SIN precioUnitario aquí
+
     mensaje: "",
+    tipo: "Cliente",
   });
 
   const [open, setOpen] = useState(false);
@@ -33,36 +35,100 @@ const CotizaForm = () => {
   const [touched, setTouched] = useState({});
   const [submitAttempted, setSubmitAttempted] = useState(false);
 
-  const handleChange = (e) => {
-    setFormData((prev) => ({ ...prev, [e.target.name]: e.target.value }));
+  const handleChange = async (e) => {
+    const { name, value } = e.target;
+    setFormData((prev) => ({ ...prev, [name]: value }));
+  };
+
+  const handleProductChange = (index, e) => {
+    const { name, value } = e.target;
+    const newProducts = [...formData.productosSolicitados];
+    // Solo 'cantidad' se convierte a número
+    newProducts[index][name] =
+      name === "cantidad" ? parseInt(value) || "" : value;
+    setFormData((prev) => ({ ...prev, productosSolicitados: newProducts }));
   };
 
   const handleBlur = (e) => {
     setTouched((prev) => ({ ...prev, [e.target.name]: true }));
   };
 
+
+  const handleProductBlur = (index, fieldName) => {
+    setTouched((prev) => ({
+      ...prev,
+      [`producto-${index}-${fieldName}`]: true,
+    }));
+  };
+
+
   const isEmpty = (field) =>
     (touched[field] || submitAttempted) && !formData[field];
+
+  const isProductFieldEmpty = (index, fieldName) =>
+    (touched[`producto-${index}-${fieldName}`] || submitAttempted) &&
+    (formData.productosSolicitados[index][fieldName] === "" ||
+      (fieldName === "cantidad" &&
+        parseFloat(formData.productosSolicitados[index].cantidad) <= 0)); // Validar cantidad > 0
+
+  const handleAddProduct = () => {
+    setFormData((prev) => ({
+      ...prev,
+      // SIN precioUnitario al agregar nuevo producto
+      productosSolicitados: [
+        ...prev.productosSolicitados,
+        { detalle: "", cantidad: "" },
+      ],
+    }));
+  };
+
+  const handleRemoveProduct = (index) => {
+    const newProducts = [...formData.productosSolicitados];
+    newProducts.splice(index, 1);
+    setFormData((prev) => ({ ...prev, productosSolicitados: newProducts }));
+  };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     setSubmitAttempted(true);
 
     const camposVacios = Object.keys(formData).filter(
-      (campo) => !formData[campo]
+      (campo) =>
+        campo !== "productosSolicitados" &&
+        campo !== "mensaje" &&
+        campo !== "tipo" &&
+        !formData[campo]
     );
-    if (camposVacios.length > 0) return;
+
+    // Validar que al menos un producto esté especificado y sus campos no estén vacíos
+    // SIN validación de precioUnitario aquí
+    const productosVacios = formData.productosSolicitados.some(
+      (prod) =>
+        !prod.detalle || prod.cantidad === "" || parseFloat(prod.cantidad) <= 0
+    );
+
+
+    if (camposVacios.length > 0 || productosVacios) {
+      setError(
+        "Por favor, completa todos los campos obligatorios y los productos."
+      );
+      return;
+    }
+
 
     const payload = {
       rutSolicitante: formData.rut,
       nombreSolicitante: formData.nombre,
       correo: formData.email,
       telefono: formData.telefono,
-      direccion: formData.direccion, // ← se envía
+
+      direccion: formData.direccion,
+
       fechaSolicitud: new Date(),
-      productosSolicitados: [formData.tipoProducto],
+      productosSolicitados: formData.productosSolicitados, // Los productos se envían sin precio unitario
       estado: "Pendiente",
       detalle: formData.mensaje,
+      tipo: formData.tipo,
     };
 
     try {
@@ -80,23 +146,21 @@ const CotizaForm = () => {
         nombre: "",
         email: "",
         telefono: "",
-        direccion: "", // ← limpiar
-        tipoProducto: "",
+
+        direccion: "",
+        productosSolicitados: [{ detalle: "", cantidad: "" }],
+
         mensaje: "",
+        tipo: "Cliente",
       });
+      setSubmitAttempted(false);
+      setTouched({});
+      setError(null);
     } catch (error) {
       console.error("Error al enviar solicitud:", error);
-      setError(true);
+      setError("Error al enviar el mensaje. Inténtalo de nuevo.");
     }
   };
-
-  const productos = [
-    "Artículos de oficina",
-    "Material de embalaje",
-    "Productos de limpieza",
-    "Tecnología",
-    "Otro",
-  ];
 
   return (
     <Box sx={{ maxWidth: 600, mx: "auto", py: 2 }}>
@@ -152,17 +216,121 @@ const CotizaForm = () => {
           error={isEmpty("telefono")}
           helperText={isEmpty("telefono") ? "Debes Ingresar un Telefono" : ""}
         />
+
         <TextField
           fullWidth
           margin="normal"
           name="direccion"
           label="Dirección"
+
+          type="text"
+
           value={formData.direccion}
           onChange={handleChange}
           onBlur={handleBlur}
           error={isEmpty("direccion")}
-          helperText={isEmpty("direccion") ? "La Dirección es obligatoria" : ""}
+
+          helperText={
+            isEmpty("direccion") ? "Debes Ingresar una Dirección." : ""
+          }
+          placeholder="Ej: Avenida Providencia 200, Conchalí"
         />
+
+        {/* Sección de Productos Solicitados */}
+        <Typography variant="h5" gutterBottom sx={{ mt: 3, mb: 1 }}>
+          Productos
+        </Typography>
+        {formData.productosSolicitados.map((product, index) => (
+          <Box
+            key={index}
+            sx={{
+              display: "flex",
+              alignItems: "center",
+              gap: 1,
+              mb: 2,
+              border: "1px solid #e0e0e0",
+              borderRadius: 1,
+              p: 1.5,
+              boxShadow: 1,
+              flexWrap: "wrap",
+            }}
+          >
+            <TextField
+              margin="dense"
+              name="detalle"
+              label="Detalle Producto"
+              value={product.detalle}
+              onChange={(e) => handleProductChange(index, e)}
+              onBlur={() => handleProductBlur(index, "detalle")}
+              error={isProductFieldEmpty(index, "detalle")}
+              helperText={
+                isProductFieldEmpty(index, "detalle")
+                  ? "Describe el producto"
+                  : ""
+              }
+              placeholder="Ej: 50 bolsas de cemento, color gris"
+              sx={{
+                flexBasis: { xs: "100%", sm: "calc(60% - 8px)" },
+                flexGrow: 1,
+              }}
+            />
+            <TextField
+              margin="dense"
+              name="cantidad"
+              label="Cant."
+              type="number"
+              value={product.cantidad}
+              onChange={(e) => handleProductChange(index, e)}
+              onBlur={() => handleProductBlur(index, "cantidad")}
+              error={isProductFieldEmpty(index, "cantidad")}
+              helperText={
+                isProductFieldEmpty(index, "cantidad")
+                  ? "Ingresa la cantidad"
+                  : ""
+              }
+              sx={{
+                flexBasis: { xs: "calc(40% - 8px)", sm: "120px" },
+                minWidth: "80px",
+              }}
+            />
+            {/* <--- ELIMINADO: Campo Precio Unitario */}
+            {formData.productosSolicitados.length > 1 && (
+              <Tooltip title="Eliminar Producto">
+                <IconButton
+                  onClick={() => handleRemoveProduct(index)}
+                  color="error"
+                  aria-label="eliminar producto"
+                  sx={{ mt: { xs: 1, sm: 0 }, ml: { xs: 0, sm: 1 } }}
+                >
+                  <DeleteOutlineIcon />
+                </IconButton>
+              </Tooltip>
+            )}
+          </Box>
+        ))}
+
+        {/* Botón "AGREGAR PRODUCTO" */}
+        <Button
+          variant="outlined"
+          fullWidth
+          onClick={handleAddProduct}
+          startIcon={<AddCircleOutlineIcon />}
+          sx={{
+            mt: 2,
+            mb: 3,
+            fontWeight: "bold",
+            borderRadius: 1,
+            color: "#D95830",
+            borderColor: "#D95830",
+            "&:hover": {
+              bgcolor: "#D958301A",
+              borderColor: "#D95830",
+            },
+          }}
+        >
+          AGREGAR PRODUCTO
+        </Button>
+
 
         <TextField
           fullWidth
@@ -170,15 +338,11 @@ const CotizaForm = () => {
           rows={4}
           margin="normal"
           name="mensaje"
-          label="Detalles adicionales"
+          label="Detalles adicionales (opcional)"
           value={formData.mensaje}
           onChange={handleChange}
           onBlur={handleBlur}
-          error={isEmpty("mensaje")}
-          helperText={
-            isEmpty("mensaje") ? "Describe tus Productos, Por favor" : ""
-          }
-          placeholder="Ej: Necesito 50 bolsas de cemento y 10 mallas ACMA 15-15-6..."
+          placeholder="Ej: Necesito que la entrega sea antes de fin de mes..."
         />
         <Button
           type="submit"
@@ -213,17 +377,17 @@ const CotizaForm = () => {
       </Snackbar>
 
       <Snackbar
-        open={error}
-        autoHideDuration={4000}
-        onClose={() => setError(false)}
+        open={!!error}
+        autoHideDuration={6000}
+        onClose={() => setError(null)}
         anchorOrigin={{ vertical: "bottom", horizontal: "center" }}
       >
         <Alert
-          onClose={() => setError(false)}
+          onClose={() => setError(null)}
           severity="error"
           sx={{ width: "100%" }}
         >
-          Error al enviar el mensaje.
+          {error}
         </Alert>
       </Snackbar>
     </Box>
