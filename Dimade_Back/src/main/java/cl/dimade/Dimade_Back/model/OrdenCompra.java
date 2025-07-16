@@ -35,4 +35,9 @@ public class OrdenCompra {
     private String estado;
     private String tipo;
     private String detalle;
+<<<<<<< HEAD
 }
+=======
+    private String pdfId;
+}
+>>>>>>> e8aa16ed00c4ff87d8239d92399067968fa540d0

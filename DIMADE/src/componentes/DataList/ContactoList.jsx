@@ -27,6 +27,7 @@ import {
   Edit as EditIcon,
   Add as AddIcon,
 } from "@mui/icons-material";
+import BASE_URL from "../../config/apiConfig";
 
 // Helper para formatear fechas de manera consistente
 const formatFecha = (dateString) => {
@@ -63,10 +64,11 @@ const ContactoList = () => {
   const fetchSolicitudes = async () => {
     try {
       const token = localStorage.getItem("jwtToken");
-      const res = await fetch(
-        "http://localhost:8080/api/solicitudes-contacto",
-        { headers: { Authorization: `Bearer ${token}` } }
-      );
+
+      const res = await fetch(`${BASE_URL}/api/solicitudes-contacto`, {
+        headers: { Authorization: `Bearer ${token}` },
+      });
+
       const data = await res.json();
       setSolicitudes(Array.isArray(data) ? data : []);
     } catch (err) {
@@ -129,8 +131,8 @@ const ContactoList = () => {
       const token = localStorage.getItem("jwtToken");
       const url =
         modalMode === "new"
-          ? "http://localhost:8080/api/solicitudes-contacto"
-          : `http://localhost:8080/api/solicitudes-contacto/${selectedSolicitud.id}`;
+          ? `${BASE_URL}/api/solicitudes-contacto`
+          : `${BASE_URL}/api/solicitudes-contacto/${selectedSolicitud.id}`;
       const method = modalMode === "new" ? "POST" : "PUT";
       const res = await fetch(url, {
         method,
@@ -154,8 +156,13 @@ const ContactoList = () => {
     try {
       const token = localStorage.getItem("jwtToken");
       const res = await fetch(
-        `http://localhost:8080/api/solicitudes-contacto/${deleteId}`,
-        { method: "DELETE", headers: { Authorization: `Bearer ${token}` } }
+
+        `${BASE_URL}/api/solicitudes-contacto/${deleteId}`,
+        {
+          method: "DELETE",
+          headers: { Authorization: `Bearer ${token}` },
+        }
+
       );
       if (res.ok) {
         await fetchSolicitudes();

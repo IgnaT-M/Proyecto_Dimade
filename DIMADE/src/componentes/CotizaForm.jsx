@@ -14,6 +14,7 @@ import AddCircleOutlineIcon from "@mui/icons-material/AddCircleOutline";
 import DeleteOutlineIcon from "@mui/icons-material/DeleteOutline";
 
 import ModalCubitaje from "./ModalCubicador";
+import BASE_URL from "../config/apiConfig";
 
 const CotizaForm = () => {
   const [formData, setFormData] = useState({
@@ -123,14 +124,11 @@ const CotizaForm = () => {
     };
 
     try {
-      const response = await fetch(
-        "http://localhost:8080/api/solicitudes-cotizacion",
-        {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify(payload),
-        }
-      );
+      const response = await fetch(`${BASE_URL}/api/solicitudes-cotizacion`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(payload),
+      });
 
       if (!response.ok) throw new Error("Error al enviar la solicitud");
 

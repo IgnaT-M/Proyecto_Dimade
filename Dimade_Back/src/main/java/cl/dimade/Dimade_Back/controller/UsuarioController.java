@@ -21,7 +21,7 @@ import cl.dimade.Dimade_Back.service.UsuarioService;
 
 @RestController
 @RequestMapping("/api/usuarios")
-@CrossOrigin(origins = "http://localhost:5173")
+@CrossOrigin(origins = "${frontend.url}")
 public class UsuarioController {
 
     @Autowired

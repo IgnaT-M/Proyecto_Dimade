@@ -33,6 +33,7 @@ import VisibilityIcon from "@mui/icons-material/Visibility";
 import DeleteIcon from "@mui/icons-material/Delete";
 import EditIcon from "@mui/icons-material/Edit";
 import AddIcon from "@mui/icons-material/Add";
+import BASE_URL from "../../config/apiConfig";
 
 const RegistrosList = () => {
   const [registros, setRegistros] = useState([]);
@@ -61,17 +62,11 @@ const RegistrosList = () => {
   const fetchRegistros = async () => {
     try {
       const token = localStorage.getItem("jwtToken");
-      const res = await fetch(
-        "http://localhost:8080/api/registros-financieros",
-        {
-          headers: { Authorization: `Bearer ${token}` },
-        }
-      );
-      if (!res.ok) {
-        console.error("Error en la respuesta de la API:", res.status);
-        setRegistros([]);
-        return;
-      }
+
+      const res = await fetch(`${BASE_URL}/api/registros-financieros`, {
+        headers: { Authorization: `Bearer ${token}` },
+      });
+
       const data = await res.json();
       setRegistros(Array.isArray(data) ? data : []);
     } catch (err) {
@@ -106,13 +101,10 @@ const RegistrosList = () => {
     if (!window.confirm("¿Eliminar registro financiero?")) return;
     try {
       const token = localStorage.getItem("jwtToken");
-      const res = await fetch(
-        `http://localhost:8080/api/registros-financieros/${id}`,
-        {
-          method: "DELETE",
-          headers: { Authorization: `Bearer ${token}` },
-        }
-      );
+      const res = await fetch(`${BASE_URL}/api/registros-financieros/${id}`, {
+        method: "DELETE",
+        headers: { Authorization: `Bearer ${token}` },
+      });
       if (res.ok) {
         setRegistros((prev) => prev.filter((r) => r.id !== id));
       }
@@ -126,9 +118,12 @@ const RegistrosList = () => {
       const token = localStorage.getItem("jwtToken");
       const method = modalMode === "new" ? "POST" : "PUT";
       const url =
-        modalMode === "new"
-          ? "http://localhost:8080/api/registros-financieros"
-          : `http://localhost:8080/api/registros-financieros/${modalRegistro.datos.id}`;
+
+        modalMode === "edit"
+          ? `${BASE_URL}/api/registros-financieros/${modalRegistro.datos.id}`
+          : `${BASE_URL}/api/registros-financieros`;
+
+
       const res = await fetch(url, {
         method,
         headers: {

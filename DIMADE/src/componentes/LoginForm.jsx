@@ -17,6 +17,7 @@ import Visibility from "@mui/icons-material/Visibility";
 import VisibilityOff from "@mui/icons-material/VisibilityOff";
 import { useNavigate } from "react-router-dom";
 import { jwtDecode } from "jwt-decode";
+import BASE_URL from "../config/apiConfig";
 
 const LoginForm = () => {
   const [form, setForm] = useState({ email: "", password: "" });
@@ -57,7 +58,7 @@ const LoginForm = () => {
 
     // El resto de la lógica de submit permanece igual
     try {
-      const response = await fetch("http://localhost:8080/api/auth/login", {
+      const response = await fetch(`${BASE_URL}/api/auth/login`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ email: form.email, password: form.password }),

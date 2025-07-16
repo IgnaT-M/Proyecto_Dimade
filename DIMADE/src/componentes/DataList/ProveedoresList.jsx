@@ -27,6 +27,7 @@ import EditIcon from "@mui/icons-material/Edit";
 import ToggleOnIcon from "@mui/icons-material/ToggleOn";
 import ToggleOffIcon from "@mui/icons-material/ToggleOff";
 import AddIcon from "@mui/icons-material/Add";
+import BASE_URL from "../../config/apiConfig";
 
 // Se mantiene la función helper para validación
 const isValidEmail = (correo) => /\S+@\S+\.\S+/.test(correo);
@@ -51,8 +52,12 @@ const ProveedoresList = () => {
   const fetchProveedores = async () => {
     try {
       const token = localStorage.getItem("jwtToken");
-      const res = await fetch("http://localhost:8080/api/proveedores", {
-        headers: { Authorization: `Bearer ${token}` },
+
+      const res = await fetch(`${BASE_URL}/api/proveedores`, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+
       });
       if (!res.ok) {
         console.error(
@@ -93,7 +98,7 @@ const ProveedoresList = () => {
     if (!window.confirm("¿Eliminar proveedor?")) return;
     try {
       const token = localStorage.getItem("jwtToken");
-      const res = await fetch(`http://localhost:8080/api/proveedores/${id}`, {
+      const res = await fetch(`${BASE_URL}/api/proveedores/${id}`, {
         method: "DELETE",
         headers: { Authorization: `Bearer ${token}` },
       });
@@ -119,8 +124,8 @@ const ProveedoresList = () => {
       const token = localStorage.getItem("jwtToken");
       const url =
         modalMode === "new"
-          ? "http://localhost:8080/api/proveedores"
-          : `http://localhost:8080/api/proveedores/${selectedProveedor.id}`;
+          ? `${BASE_URL}/api/proveedores`
+          : `${BASE_URL}/api/proveedores/${selectedProveedor.id}`;
       const method = modalMode === "new" ? "POST" : "PUT";
       const res = await fetch(url, {
         method,
@@ -144,17 +149,14 @@ const ProveedoresList = () => {
     try {
       const token = localStorage.getItem("jwtToken");
       const updated = { ...proveedor, activo: !proveedor.activo };
-      const res = await fetch(
-        `http://localhost:8080/api/proveedores/${proveedor.id}`,
-        {
-          method: "PUT",
-          headers: {
-            "Content-Type": "application/json",
-            Authorization: `Bearer ${token}`,
-          },
-          body: JSON.stringify(updated),
-        }
-      );
+      const res = await fetch(`${BASE_URL}/api/proveedores/${proveedor.id}`, {
+        method: "PUT",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
+        },
+        body: JSON.stringify(updated),
+      });
       if (res.ok) {
         setProveedores((prev) =>
           prev.map((p) => (p.id === proveedor.id ? updated : p))

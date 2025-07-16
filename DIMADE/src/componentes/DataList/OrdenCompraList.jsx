@@ -34,6 +34,7 @@ import {
   Add as AddIcon,
   Download as DownloadIcon,
 } from "@mui/icons-material";
+<<<<<<< HEAD
 import UploadFileIcon from "@mui/icons-material/UploadFile";
 import PictureAsPdfIcon from "@mui/icons-material/PictureAsPdf";
 import DescriptionIcon from "@mui/icons-material/Description";
@@ -41,6 +42,11 @@ import jsPDF from "jspdf";
 import autoTable from "jspdf-autotable";
 import BASE_URL from "../../config/apiConfig";
 import logoDimade from "../../../public/imagenes/logo_dimade.png";
+=======
+import jsPDF from "jspdf";
+import autoTable from "jspdf-autotable";
+import BASE_URL from "../../config/apiConfig";
+>>>>>>> e8aa16ed00c4ff87d8239d92399067968fa540d0
 
 const formatFecha = (dateString) => {
   if (!dateString) return "N/A";
@@ -139,6 +145,7 @@ export const OrdenCompraList = () => {
     return filteredOrdenes.slice(start, start + rowsPerPage);
   }, [filteredOrdenes, page, rowsPerPage]);
 
+<<<<<<< HEAD
   const handleMenuClick = (event) => setAnchorEl(event.currentTarget);
 
   const handleMenuClose = () => setAnchorEl(null);
@@ -148,11 +155,19 @@ export const OrdenCompraList = () => {
     handleOpenModal(null, "new", orderType);
   };
 
+=======
+>>>>>>> e8aa16ed00c4ff87d8239d92399067968fa540d0
   const handleUpload = async (file, ordenId) => {
     const formData = new FormData();
     formData.append("file", file);
     formData.append("nombreOrden", ordenId);
+<<<<<<< HEAD
     const token = localStorage.getItem("jwtToken");
+=======
+
+    const token = localStorage.getItem("jwtToken");
+
+>>>>>>> e8aa16ed00c4ff87d8239d92399067968fa540d0
     const res = await fetch(`${BASE_URL}/api/ordenes-compra/upload`, {
       method: "POST",
       headers: {
@@ -160,7 +175,13 @@ export const OrdenCompraList = () => {
       },
       body: formData,
     });
+<<<<<<< HEAD
     const pdfId = await res.text();
+=======
+
+    const pdfId = await res.text();
+
+>>>>>>> e8aa16ed00c4ff87d8239d92399067968fa540d0
     await fetch(`${BASE_URL}/api/ordenes-compra/${ordenId}/pdf`, {
       method: "PUT",
       headers: {
@@ -169,6 +190,10 @@ export const OrdenCompraList = () => {
       },
       body: JSON.stringify({ pdfId }),
     });
+<<<<<<< HEAD
+=======
+
+>>>>>>> e8aa16ed00c4ff87d8239d92399067968fa540d0
     console.log("PDF almacenado para orden:", ordenId);
     await fetchOrdenes();
   };
@@ -178,7 +203,13 @@ export const OrdenCompraList = () => {
       alert("Esta orden no tiene un PDF asociado.");
       return;
     }
+<<<<<<< HEAD
     const token = localStorage.getItem("jwtToken");
+=======
+
+    const token = localStorage.getItem("jwtToken");
+
+>>>>>>> e8aa16ed00c4ff87d8239d92399067968fa540d0
     const res = await fetch(
       `${BASE_URL}/api/ordenes-compra/download/${pdfId}`,
       {
@@ -188,10 +219,18 @@ export const OrdenCompraList = () => {
         },
       }
     );
+<<<<<<< HEAD
+=======
+
+>>>>>>> e8aa16ed00c4ff87d8239d92399067968fa540d0
     if (!res.ok) {
       alert("Error al descargar PDF: " + res.status);
       return;
     }
+<<<<<<< HEAD
+=======
+
+>>>>>>> e8aa16ed00c4ff87d8239d92399067968fa540d0
     const blob = await res.blob();
     const url = window.URL.createObjectURL(blob);
     const link = document.createElement("a");
@@ -204,10 +243,18 @@ export const OrdenCompraList = () => {
     if (!window.confirm("¿Eliminar orden de compra?")) return;
     try {
       const token = localStorage.getItem("jwtToken");
+<<<<<<< HEAD
+=======
+
+>>>>>>> e8aa16ed00c4ff87d8239d92399067968fa540d0
       const res = await fetch(`${BASE_URL}/api/ordenes-compra/${id}`, {
         method: "DELETE",
         headers: { Authorization: `Bearer ${token}` },
       });
+<<<<<<< HEAD
+=======
+
+>>>>>>> e8aa16ed00c4ff87d8239d92399067968fa540d0
       if (res.ok) {
         setOrdenes((prev) => prev.filter((o) => o.id !== id));
       }
@@ -674,6 +721,52 @@ export const OrdenCompraList = () => {
     return Object.keys(tempErrors).length === 0;
   };
 
+  const generarPDFOrden = (orden) => {
+    const doc = new jsPDF();
+
+    // Usar autoTable importado directamente
+    autoTable(doc, {
+      startY: 100,
+      head: [["Producto", "Cantidad", "Precio Unitario", "Subtotal"]],
+      body:
+        Array.isArray(orden.productos) && orden.productos.length > 0
+          ? orden.productos.map((p) => [
+              p.nombre || "-",
+              p.cantidad || 0,
+              `$${p.precioUnitario || 0}`,
+              `$${(p.cantidad || 0) * (p.precioUnitario || 0)}`,
+            ])
+          : [["Sin productos", "", "", ""]],
+      styles: { halign: "left" },
+      theme: "grid",
+    });
+
+    doc.setFontSize(16);
+    doc.text("DIMADE - ORDEN DE COMPRA", 14, 20);
+    doc.setFontSize(12);
+    doc.text(
+      `Fecha: ${new Date(orden.fechaOrden).toLocaleDateString()}`,
+      14,
+      30
+    );
+    doc.text(`N° Orden: ${orden.id || "Sin ID"}`, 14, 38);
+
+    doc.text("Cliente / Proveedor:", 14, 50);
+    doc.text(`RUT Cliente: ${orden.rutCliente || "-"}`, 14, 58);
+    doc.text(`RUT Proveedor: ${orden.rutProveedor || "-"}`, 14, 66);
+    doc.text(`Teléfono: ${orden.telefono || "-"}`, 14, 74);
+    doc.text(`Email: ${orden.mail || "-"}`, 14, 82);
+
+    doc.setFontSize(14);
+    doc.text(
+      `TOTAL: $${orden.total || 0}`,
+      14,
+      doc.lastAutoTable?.finalY + 10 || 120
+    );
+
+    doc.save(`orden-${orden.id || "sin-id"}.pdf`);
+  };
+
   const handleSave = async () => {
     // Concatena el código de país con el número antes de guardar
     const telefonoFinal = selectedOrden.telefono
@@ -993,6 +1086,7 @@ export const OrdenCompraList = () => {
                   <TableCell key={column.id}>{column.label}</TableCell>
                 ))}
                 <TableCell align="right">Acciones</TableCell>
+
               </TableRow>
             </TableHead>
             <TableBody>

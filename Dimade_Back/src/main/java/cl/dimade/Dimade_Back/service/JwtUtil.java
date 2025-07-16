@@ -24,7 +24,7 @@ public class JwtUtil {
 
     private SecretKey secretKey;
 
-    private final long EXPIRATION_TIME = 186400000; // 24 horas
+    private final long EXPIRATION_TIME = 86400000; // 24 horas
 
     @PostConstruct
     public void init() {
@@ -35,13 +35,8 @@ public class JwtUtil {
         Map<String, Object> claims = new HashMap<>();
         claims.put("rol", "ROLE_" + rol); // ✅ Prefijo obligatorio para Spring Security
 
-        return Jwts.builder()
-                .setClaims(claims)
-                .setSubject(email)
-                .setIssuedAt(new Date())
-                .setExpiration(new Date(System.currentTimeMillis() + EXPIRATION_TIME))
-                .signWith(secretKey)
-                .compact();
+        return Jwts.builder().setClaims(claims).setSubject(email).setIssuedAt(new Date())
+                .setExpiration(new Date(System.currentTimeMillis() + EXPIRATION_TIME)).signWith(secretKey).compact();
     }
 
     public String extractUsername(String token) {
@@ -49,11 +44,8 @@ public class JwtUtil {
     }
 
     public Claims extractAllClaims(String token) {
-        return Jwts.parserBuilder()
-                .setSigningKey(secretKey) // Usa tu key real aquí
-                .build()
-                .parseClaimsJws(token)
-                .getBody();
+        return Jwts.parserBuilder().setSigningKey(secretKey) // Usa tu key real aquí
+                .build().parseClaimsJws(token).getBody();
     }
 
     public String extractRol(String token) {
@@ -70,11 +62,6 @@ public class JwtUtil {
     }
 
     private Claims getClaims(String token) {
-        return Jwts
-                .parserBuilder()
-                .setSigningKey(secretKey)
-                .build()
-                .parseClaimsJws(token)
-                .getBody();
+        return Jwts.parserBuilder().setSigningKey(secretKey).build().parseClaimsJws(token).getBody();
     }
 }
