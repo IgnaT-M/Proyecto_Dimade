@@ -320,20 +320,16 @@ const CotizacionesList = () => {
 
   // Modificación en handleOpenModal (para solicitud de cotización)
   const handleOpenModal = (item, mode, type = "Cliente") => {
+    // Al abrir el modal
     let productsForModal;
     if (mode === "new") {
-      // Para un nuevo formulario de solicitud, inicializa con un producto vacío (con precio unitario en 0)
-      productsForModal = [{ detalle: "", cantidad: "", precioUnitario: "" }]; // <-- AGREGADO precioUnitario aquí
+      productsForModal = [{ detalle: "", cantidad: "", precioUnitario: "" }];
     } else {
-      // Para ver/editar una solicitud existente, asegúrate de que productosSolicitados sea un array
-      productsForModal = Array.isArray(item?.productosSolicitados)
-        ? item.productosSolicitados
-        : [];
-      // Asegura que cada producto tenga las propiedades esperadas, incluso si CotizaForm no las envía
+      productsForModal = Array.isArray(item?.productos) ? item.productos : [];
       productsForModal = productsForModal.map((p) => ({
         detalle: p.detalle || "",
         cantidad: p.cantidad || "",
-        precioUnitario: p.precioUnitario || "", // Asegura que el precioUnitario exista, inicializa a vacío
+        precioUnitario: p.precioUnitario || "",
       }));
     }
 
@@ -346,14 +342,12 @@ const CotizacionesList = () => {
       detalle: "",
       estado: "Pendiente",
       tipo: type, // Asigna el tipo directamente al crear
-      productosSolicitados: productsForModal, // Usamos los productos preparados
+      productos: productsForModal, // <-- CAMBIO AQUÍ
       fechaSolicitud: new Date().toISOString(), // Añade fecha por defecto
     };
 
     setSelected(
-      mode === "new"
-        ? initialData
-        : { ...item, productosSolicitados: productsForModal }
+      mode === "new" ? initialData : { ...item, productos: productsForModal }
     );
     setModalMode(mode);
     setOpenModal(true);
@@ -374,29 +368,28 @@ const CotizacionesList = () => {
   // handleProductChange para el modal de solicitud de cotización (productosSolicitados)
   const handleProductChangeSolicitud = (index, e) => {
     const { name, value } = e.target;
-    const newProducts = [...(selected.productosSolicitados || [])];
-    // Convierte a número si es cantidad o precioUnitario
+    const newProducts = [...(selected.productos || [])];
     newProducts[index][name] =
       name === "cantidad" || name === "precioUnitario"
-        ? parseFloat(value) || (value === "" ? "" : 0) // Permite vacío temporalmente para borrar
+        ? parseFloat(value) || (value === "" ? "" : 0)
         : value;
-    setSelected((prev) => ({ ...prev, productosSolicitados: newProducts }));
+    setSelected((prev) => ({ ...prev, productos: newProducts }));
   };
 
   const handleAddProductSolicitud = () => {
     setSelected((prev) => ({
       ...prev,
-      productosSolicitados: [
-        ...(prev.productosSolicitados || []),
-        { detalle: "", cantidad: "", precioUnitario: "" }, // <-- AGREGADO precioUnitario al agregar
+      productos: [
+        ...(prev.productos || []),
+        { detalle: "", cantidad: "", precioUnitario: "" },
       ],
     }));
   };
 
   const handleRemoveProductSolicitud = (index) => {
-    const newProducts = [...(selected.productosSolicitados || [])];
+    const newProducts = [...(selected.productos || [])];
     newProducts.splice(index, 1);
-    setSelected((prev) => ({ ...prev, productosSolicitados: newProducts }));
+    setSelected((prev) => ({ ...prev, productos: newProducts }));
   };
 
   const handleSave = async () => {
@@ -409,7 +402,7 @@ const CotizacionesList = () => {
       const method = modalMode === "new" ? "POST" : "PUT";
 
       // Validar productosSolicitados antes de enviar
-      const invalidProducts = selected.productosSolicitados.some(
+      const invalidProducts = selected.productos.some(
         (p) =>
           !p.detalle ||
           p.cantidad === "" ||
@@ -436,10 +429,10 @@ const CotizacionesList = () => {
         body: JSON.stringify({
           ...selected,
           // Al guardar la solicitud, se envía detalle, cantidad y precioUnitario
-          productosSolicitados: selected.productosSolicitados.map((p) => ({
+          productos: selected.productos.map((p) => ({
             detalle: p.detalle,
             cantidad: parseFloat(p.cantidad),
-            precioUnitario: parseFloat(p.precioUnitario) || 0, // Asegura que sea un número o 0
+            precioUnitario: parseFloat(p.precioUnitario) || 0,
           })),
           fechaSolicitud: selected.fechaSolicitud || new Date().toISOString(),
         }),
@@ -459,25 +452,23 @@ const CotizacionesList = () => {
 
   // --- LÓGICA DEL MODAL DE ORDEN DE COMPRA ---
   const handleCrearOrden = (item) => {
-    // Mapear productosSolicitados de la cotización al formato de productos de la orden
-    // Si la solicitud de cotización ya tiene precioUnitario (de ser editada previamente en el modal), úsalo.
-    // Si no, inicializa a 0 para que el usuario lo pueda ingresar.
-    const productsForOrder = Array.isArray(item.productosSolicitados)
-      ? item.productosSolicitados.map((prod) => ({
-          nombre: prod.detalle || "", // Detalle de cotización es nombre de producto en orden
+    // Usar productos guardados en el objeto (item.productos)
+    const productsForOrder = Array.isArray(item.productos)
+      ? item.productos.map((prod) => ({
+          nombre: prod.detalle || prod.nombre || "", // usa detalle o nombre
           cantidad: prod.cantidad || 0,
-          precioUnitario: prod.precioUnitario || 0, // <-- Usa el precioUnitario si existe, sino 0
+          precioUnitario: prod.precioUnitario || 0,
         }))
       : [];
 
     const initialOrdenData = {
       rutCliente: item.rutSolicitante || "",
       nombre: item.nombreSolicitante || "",
-      telefono: "", // Se extraerá el número local, se requiere el prefijo
+      telefono: "",
       email: item.correo || "",
       direccion: item.direccion || "",
       fechaOrden: new Date().toISOString().slice(0, 16),
-      productos: productsForOrder, // Usamos los productos mapeados con precioUnitario
+      productos: productsForOrder,
       totalSinIva: 0,
       totalConIva: 0,
       descuento: 0,
@@ -489,7 +480,7 @@ const CotizacionesList = () => {
 
     // Extraer el prefijo del teléfono si existe
     let currentTelefonoSinPrefijo = item.telefono || "";
-    let currentPrefijo = "+56"; // Default a Chile
+    let currentPrefijo = "+56";
     const prefixes = Object.keys(phonePrefixes).sort(
       (a, b) => b.length - a.length
     );
@@ -506,7 +497,7 @@ const CotizacionesList = () => {
     initialOrdenData.telefono = currentTelefonoSinPrefijo;
 
     setOrdenData(initialOrdenData);
-    setErrors({}); // Limpiar errores previos
+    setErrors({});
     setOpenOrdenModal(true);
   };
 
@@ -551,7 +542,8 @@ const CotizacionesList = () => {
             (parseFloat(curr.precioUnitario) || 0),
         0
       );
-      const totalSinIva = totalConIva / 1.19;
+      const iva = (totalConIva * (ordenData.iva || 0)) / 100;
+      const totalSinIva = totalConIva - iva;
       const descuento = ordenData.descuento || 0;
       const totalAPagar = totalConIva * (1 - descuento / 100);
 
@@ -562,7 +554,7 @@ const CotizacionesList = () => {
         totalAPagar,
       }));
     }
-  }, [ordenData?.productos, ordenData?.descuento]);
+  }, [ordenData?.productos, ordenData?.descuento, ordenData?.iva]);
 
   const validateOrden = (orden) => {
     const tempErrors = {};
@@ -898,7 +890,7 @@ const CotizacionesList = () => {
                   }}
                 >
                   <TableCell>{s.id}</TableCell>
-                  <TableCell>{s.tipo || "N/A"}</TableCell>{" "}
+                  <TableCell>{s.tipo || "N/A"}</TableCell>
                   {/* Muestra el tipo */}
                   <TableCell>{s.nombreSolicitante}</TableCell>
                   <TableCell>{s.rutSolicitante}</TableCell>
@@ -949,9 +941,14 @@ const CotizacionesList = () => {
                 name="tipo"
                 fullWidth
                 margin="dense"
+                select
                 value={selected.tipo || ""}
-                InputProps={{ readOnly: true }} // El tipo no se edita desde aquí
-              />
+                onChange={handleChangeSolicitud}
+                InputProps={{ readOnly: modalMode === "view" }}
+              >
+                <MenuItem value="Cliente">Cliente</MenuItem>
+                <MenuItem value="Proveedor">Proveedor</MenuItem>
+              </TextField>
               <TextField
                 label="Nombre Solicitante"
                 name="nombreSolicitante"
@@ -1012,8 +1009,8 @@ const CotizacionesList = () => {
               <Typography variant="subtitle1" mt={2} mb={1}>
                 Productos Solicitados
               </Typography>
-              {Array.isArray(selected.productosSolicitados) &&
-                selected.productosSolicitados.map((product, index) => (
+              {Array.isArray(selected.productos) &&
+                selected.productos.map((product, index) => (
                   <Box
                     key={index}
                     sx={{
@@ -1021,10 +1018,10 @@ const CotizacionesList = () => {
                       alignItems: "center",
                       gap: 1,
                       mb: 1,
-                      p: 1, // Añadido padding para visualización
-                      border: "1px solid #e0e0e0", // Borde para cada producto
+                      p: 1,
+                      border: "1px solid #e0e0e0",
                       borderRadius: 1,
-                      flexWrap: "wrap", // Permite que los campos se envuelvan en pantallas pequeñas
+                      flexWrap: "wrap",
                     }}
                   >
                     <TextField
@@ -1035,7 +1032,7 @@ const CotizacionesList = () => {
                       size="small"
                       value={product.detalle}
                       onChange={(e) => handleProductChangeSolicitud(index, e)}
-                      disabled={modalMode === "view"} // Deshabilitado en modo "ver"
+                      disabled={modalMode === "view"}
                       sx={{
                         flexBasis: { xs: "100%", sm: "calc(60% - 8px)" },
                         flexGrow: 1,
@@ -1050,28 +1047,27 @@ const CotizacionesList = () => {
                       size="small"
                       value={product.cantidad}
                       onChange={(e) => handleProductChangeSolicitud(index, e)}
-                      disabled={modalMode === "view"} // Deshabilitado en modo "ver"
+                      disabled={modalMode === "view"}
                       sx={{
-                        flexBasis: { xs: "calc(40% - 8px)", sm: "100px" }, // Ajusta el ancho
+                        flexBasis: { xs: "calc(40% - 8px)", sm: "100px" },
                         minWidth: "80px",
                       }}
                     />
-                    {(modalMode === "edit" || modalMode === "new") && ( // Solo muestra en editar/nuevo
-                      <TextField
-                        margin="dense"
-                        name="precioUnitario"
-                        label="Precio Unit."
-                        type="number"
-                        variant="outlined"
-                        size="small"
-                        value={product.precioUnitario}
-                        onChange={(e) => handleProductChangeSolicitud(index, e)}
-                        sx={{
-                          flexBasis: { xs: "calc(50% - 8px)", sm: "120px" }, // Ajusta el ancho
-                          minWidth: "80px",
-                        }}
-                      />
-                    )}
+                    <TextField
+                      margin="dense"
+                      name="precioUnitario"
+                      label="Precio Unit."
+                      type="number"
+                      variant="outlined"
+                      size="small"
+                      value={product.precioUnitario}
+                      onChange={(e) => handleProductChangeSolicitud(index, e)}
+                      disabled={modalMode === "view"}
+                      sx={{
+                        flexBasis: { xs: "calc(50% - 8px)", sm: "120px" },
+                        minWidth: "80px",
+                      }}
+                    />
                     {modalMode !== "view" && (
                       <Tooltip title="Eliminar Producto">
                         <IconButton
@@ -1095,7 +1091,6 @@ const CotizacionesList = () => {
                   Agregar Producto
                 </Button>
               )}
-              {/* FIN SECCIÓN DE PRODUCTOS SOLICITADOS */}
 
               <TextField
                 label="Estado"
@@ -1114,7 +1109,6 @@ const CotizacionesList = () => {
 
               {modalMode === "view" && (
                 <Box mt={2} sx={{ textAlign: "right" }}>
-                  {" "}
                   {/* Alineado a la derecha */}
                   <Button variant="contained" onClick={handleCloseModal}>
                     Cerrar
@@ -1137,23 +1131,42 @@ const CotizacionesList = () => {
       <Modal open={openOrdenModal} onClose={() => setOpenOrdenModal(false)}>
         <Box sx={modalStyle}>
           <Typography variant="h6" mb={2}>
-            Nueva Orden de Compra de Cliente
+            {modalMode === "view"
+              ? "Ver Orden"
+              : modalMode === "edit"
+              ? "Editar Orden"
+              : "Nueva Orden"}
           </Typography>
           {ordenData && (
             <>
+              {ordenData.tipo === "Cliente" && (
+                <TextField
+                  label="RUT Cliente"
+                  name="rutCliente"
+                  fullWidth
+                  margin="dense"
+                  value={ordenData.rutCliente || ""}
+                  onChange={handleOrdenChange}
+                  error={!!errors.rutCliente}
+                  helperText={errors.rutCliente}
+                  InputProps={{ readOnly: modalMode === "view" }}
+                />
+              )}
+              {ordenData.tipo === "Proveedor" && (
+                <TextField
+                  label="RUT Proveedor"
+                  name="rutProveedor"
+                  fullWidth
+                  margin="dense"
+                  value={ordenData.rutProveedor || ""}
+                  onChange={handleOrdenChange}
+                  error={!!errors.rutProveedor}
+                  helperText={errors.rutProveedor}
+                  InputProps={{ readOnly: modalMode === "view" }}
+                />
+              )}
               <TextField
-                label="RUT Cliente"
-                name="rutCliente"
-                fullWidth
-                margin="dense"
-                value={ordenData.rutCliente || ""}
-                onChange={handleOrdenChange}
-                error={!!errors.rutCliente}
-                helperText={errors.rutCliente}
-                InputProps={{ readOnly: modalMode === "view" }}
-              />
-              <TextField
-                label="Nombre de Cliente"
+                label="Nombre de Empresa / Contacto"
                 name="nombre"
                 fullWidth
                 margin="dense"
@@ -1279,6 +1292,21 @@ const CotizacionesList = () => {
                   ),
                 }}
               />
+              <TextField
+                label="IVA (%)"
+                name="iva"
+                type="number"
+                fullWidth
+                margin="dense"
+                value={ordenData.iva || ""}
+                onChange={handleOrdenChange}
+                InputProps={{
+                  readOnly: modalMode === "view",
+                  endAdornment: (
+                    <InputAdornment position="end">%</InputAdornment>
+                  ),
+                }}
+              />
 
               <Typography variant="subtitle1" mt={2} mb={1}>
                 Productos de la Orden
@@ -1336,7 +1364,6 @@ const CotizacionesList = () => {
                     )}
                   </Box>
                 ))}
-
               {modalMode !== "view" && (
                 <Button
                   startIcon={<AddIcon />}

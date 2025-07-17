@@ -60,7 +60,7 @@ const formatTotal = (amount) => {
   }).format(numberAmount);
 };
 
-export const OrdenCompraList = () => {
+const OrdenCompraList = () => {
   const [ordenes, setOrdenes] = useState([]);
   const [search, setSearch] = useState("");
   const [estadoFiltro, setEstadoFiltro] = useState("todos");
@@ -150,35 +150,60 @@ export const OrdenCompraList = () => {
   };
 
   const handleUpload = async (file, ordenId) => {
-    const formData = new FormData();
-    formData.append("file", file);
-    formData.append("nombreOrden", ordenId);
+    try {
+      const formData = new FormData();
+      formData.append("file", file);
+      formData.append("nombreOrden", ordenId);
 
-    const token = localStorage.getItem("jwtToken");
+      const token = localStorage.getItem("jwtToken");
 
-    const res = await fetch(`${BASE_URL}/api/ordenes-compra/upload`, {
-      method: "POST",
-      headers: {
-        Authorization: `Bearer ${token}`,
-      },
-      body: formData,
-    });
+      const uploadRes = await fetch(`${BASE_URL}/api/ordenes-compra/upload`, {
+        method: "POST",
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+        body: formData,
+      });
 
-    const pdfId = await res.text();
+      if (!uploadRes.ok) {
+        throw new Error("Error al subir el archivo");
+      }
 
-    await fetch(`${BASE_URL}/api/ordenes-compra/${ordenId}/pdf`, {
-      method: "PUT",
-      headers: {
-        "Content-Type": "application/json",
-        Authorization: `Bearer ${token}`,
-      },
-      body: JSON.stringify({ pdfId }),
-    });
+      const pdfId = await uploadRes.text();
 
-    console.log("PDF almacenado para orden:", ordenId);
-    await fetchOrdenes();
+      if (!pdfId || pdfId === "null" || pdfId === "undefined") {
+        throw new Error("No se recibió un ID válido del PDF");
+      }
+
+      const associateRes = await fetch(
+        `${BASE_URL}/api/ordenes-compra/${ordenId}/pdf`,
+        {
+          method: "PUT",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${token}`,
+          },
+          body: JSON.stringify({ pdfId }),
+        }
+      );
+
+      if (!associateRes.ok) {
+        throw new Error("Error al asociar PDF a la orden");
+      }
+
+      setSnackbarMessage("PDF subido y asociado correctamente");
+      setSnackbarSeverity("success");
+      setSnackbarOpen(true);
+      await fetchOrdenes();
+    } catch (err) {
+      console.error(err);
+      setSnackbarMessage("Fallo al subir o asociar el PDF");
+      setSnackbarSeverity("error");
+      setSnackbarOpen(true);
+    }
   };
 
+  // DESCARGAR PDF
   const handleDownload = async (pdfId) => {
     if (!pdfId) {
       alert("Esta orden no tiene un PDF asociado.");
@@ -210,6 +235,159 @@ export const OrdenCompraList = () => {
     link.click();
   };
 
+  // GENERAR PDF DESDE DATOS
+  const generarPDFOrden = (orden) => {
+    if (!orden) {
+      console.error(
+        "No se pueden generar el PDF: los datos de la orden son nulos."
+      );
+      alert("No se pueden generar el PDF porque no hay datos de la orden.");
+      return;
+    }
+
+    const doc = new jsPDF();
+    const pageWidth =
+      doc.internal.pageSize.width || doc.internal.pageSize.getWidth();
+
+    try {
+      doc.addImage(logoDimade, "PNG", 14, 12, 25, 27);
+    } catch (e) {
+      console.error("Error al cargar el logo importado:", e);
+      doc.text("[Logo]", 14, 20);
+    }
+
+    const infoStartY = 45;
+    doc.setFontSize(8);
+    doc.setFont("helvetica", "normal");
+    doc.text("Rut: 78.039.286-K", 14, infoStartY);
+    doc.text("Dirección: N/A", 14, infoStartY + 5);
+    doc.text("Teléfono: +56-9-6523-7854", 14, infoStartY + 10);
+    doc.text("Correo: correo@dimade.cl", 14, infoStartY + 15);
+    doc.text("Sitio Web: www.dimade.cl", 14, infoStartY + 20);
+
+    doc.setFontSize(18);
+    doc.setFont("helvetica", "bold");
+    doc.text("ORDEN DE COMPRA", pageWidth - 14, 20, { align: "right" });
+
+    doc.setFontSize(10);
+    doc.setDrawColor(0);
+    doc.setLineWidth(0.5);
+
+    const firstBlockY = 30;
+    doc.setFont("helvetica", "bold");
+    doc.text("Fecha", pageWidth - 64, firstBlockY);
+    doc.setFont("helvetica", "normal");
+    doc.rect(pageWidth - 64, firstBlockY + 2, 50, 8);
+    doc.text(
+      formatFecha(orden.fechaOrden) || "N/A",
+      pageWidth - 39,
+      firstBlockY + 7,
+      { align: "center" }
+    );
+
+    const secondBlockY = firstBlockY + 14;
+    doc.setFont("helvetica", "bold");
+    doc.text("Número de Orden de Compra", pageWidth - 64, secondBlockY);
+    doc.setFont("helvetica", "normal");
+    doc.rect(pageWidth - 64, secondBlockY + 2, 50, 8);
+    doc.text(`${orden.id || "N/A"}`, pageWidth - 39, secondBlockY + 7, {
+      align: "center",
+    });
+
+    doc.setFontSize(10);
+    doc.setFont("helvetica", "bold");
+    doc.text("SEÑORES:", 14, 75);
+
+    // Ajuste: Usa orden.nombre para el campo de nombre de la empresa/contacto
+    doc.setFont("helvetica", "normal");
+    doc.text(orden.nombre || "N/A", 16, 82);
+    // Eliminado el campo de contacto duplicado que causaba la línea vacía
+    doc.text(orden.direccion || "N/A", 16, 87);
+    doc.text(`Rut: ${orden.rutCliente || orden.rutProveedor || "N/A"}`, 16, 92);
+    doc.text(`Teléfono: ${orden.telefono || "N/A"}`, 16, 97);
+    doc.text(`Correo: ${orden.email || "N/A"}`, 16, 102);
+
+    const tableHeaders = [["Detalle", "Cantidad", "Precio Unitario", "Total"]];
+    const tableBody =
+      Array.isArray(orden.productos) && orden.productos.length > 0
+        ? orden.productos.map((p) => [
+            p?.nombre || "-",
+            p?.cantidad || 0,
+            formatTotal(p?.precioUnitario || 0),
+            formatTotal((p?.cantidad || 0) * (p?.precioUnitario || 0)),
+          ])
+        : [["Sin productos", "", "", ""]];
+
+    autoTable(doc, {
+      startY: 115,
+      head: tableHeaders,
+      body: tableBody,
+      theme: "grid",
+      headStyles: { fillColor: "#10567E", textColor: 255, halign: "center" },
+      columnStyles: {
+        0: { halign: "left" },
+        1: { halign: "right" },
+        2: { halign: "right" },
+        3: { halign: "right" },
+      },
+    });
+
+    // Calcular totales para el PDF, incluyendo el descuento
+    const currentTableBottomY = doc.lastAutoTable.finalY;
+    let currentY = currentTableBottomY + 10;
+    const startX = pageWidth - 84;
+
+    const totalBruto = orden.productos.reduce(
+      (acc, curr) => acc + (curr.cantidad || 0) * (curr.precioUnitario || 0),
+      0
+    );
+    const netoOrden = totalBruto / 1.19;
+    const iva = totalBruto - netoOrden;
+    const descuentoPorcentaje =
+      typeof orden.descuento === "number" ? orden.descuento : 0;
+    const descuentoMonto = totalBruto * (descuentoPorcentaje / 100);
+    const totalAPagarConDescuento = totalBruto - descuentoMonto;
+
+    const drawTotalRow = (y, label, value, isTotal = false) => {
+      const boxX = startX;
+      const boxWidth = 60;
+      doc.rect(boxX, y, boxWidth, 7);
+      doc.text(label, boxX - 2, y + 5, { align: "right" });
+
+      if (isTotal) {
+        doc.setFillColor(200, 200, 200);
+        doc.rect(boxX, y, boxWidth, 7, "F");
+        doc.setFont("helvetica", "bold");
+      }
+
+      const currencyText = formatTotal(typeof value === "number" ? value : 0);
+      const symbol = currencyText.charAt(0);
+      const numberText = currencyText.substring(1).trim();
+
+      doc.text(symbol, boxX + 2, y + 5);
+      doc.text(numberText, boxX + boxWidth - 2, y + 5, { align: "right" });
+
+      doc.setFont("helvetica", "normal");
+    };
+
+    drawTotalRow(currentY, "NETO", netoOrden);
+    currentY += 7;
+    drawTotalRow(currentY, "IVA 19%", iva);
+    currentY += 7;
+    // Agregar fila de Descuento si aplica
+    if (descuentoMonto > 0) {
+      drawTotalRow(
+        currentY,
+        `Descuento (${descuentoPorcentaje}%)`,
+        -descuentoMonto
+      ); // Muestra el descuento como negativo
+      currentY += 7;
+    }
+    drawTotalRow(currentY, "TOTAL", totalAPagarConDescuento, true); // Usar el total con descuento
+
+    doc.save(`orden-${orden.id || "sin-id"}.pdf`);
+  };
+
   const handleDelete = async (id) => {
     if (!window.confirm("¿Eliminar orden de compra?")) return;
     try {
@@ -232,7 +410,7 @@ export const OrdenCompraList = () => {
     let dataForModal;
     if (mode === "new") {
       const baseData = {
-        nombre: "", // Campo de nombre (empresa/contacto)
+        nombre: "",
         telefono: "",
         email: "",
         direccion: "",
@@ -256,20 +434,47 @@ export const OrdenCompraList = () => {
         ...orden,
         email: orden.email || "",
         direccion: orden.direccion || "",
-        nombre: orden.nombre || "", // Asegura que el nombre exista
+        nombre: orden.nombre || "",
       };
+      // --- CORRECCIÓN: Normaliza productos ---
+      if (!Array.isArray(ordenCorregida.productos)) {
+        // Si es string, conviértelo a array de objetos
+        let items = [];
+        if (typeof ordenCorregida.productos === "string") {
+          items = ordenCorregida.productos.includes(",")
+            ? ordenCorregida.productos.split(",")
+            : [ordenCorregida.productos];
+        }
+        ordenCorregida.productos = items.map((item) => {
+          // Ejemplo: "madera * 2 : $3000"
+          const match = item.match(/^(.*?)\s*\*\s*(\d+)\s*:\s*\$(\d+)/);
+          if (!match)
+            return { nombre: item.trim(), cantidad: "", precioUnitario: "" };
+          const [, nombre, cantidad, precioUnitario] = match;
+          return {
+            nombre: nombre.trim(),
+            cantidad: cantidad || "",
+            precioUnitario: precioUnitario || "",
+          };
+        });
+      } else {
+        // Si ya es array, asegúrate de que todos los campos sean string o número válidos
+        ordenCorregida.productos = ordenCorregida.productos.map((prod) => ({
+          nombre: prod.nombre || "",
+          cantidad: prod.cantidad || "",
+          precioUnitario: prod.precioUnitario || "",
+        }));
+      }
       // Extrae el código de país si existe en el teléfono
       const telefonoCompleto = ordenCorregida.telefono || "";
-      let foundPrefix = "+56"; // Default to Chile if no prefix found or not in map
-
-      // Find the longest matching prefix
+      let foundPrefix = "+56";
       const prefixes = Object.keys(phonePrefixes).sort(
         (a, b) => b.length - a.length
       );
       for (let prefix of prefixes) {
         if (telefonoCompleto.startsWith(prefix)) {
           foundPrefix = prefix;
-          ordenCorregida.telefono = telefonoCompleto.substring(prefix.length); // Guarda solo el número local
+          ordenCorregida.telefono = telefonoCompleto.substring(prefix.length);
           break;
         }
       }
@@ -290,15 +495,76 @@ export const OrdenCompraList = () => {
 
   const handleEditChange = (e) => {
     const { name, value } = e.target;
-    setSelectedOrden((prev) => ({ ...prev, [name]: value }));
+    let newValue = value;
+    if (name === "descuento") {
+      newValue = parseFloat(value) || 0;
+    }
+    let productos = selectedOrden.productos || [];
+    let totalConIva = productos.reduce(
+      (acc, curr) => acc + (curr.cantidad || 0) * (curr.precioUnitario || 0),
+      0
+    );
+    let totalSinIva = totalConIva / 1.19;
+    let descuento =
+      name === "descuento" ? newValue : selectedOrden.descuento || 0;
+    let totalAPagar = totalConIva * (1 - descuento / 100);
+
+    setSelectedOrden((prev) => ({
+      ...prev,
+      [name]: newValue,
+      totalConIva,
+      totalSinIva,
+      totalAPagar,
+    }));
+  };
+
+  const handleSave = async () => {
+    try {
+      const token = localStorage.getItem("jwtToken");
+      const url =
+        modalMode === "new"
+          ? `${BASE_URL}/api/ordenes-compra`
+          : `${BASE_URL}/api/ordenes-compra/${selectedOrden.id}`;
+      const method = modalMode === "new" ? "POST" : "PUT";
+      const res = await fetch(url, {
+        method,
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
+        },
+        body: JSON.stringify(selectedOrden),
+      });
+      if (res.ok) {
+        await fetchOrdenes();
+        handleCloseModal();
+      }
+    } catch (err) {
+      console.error("Error al guardar orden:", err);
+    }
   };
 
   const handleProductChange = (index, event) => {
     const { name, value } = event.target;
     const list = [...selectedOrden.productos];
-    const parsedValue = name === "nombre" ? value : parseFloat(value) || 0;
-    list[index][name] = parsedValue;
-    setSelectedOrden((prev) => ({ ...prev, productos: list }));
+    // Si es cantidad o precioUnitario, convierte a número
+    list[index][name] = name === "nombre" ? value : parseFloat(value) || 0;
+
+    // Calcula totales dinámicamente
+    const totalConIva = list.reduce(
+      (acc, curr) => acc + (curr.cantidad || 0) * (curr.precioUnitario || 0),
+      0
+    );
+    const totalSinIva = totalConIva / 1.19;
+    const descuento = selectedOrden.descuento || 0;
+    const totalAPagar = totalConIva * (1 - descuento / 100);
+
+    setSelectedOrden((prev) => ({
+      ...prev,
+      productos: list,
+      totalConIva,
+      totalSinIva,
+      totalAPagar,
+    }));
   };
 
   const handleRemoveProduct = (index) => {
@@ -504,240 +770,22 @@ export const OrdenCompraList = () => {
     handlePhonePrefixClose();
   };
 
-  const validate = (orden) => {
-    const tempErrors = {};
-    const rutRegex = /^\d{7,8}-[\dkK]$/; // Regex para RUT sin puntos, solo con guion
-    const mailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-
-    // Validación del teléfono: se valida el número completo con el prefijo
-    const telefonoCompleto = selectedOrden.telefono
-      ? `${codigoPais}${selectedOrden.telefono}`
-      : "";
-    // Una regex más general para números de teléfono con prefijo internacional
-    // Permitir números de 6 a 14 dígitos después del prefijo
-    const telefonoRegex = /^\+\d{1,4}\d{6,14}$/;
-
-    if (orden.rutCliente && !rutRegex.test(orden.rutCliente)) {
-      tempErrors.rutCliente = "Formato incorrecto. Ej: 12345678-9";
-    }
-    if (orden.rutProveedor && !rutRegex.test(orden.rutProveedor)) {
-      tempErrors.rutProveedor = "Formato incorrecto. Ej: 12345678-9";
-    }
-    if (orden.email && !mailRegex.test(orden.email)) {
-      tempErrors.email = "El formato del correo es inválido.";
-    }
-    // Solo validar si el campo de teléfono no está vacío, para permitir campos opcionales
-    if (selectedOrden.telefono && !telefonoRegex.test(telefonoCompleto)) {
-      tempErrors.telefono = "Formato de teléfono incorrecto. Ej: +56912345678";
-    }
-
-    setErrors(tempErrors);
-    return Object.keys(tempErrors).length === 0;
-  };
-
-  const generarPDFOrden = (orden) => {
-    const doc = new jsPDF();
-    const pageWidth = doc.internal.pageSize.width;
-
-    // --- Logo ---
-    try {
-      doc.addImage(logoDimade, "PNG", 14, 12, 25, 25);
-    } catch (err) {
-      console.error("Error cargando logo:", err);
-      doc.setFontSize(12);
-      doc.text("[Logo]", 14, 20);
-    }
-
-    // --- Empresa info ---
-    doc.setFontSize(8);
-    doc.text("Rut: 16.458.963-4", 14, 40);
-    doc.text("Dirección: Dirección Dimade 35", 14, 45);
-    doc.text("Teléfono: +56-9-6523-7854", 14, 50);
-    doc.text("Correo: correo@dimade.cl", 14, 55);
-    doc.text("Sitio Web: www.dimade.cl", 14, 60);
-
-    // --- Título principal ---
-    doc.setFontSize(16);
-    doc.setFont("helvetica", "bold");
-    doc.text("ORDEN DE COMPRA", pageWidth - 14, 20, { align: "right" });
-
-    // --- Fecha y número OC ---
-    doc.setFontSize(10);
-    const fechaY = 30;
-    doc.text("Fecha", pageWidth - 64, fechaY);
-    doc.rect(pageWidth - 64, fechaY + 2, 50, 8);
-    doc.text(formatFecha(orden.fechaOrden), pageWidth - 39, fechaY + 7, {
-      align: "center",
-    });
-
-    const ordenY = fechaY + 14;
-    doc.text("Número de Orden de Compra", pageWidth - 64, ordenY);
-    doc.rect(pageWidth - 64, ordenY + 2, 50, 8);
-    doc.text(orden.id || "N/A", pageWidth - 39, ordenY + 7, {
-      align: "center",
-    });
-
-    // --- Datos cliente/proveedor ---
-    let infoY = 75;
-    doc.setFontSize(10);
-    doc.setFont("helvetica", "bold");
-    doc.text("SEÑORES:", 14, infoY);
-
-    doc.setFont("helvetica", "normal");
-    infoY += 7;
-    doc.text(orden.nombreEmpresa || "[Nombre de empresa]", 16, infoY);
-    infoY += 5;
-    doc.text(orden.contacto || "[Contacto o Departamento]", 16, infoY);
-    infoY += 5;
-    doc.text(orden.direccion || "[Dirección]", 16, infoY);
-    infoY += 5;
-    doc.text(`Rut: ${orden.rutCliente || "N/A"}`, 16, infoY);
-    infoY += 5;
-    doc.text(`Teléfono: ${orden.telefono || "-"}`, 16, infoY);
-    infoY += 5;
-    doc.text(`Correo: ${orden.mail || "-"}`, 16, infoY);
-
-    // --- Tabla productos ---
-    const productos = (orden.productos || "").split(",").map((item) => {
-      const match = item.match(/^(.*?)\s*\*\s*(\d+)\s*:\s*\$(\d+)/);
-      if (!match) return ["-", "-", "-"];
-      const [_, nombre, cantidad, total] = match;
-      return [nombre.trim(), cantidad, `$${total}`];
-    });
-
-    autoTable(doc, {
-      startY: 120,
-      head: [["DETALLE", "CANTIDAD", "TOTAL"]],
-      body: productos.length ? productos : [["Sin productos", "", ""]],
-      theme: "grid",
-      headStyles: { fillColor: "#10567E", textColor: 255, halign: "center" },
-      columnStyles: {
-        0: { halign: "left" },
-        1: { halign: "right" },
-        2: { halign: "right" },
-      },
-    });
-
-    // --- Totales ---
-    const finalY = doc.lastAutoTable.finalY + 10;
-
-    const modificador = parseFloat(orden.modificador) || 0; // % de descuento
-    const ivaPorcentaje = parseFloat(orden.iva) || 0;
-    const subtotal = parseFloat(orden.total) || 0; // Subtotal = bruto
-
-    // 1. IVA
-    const iva = subtotal * (ivaPorcentaje / 100);
-
-    // 2. NETO
-    const neto = subtotal - iva;
-
-    // 3. DESCUENTO
-    const descuento = subtotal * (modificador / 100);
-
-    // 4. TOTAL FINAL
-    const totalFinal = subtotal - descuento;
-
-    // --- Redondeo limpio para PDF ---
-    const round = (n) => Math.round(n);
-
-    // --- Fila de totales ---
-    const drawBoxRow = (y, label, value, isTotal = false) => {
-      const boxX = pageWidth - 80;
-      const boxWidth = 60;
-      doc.setFont("helvetica", isTotal ? "bold" : "normal");
-      if (isTotal) {
-        doc.setFillColor(220);
-        doc.rect(boxX, y, boxWidth, 7, "F");
-      } else {
-        doc.rect(boxX, y, boxWidth, 7);
-      }
-      doc.text(label, boxX - 2, y + 5, { align: "right" });
-      const monto = formatTotal(round(value));
-      doc.text("$", boxX + 2, y + 5);
-      doc.text(monto.replace("$", ""), boxX + boxWidth - 2, y + 5, {
-        align: "right",
-      });
-    };
-
-    // --- Impresión final en el PDF ---
-    let currentY = finalY;
-    drawBoxRow(currentY, "NETO", neto);
-    currentY += 7;
-    drawBoxRow(currentY, `IVA ${ivaPorcentaje}%`, iva);
-    currentY += 7;
-    drawBoxRow(currentY, "SUBTOTAL", subtotal);
-    currentY += 7;
-    drawBoxRow(currentY, `DESCUENTO (${modificador}%)`, descuento);
-    currentY += 7;
-    drawBoxRow(currentY, "TOTAL", totalFinal, true);
-
-    doc.save(`orden-${orden.id || "sin-id"}.pdf`);
-  };
-
-  const handleSave = async () => {
-    // Concatena el código de país con el número antes de guardar
-    const telefonoFinal = selectedOrden.telefono
-      ? `${codigoPais}${selectedOrden.telefono}`
-      : "";
-    const ordenToSave = { ...selectedOrden, telefono: telefonoFinal };
-
-    if (!validate(ordenToSave)) {
-      // Valida con el número completo
-      setSnackbarMessage("Por favor, corrige los errores en el formulario.");
-      setSnackbarSeverity("error");
-      setSnackbarOpen(true);
-      return;
-    }
-
-    try {
-      const payload = { ...ordenToSave, total: selectedOrden.totalAPagar }; // Usa ordenToSave aquí
-      const token = localStorage.getItem("jwtToken");
-      const url =
-        modalMode === "new"
-          ? `${BASE_URL}/api/ordenes-compra`
-          : `${BASE_URL}/api/ordenes-compra/${selectedOrden.id}`;
-      const method = modalMode === "new" ? "POST" : "PUT";
-
-      const res = await fetch(url, {
-        method,
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${token}`,
-        },
-        body: JSON.stringify(payload),
-      });
-
-      if (res.ok) {
-        await fetchOrdenes();
-        handleCloseModal();
-        setSnackbarMessage(
-          `Orden ${modalMode === "new" ? "creada" : "actualizada"} con éxito.`
-        );
-        setSnackbarSeverity("success");
-        setSnackbarOpen(true);
-      } else {
-        setSnackbarMessage("Hubo un error al guardar la orden.");
-        setSnackbarSeverity("error");
-        setSnackbarOpen(true);
-        console.error(
-          "Error al guardar la orden:",
-          res.status,
-          await res.text()
-        );
-      }
-    } catch (err) {
-      setSnackbarMessage("Error de conexión al guardar la orden.");
-      setSnackbarSeverity("error");
-      setSnackbarOpen(true);
-      console.error("Error en la función handleSave:", err);
-    }
-  };
-
   const handleSnackbarClose = (event, reason) => {
-    if (reason === "clickaway") {
-      return;
-    }
+    if (reason === "clickaway") return;
     setSnackbarOpen(false);
+  };
+
+  const getEstadoColor = (estado) => {
+    switch (estado) {
+      case "Pendiente":
+        return "warning";
+      case "Aprobada":
+        return "success";
+      case "Rechazada":
+        return "error";
+      default:
+        return "default";
+    }
   };
 
   const renderActions = (orden) => (
@@ -754,31 +802,7 @@ export const OrdenCompraList = () => {
       </Tooltip>
       <Tooltip title="Eliminar">
         <IconButton onClick={() => handleDelete(orden.id)}>
-          <DeleteIcon color="error" />
-        </IconButton>
-      </Tooltip>
-      <Tooltip title="Subir PDF">
-        <IconButton component="label">
-          <input
-            type="file"
-            hidden
-            accept="application/pdf"
-            onChange={(e) => {
-              const file = e.target.files[0];
-              if (file) handleUpload(file, orden.id);
-            }}
-          />
-          <UploadFileIcon sx={{ color: "#4caf50" }} />
-        </IconButton>
-      </Tooltip>
-      <Tooltip title="Descargar PDF">
-        <IconButton onClick={() => handleDownload(orden.pdfId)}>
-          <PictureAsPdfIcon sx={{ color: "#0288d1" }} />
-        </IconButton>
-      </Tooltip>
-      <Tooltip title="Generar PDF desde datos">
-        <IconButton onClick={() => generarPDFOrden(orden)}>
-          <DescriptionIcon sx={{ color: "#7b1fa2" }} />
+          <DeleteIcon sx={{ color: "#d32f2f" }} />
         </IconButton>
       </Tooltip>
       <Tooltip title="Subir PDF">
@@ -808,17 +832,66 @@ export const OrdenCompraList = () => {
     </Box>
   );
 
-  const getEstadoColor = (estado) => {
-    switch (estado) {
-      case "Aprobada":
-        return "success";
-      case "Pendiente":
-        return "warning";
-      case "Rechazada":
-        return "error";
-      default:
-        return "default";
+  const validate = (orden) => {
+    const tempErrors = {};
+    const mailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    const telefonoCompleto = selectedOrden.telefono
+      ? `${codigoPais}${selectedOrden.telefono}`
+      : "";
+    const telefonoRegex = /^\+\d{1,4}\d{6,14}$/;
+
+    // Elimina la validación de RUT:
+    // if (orden.rutCliente && !rutRegex.test(orden.rutCliente)) {
+    //   tempErrors.rutCliente = "RUT Cliente: Formato incorrecto. Ej: 12345678-9";
+    // }
+    // if (orden.rutProveedor && !rutRegex.test(orden.rutProveedor)) {
+    //   tempErrors.rutProveedor =
+    //     "RUT Proveedor: Formato incorrecto. Ej: 12345678-9";
+    // }
+
+    if (orden.email && !mailRegex.test(orden.email)) {
+      tempErrors.email = "Email: El formato del correo es inválido.";
     }
+    if (selectedOrden.telefono && !telefonoRegex.test(telefonoCompleto)) {
+      tempErrors.telefono = "Teléfono: Formato incorrecto. Ej: +56912345678";
+    }
+
+    // Validación de productos
+    if (!orden.productos || !orden.productos.length) {
+      tempErrors.productos = "Debe agregar al menos un producto.";
+    } else {
+      orden.productos.forEach((prod, idx) => {
+        if (!prod.nombre || prod.nombre.trim() === "") {
+          tempErrors[`producto_nombre_${idx}`] = `Producto ${
+            idx + 1
+          }: El nombre es obligatorio.`;
+        }
+        if (
+          !prod.cantidad ||
+          isNaN(prod.cantidad) ||
+          Number(prod.cantidad) <= 0
+        ) {
+          tempErrors[`producto_cantidad_${idx}`] = `Producto ${
+            idx + 1
+          }: Cantidad debe ser mayor a 0.`;
+        }
+        if (
+          !prod.precioUnitario ||
+          isNaN(prod.precioUnitario) ||
+          Number(prod.precioUnitario) <= 0
+        ) {
+          tempErrors[`producto_precio_${idx}`] = `Producto ${
+            idx + 1
+          }: Precio debe ser mayor a 0.`;
+        }
+      });
+    }
+
+    setErrors(tempErrors);
+
+    // Devuelve el primer mensaje de error, o null si no hay errores
+    const firstError = Object.values(tempErrors)[0] || null;
+    return firstError;
   };
 
   const modalStyle = {
@@ -838,7 +911,7 @@ export const OrdenCompraList = () => {
   // Actualización: Añadida columna para el nombre del solicitante
   const tableColumns = [
     { id: "id", label: "ID" },
-    { id: "nombre", label: "Nombre Solicitante" }, // Nueva columna para el nombre
+    { id: "nombre", label: "Nombre" }, // <-- Cambia a "nombre"
     { id: "tipo", label: "Tipo" },
     { id: "rut", label: "RUT" },
     { id: "email", label: "Email" },
@@ -846,6 +919,9 @@ export const OrdenCompraList = () => {
     { id: "estado", label: "Estado" },
     { id: "totalAPagar", label: "Total" },
   ];
+
+  // Justo antes del return principal:
+  const isEditable = modalMode === "edit" || modalMode === "new";
 
   return (
     <Box>
@@ -978,7 +1054,8 @@ export const OrdenCompraList = () => {
                 </strong>
               </Typography>
               <Typography variant="body2" color="text.secondary">
-                Nombre Solicitante: <strong>{orden.nombre || "N/A"}</strong>
+                Nombre Solicitante:{" "}
+                <strong>{orden.nombreSolicitante || "N/A"}</strong>
               </Typography>
               <Typography variant="body2" color="text.secondary">
                 Email: <strong>{orden.email || "N/A"}</strong>
@@ -1039,6 +1116,8 @@ export const OrdenCompraList = () => {
                         orden.tipo === "Proveedor"
                           ? orden.rutProveedor
                           : orden.rutCliente;
+                    } else if (column.id === "nombre") {
+                      value = orden.nombre || orden.nombreSolicitante || ""; // <-- Muestra correctamente el nombre
                     } else {
                       value = orden[column.id];
                     }
@@ -1092,173 +1171,179 @@ export const OrdenCompraList = () => {
 
           {selectedOrden && (
             <>
-              {(() => {
-                const isReadOnly = modalMode === "view";
-                return (
-                  <Box>
-                    {selectedOrden.tipo === "Cliente" && (
-                      <TextField
-                        label="RUT Cliente"
-                        name="rutCliente"
-                        fullWidth
-                        margin="dense"
-                        value={selectedOrden.rutCliente || ""}
-                        onChange={handleEditChange}
-                        error={!!errors.rutCliente}
-                        helperText={errors.rutCliente}
-                        InputProps={{ readOnly: isReadOnly }}
-                      />
-                    )}
-                    {selectedOrden.tipo === "Proveedor" && (
-                      <TextField
-                        label="RUT Proveedor"
-                        name="rutProveedor"
-                        fullWidth
-                        margin="dense"
-                        value={selectedOrden.rutProveedor || ""}
-                        onChange={handleEditChange}
-                        error={!!errors.rutProveedor}
-                        helperText={errors.rutProveedor}
-                        InputProps={{ readOnly: isReadOnly }}
-                      />
-                    )}
-                    {/* Campo para Nombre de Empresa / Contacto */}
-                    <TextField
-                      label="Nombre de Empresa / Contacto"
-                      name="nombre"
-                      fullWidth
-                      margin="dense"
-                      value={selectedOrden.nombre || ""}
-                      onChange={handleEditChange}
-                      InputProps={{ readOnly: isReadOnly }}
-                    />
-                    <TextField
-                      label="Email"
-                      name="email"
-                      type="email"
-                      fullWidth
-                      margin="dense"
-                      value={selectedOrden.email || ""}
-                      onChange={handleEditChange}
-                      error={!!errors.email}
-                      helperText={errors.email}
-                      InputProps={{ readOnly: isReadOnly }}
-                    />
-                    {/* Campo de Teléfono con Adornment para el prefijo */}
-                    <TextField
-                      label="Teléfono"
-                      name="telefono"
-                      fullWidth
-                      margin="dense"
-                      value={selectedOrden.telefono || ""}
-                      onChange={handleEditChange}
-                      error={!!errors.telefono}
-                      helperText={errors.telefono}
-                      InputProps={{
-                        readOnly: isReadOnly,
-                        startAdornment: (
-                          <InputAdornment position="start">
-                            <Button
-                              onClick={handlePhonePrefixClick}
-                              disabled={isReadOnly}
-                              sx={{
-                                minWidth: 0,
-                                padding: "4px 8px",
-                                textTransform: "none",
-                                color: "inherit",
-                              }}
-                            >
-                              {codigoPais}
-                            </Button>
-                            <Menu
-                              anchorEl={anchorElPhonePrefix}
-                              open={Boolean(anchorElPhonePrefix)}
-                              onClose={handlePhonePrefixClose}
-                              PaperProps={{
-                                style: {
-                                  maxHeight: 200, // Altura máxima para hacer scroll
-                                  width: "20ch", // Ancho del menú
-                                },
-                              }}
-                            >
-                              {Object.entries(phonePrefixes).map(
-                                ([prefix, countryName]) => (
-                                  <MenuItem
-                                    key={prefix}
-                                    onClick={() =>
-                                      handleSelectPhonePrefix(prefix)
-                                    }
-                                  >
-                                    {countryName} ({prefix})
-                                  </MenuItem>
-                                )
-                              )}
-                            </Menu>
-                          </InputAdornment>
-                        ),
-                      }}
-                    />
-                    {/* Campo de Dirección */}
-                    <TextField
-                      label="Dirección"
-                      name="direccion"
-                      fullWidth
-                      margin="dense"
-                      value={selectedOrden.direccion || ""}
-                      onChange={handleEditChange}
-                      InputProps={{ readOnly: isReadOnly }}
-                    />
-                    <TextField
-                      label="Fecha de Orden"
-                      name="fechaOrden"
-                      fullWidth
-                      margin="dense"
-                      type="datetime-local"
-                      value={
-                        selectedOrden.fechaOrden
-                          ? new Date(selectedOrden.fechaOrden)
-                              .toISOString()
-                              .slice(0, 16)
-                          : ""
-                      }
-                      onChange={handleEditChange}
-                      InputProps={{ readOnly: isReadOnly }}
-                      InputLabelProps={{ shrink: true }}
-                    />
-                    <TextField
-                      label="Estado"
-                      name="estado"
-                      select
-                      fullWidth
-                      margin="dense"
-                      value={selectedOrden.estado}
-                      onChange={handleEditChange}
-                      InputProps={{ readOnly: isReadOnly }}
-                    >
-                      {["Pendiente", "Aprobada", "Rechazada"].map((opt) => (
-                        <MenuItem key={opt} value={opt}>
-                          {opt}
-                        </MenuItem>
-                      ))}
-                    </TextField>
-                    <TextField
-                      label="Descuento"
-                      name="descuento"
-                      type="number"
-                      fullWidth
-                      margin="dense"
-                      value={selectedOrden.descuento || ""}
-                      onChange={handleEditChange}
-                      InputProps={{
-                        readOnly: isReadOnly,
-                        endAdornment: (
-                          <InputAdornment position="end">%</InputAdornment>
-                        ),
-                      }}
-                    />
-                  </Box>
-                );
-              })()}
+              <Box>
+                {selectedOrden.tipo === "Cliente" && (
+                  <TextField
+                    label="RUT Cliente"
+                    name="rutCliente"
+                    fullWidth
+                    margin="dense"
+                    value={selectedOrden.rutCliente || ""}
+                    onChange={handleEditChange}
+                    error={!!errors.rutCliente}
+                    helperText={errors.rutCliente}
+                    disabled={!isEditable}
+                  />
+                )}
+                {selectedOrden.tipo === "Proveedor" && (
+                  <TextField
+                    label="RUT Proveedor"
+                    name="rutProveedor"
+                    fullWidth
+                    margin="dense"
+                    value={selectedOrden.rutProveedor || ""}
+                    onChange={handleEditChange}
+                    error={!!errors.rutProveedor}
+                    helperText={errors.rutProveedor}
+                    disabled={!isEditable}
+                  />
+                )}
+                <TextField
+                  label="Nombre de Empresa / Contacto"
+                  name="nombre"
+                  fullWidth
+                  margin="dense"
+                  value={selectedOrden.nombre || ""}
+                  onChange={handleEditChange}
+                  disabled={!isEditable}
+                />
+                <TextField
+                  label="Email"
+                  name="email"
+                  type="email"
+                  fullWidth
+                  margin="dense"
+                  value={selectedOrden.email || ""}
+                  onChange={handleEditChange}
+                  error={!!errors.email}
+                  helperText={errors.email}
+                  disabled={!isEditable}
+                />
+                <TextField
+                  label="Teléfono"
+                  name="telefono"
+                  fullWidth
+                  margin="dense"
+                  value={selectedOrden.telefono || ""}
+                  onChange={handleEditChange}
+                  error={!!errors.telefono}
+                  helperText={errors.telefono}
+                  InputProps={{
+                    startAdornment: (
+                      <InputAdornment position="start">
+                        <Button
+                          onClick={handlePhonePrefixClick}
+                          disabled={!isEditable}
+                          sx={{
+                            minWidth: 0,
+                            padding: "4px 8px",
+                            textTransform: "none",
+                            color: "inherit",
+                          }}
+                        >
+                          {codigoPais}
+                        </Button>
+                        <Menu
+                          anchorEl={anchorElPhonePrefix}
+                          open={Boolean(anchorElPhonePrefix)}
+                          onClose={handlePhonePrefixClose}
+                          PaperProps={{
+                            style: {
+                              maxHeight: 200,
+                              width: "20ch",
+                            },
+                          }}
+                        >
+                          {Object.entries(phonePrefixes).map(
+                            ([prefix, countryName]) => (
+                              <MenuItem
+                                key={prefix}
+                                onClick={() => handleSelectPhonePrefix(prefix)}
+                              >
+                                {countryName} ({prefix})
+                              </MenuItem>
+                            )
+                          )}
+                        </Menu>
+                      </InputAdornment>
+                    ),
+                    readOnly: !isEditable,
+                  }}
+                  disabled={!isEditable}
+                />
+                <TextField
+                  label="Dirección"
+                  name="direccion"
+                  fullWidth
+                  margin="dense"
+                  value={selectedOrden.direccion || ""}
+                  onChange={handleEditChange}
+                  disabled={!isEditable}
+                />
+                <TextField
+                  label="Fecha de Orden"
+                  name="fechaOrden"
+                  fullWidth
+                  margin="dense"
+                  type="datetime-local"
+                  value={
+                    selectedOrden.fechaOrden
+                      ? new Date(selectedOrden.fechaOrden)
+                          .toISOString()
+                          .slice(0, 16)
+                      : ""
+                  }
+                  onChange={handleEditChange}
+                  InputLabelProps={{ shrink: true }}
+                  disabled={!isEditable}
+                />
+                <TextField
+                  label="Estado"
+                  name="estado"
+                  select
+                  fullWidth
+                  margin="dense"
+                  value={selectedOrden.estado}
+                  onChange={handleEditChange}
+                  disabled={!isEditable}
+                >
+                  {["Pendiente", "Aprobada", "Rechazada"].map((opt) => (
+                    <MenuItem key={opt} value={opt}>
+                      {opt}
+                    </MenuItem>
+                  ))}
+                </TextField>
+                <TextField
+                  label="Descuento"
+                  name="descuento"
+                  type="number"
+                  fullWidth
+                  margin="dense"
+                  value={selectedOrden.descuento || ""}
+                  onChange={handleEditChange}
+                  InputProps={{
+                    endAdornment: (
+                      <InputAdornment position="end">%</InputAdornment>
+                    ),
+                    readOnly: !isEditable,
+                  }}
+                  disabled={!isEditable}
+                />
+                {isEditable && (
+                  <TextField
+                    select
+                    label="Tipo de Orden"
+                    name="tipo"
+                    value={selectedOrden.tipo || ""}
+                    onChange={handleEditChange}
+                    fullWidth
+                    margin="dense"
+                  >
+                    <MenuItem value="Cliente">Cliente</MenuItem>
+                    <MenuItem value="Proveedor">Proveedor</MenuItem>
+                  </TextField>
+                )}
+              </Box>
 
               <Typography variant="subtitle1" mt={2} mb={1}>
                 Productos
@@ -1307,7 +1392,7 @@ export const OrdenCompraList = () => {
                     <Tooltip title="Eliminar Producto">
                       <IconButton
                         onClick={() => handleRemoveProduct(index)}
-                        sx={{ color: "#f57c00" }} // Color naranja para el ícono
+                        sx={{ color: "#f57c00" }}
                       >
                         <DeleteIcon />
                       </IconButton>
@@ -1335,10 +1420,11 @@ export const OrdenCompraList = () => {
                 margin="dense"
                 value={selectedOrden.detalle || ""}
                 onChange={handleEditChange}
-                InputProps={{ readOnly: modalMode === "view" }}
+                InputProps={{ readOnly: !isEditable }}
                 multiline
                 rows={3}
                 sx={{ mt: 3 }}
+                disabled={!isEditable}
               />
 
               <Box display="flex" gap={2} mt={2}>
@@ -1362,7 +1448,7 @@ export const OrdenCompraList = () => {
                 />
               </Box>
 
-              {modalMode !== "view" && (
+              {isEditable && (
                 <Box sx={{ mt: 3, textAlign: "right" }}>
                   <Button variant="contained" onClick={handleSave}>
                     Guardar
@@ -1390,3 +1476,4 @@ export const OrdenCompraList = () => {
     </Box>
   );
 };
+export default OrdenCompraList;
