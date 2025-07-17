@@ -13,7 +13,6 @@ import {
 import AddCircleOutlineIcon from "@mui/icons-material/AddCircleOutline";
 import DeleteOutlineIcon from "@mui/icons-material/DeleteOutline";
 
-import ModalCubitaje from "./ModalCubicador";
 import BASE_URL from "../config/apiConfig";
 
 const CotizaForm = () => {
@@ -24,7 +23,7 @@ const CotizaForm = () => {
     telefono: "",
 
     direccion: "",
-    productosSolicitados: [{ detalle: "", cantidad: "" }], // <--- SIN precioUnitario aquí
+    productos: [{ detalle: "", cantidad: "", valor: 0 }],
 
     mensaje: "",
     tipo: "Cliente",
@@ -42,17 +41,16 @@ const CotizaForm = () => {
 
   const handleProductChange = (index, e) => {
     const { name, value } = e.target;
-    const newProducts = [...formData.productosSolicitados];
+    const newProducts = [...formData.productos];
     // Solo 'cantidad' se convierte a número
     newProducts[index][name] =
       name === "cantidad" ? parseInt(value) || "" : value;
-    setFormData((prev) => ({ ...prev, productosSolicitados: newProducts }));
+    setFormData((prev) => ({ ...prev, productos: newProducts }));
   };
 
   const handleBlur = (e) => {
     setTouched((prev) => ({ ...prev, [e.target.name]: true }));
   };
-
 
   const handleProductBlur = (index, fieldName) => {
     setTouched((prev) => ({
@@ -61,31 +59,27 @@ const CotizaForm = () => {
     }));
   };
 
-
   const isEmpty = (field) =>
     (touched[field] || submitAttempted) && !formData[field];
 
   const isProductFieldEmpty = (index, fieldName) =>
     (touched[`producto-${index}-${fieldName}`] || submitAttempted) &&
-    (formData.productosSolicitados[index][fieldName] === "" ||
+    (formData.productos[index][fieldName] === "" ||
       (fieldName === "cantidad" &&
-        parseFloat(formData.productosSolicitados[index].cantidad) <= 0)); // Validar cantidad > 0
+        parseFloat(formData.productos[index].cantidad) <= 0)); // Validar cantidad > 0
 
   const handleAddProduct = () => {
     setFormData((prev) => ({
       ...prev,
       // SIN precioUnitario al agregar nuevo producto
-      productosSolicitados: [
-        ...prev.productosSolicitados,
-        { detalle: "", cantidad: "" },
-      ],
+      productos: [...prev.productos, { detalle: "", cantidad: "", valor: 0 }],
     }));
   };
 
   const handleRemoveProduct = (index) => {
-    const newProducts = [...formData.productosSolicitados];
+    const newProducts = [...formData.productos];
     newProducts.splice(index, 1);
-    setFormData((prev) => ({ ...prev, productosSolicitados: newProducts }));
+    setFormData((prev) => ({ ...prev, productos: newProducts }));
   };
 
   const handleSubmit = async (e) => {
@@ -94,7 +88,7 @@ const CotizaForm = () => {
 
     const camposVacios = Object.keys(formData).filter(
       (campo) =>
-        campo !== "productosSolicitados" &&
+        campo !== "productos" &&
         campo !== "mensaje" &&
         campo !== "tipo" &&
         !formData[campo]
@@ -102,11 +96,10 @@ const CotizaForm = () => {
 
     // Validar que al menos un producto esté especificado y sus campos no estén vacíos
     // SIN validación de precioUnitario aquí
-    const productosVacios = formData.productosSolicitados.some(
+    const productosVacios = formData.productos.some(
       (prod) =>
         !prod.detalle || prod.cantidad === "" || parseFloat(prod.cantidad) <= 0
     );
-
 
     if (camposVacios.length > 0 || productosVacios) {
       setError(
@@ -114,7 +107,6 @@ const CotizaForm = () => {
       );
       return;
     }
-
 
     const payload = {
       rutSolicitante: formData.rut,
@@ -125,7 +117,7 @@ const CotizaForm = () => {
       direccion: formData.direccion,
 
       fechaSolicitud: new Date(),
-      productosSolicitados: formData.productosSolicitados, // Los productos se envían sin precio unitario
+      productos: formData.productos, // Los productos se envían sin precio unitario
       estado: "Pendiente",
       detalle: formData.mensaje,
       tipo: formData.tipo,
@@ -148,7 +140,7 @@ const CotizaForm = () => {
         telefono: "",
 
         direccion: "",
-        productosSolicitados: [{ detalle: "", cantidad: "" }],
+        productos: [{ detalle: "", cantidad: "" }],
 
         mensaje: "",
         tipo: "Cliente",
@@ -222,14 +214,11 @@ const CotizaForm = () => {
           margin="normal"
           name="direccion"
           label="Dirección"
-
           type="text"
-
           value={formData.direccion}
           onChange={handleChange}
           onBlur={handleBlur}
           error={isEmpty("direccion")}
-
           helperText={
             isEmpty("direccion") ? "Debes Ingresar una Dirección." : ""
           }
@@ -240,7 +229,7 @@ const CotizaForm = () => {
         <Typography variant="h5" gutterBottom sx={{ mt: 3, mb: 1 }}>
           Productos
         </Typography>
-        {formData.productosSolicitados.map((product, index) => (
+        {formData.productos.map((product, index) => (
           <Box
             key={index}
             sx={{
@@ -294,7 +283,7 @@ const CotizaForm = () => {
               }}
             />
             {/* <--- ELIMINADO: Campo Precio Unitario */}
-            {formData.productosSolicitados.length > 1 && (
+            {formData.productos.length > 1 && (
               <Tooltip title="Eliminar Producto">
                 <IconButton
                   onClick={() => handleRemoveProduct(index)}
@@ -330,7 +319,6 @@ const CotizaForm = () => {
         >
           AGREGAR PRODUCTO
         </Button>
-
 
         <TextField
           fullWidth

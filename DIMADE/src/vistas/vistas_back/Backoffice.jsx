@@ -10,7 +10,7 @@ import ProveedoresList from "../../componentes/DataList/ProveedoresList";
 import CotizacionesList from "../../componentes/DataList/CotizacionesList";
 import ContactoList from "../../componentes/DataList/ContactoList";
 import RegistrosList from "../../componentes/DataList/RegistrosList";
-import { OrdenCompraList } from "../../componentes/DataList/OrdenCompraList.jsx";
+import OrdenCompraList from "../../componentes/DataList/OrdenCompraList.jsx";
 
 const Backoffice = () => {
   const [selectedSection, setSelectedSection] = useState("clientes");
