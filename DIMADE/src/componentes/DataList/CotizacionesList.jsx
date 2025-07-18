@@ -36,6 +36,7 @@ import {
 } from "@mui/icons-material";
 import BASE_URL from "../../config/apiConfig";
 
+//formato de fecha para que sea bonito
 const formatFecha = (dateString) => {
   if (!dateString) return "N/A";
   return new Date(dateString).toLocaleString("es-CL", {
@@ -45,6 +46,7 @@ const formatFecha = (dateString) => {
   });
 };
 
+//la verdad no se porque esto esta aqui, que yo sepa el CLP no tiene un formato especial, pero bueno
 const formatTotal = (amount) => {
   const numberAmount = typeof amount === "number" ? amount : 0;
   return new Intl.NumberFormat("es-CL", {
@@ -53,6 +55,7 @@ const formatTotal = (amount) => {
   }).format(numberAmount);
 };
 
+//esto esta horrendo, en mi defensa, Pablo Ignacio Trujillo Milan, yo no lo hice, lo hizo bastian, ademas no veo la situacion en que les llegue un numero de Myanmar???
 const phonePrefixes = {
   "+1": "Estados Unidos / Canadá",
   "+7": "Rusia",
@@ -204,51 +207,47 @@ const phonePrefixes = {
   "+690": "Tokelau",
   "+691": "Micronesia",
   "+692": "Islas Marshall",
-  // Agrega más países y sus códigos si es necesario.
 };
 
 const CotizacionesList = () => {
+  //💀
   const [solicitudes, setSolicitudes] = useState([]);
   const [search, setSearch] = useState("");
   const [estadoFiltro, setEstadoFiltro] = useState("todos");
   const [ordenFecha, setOrdenFecha] = useState("recientes");
   const [page, setPage] = useState(0);
   const [rowsPerPage, setRowsPerPage] = useState(10);
-  const [selected, setSelected] = useState(null); // Para el modal de solicitud de cotización
+  const [selected, setSelected] = useState(null);
   const [modalMode, setModalMode] = useState("view");
-  const [openModal, setOpenModal] = useState(false); // Modal de solicitud de cotización
-  const [openOrdenModal, setOpenOrdenModal] = useState(false); // Modal de orden de compra
-  const [ordenData, setOrdenData] = useState(null); // Datos de la orden de compra en el modal
+  const [openModal, setOpenModal] = useState(false);
+  const [openOrdenModal, setOpenOrdenModal] = useState(false);
+  const [ordenData, setOrdenData] = useState(null);
 
-  // Snackbar state
   const [snackbarOpen, setSnackbarOpen] = useState(false);
   const [snackbarSeverity, setSnackbarSeverity] = useState("success");
   const [snackbarMessage, setSnackbarMessage] = useState("");
 
-  // Estado para el tipo de solicitud (Cliente/Proveedor) al crear una NUEVA solicitud de cotización
   const [selectedRequestType, setSelectedRequestType] = useState(null);
 
-  // Estados y manejadores para el menú del botón "Agregar" (solicitud de cotización)
   const [anchorElAddButton, setAnchorElAddButton] = useState(null);
   const openAddMenu = Boolean(anchorElAddButton);
 
-  // Estados y manejadores para el prefijo telefónico en el modal de Orden de Compra
-  const [codigoPais, setCodigoPais] = useState("+56"); // Valor predeterminado para Chile
-  const [anchorElPhonePrefix, setAnchorElPhonePrefix] = useState(null); // Para el menú de prefijos
-  const [errors, setErrors] = useState({}); // Para validación del modal de orden de compra
+  const [codigoPais, setCodigoPais] = useState("+56");
+  const [anchorElPhonePrefix, setAnchorElPhonePrefix] = useState(null);
+  const [errors, setErrors] = useState({});
 
-  // Manejadores para abrir/cerrar el menú "Agregar" (solicitud de cotización)
+  //abre el menu de agregar solicitud
   const handleOpenAddButton = (event) => {
     setAnchorElAddButton(event.currentTarget);
   };
-
+  //cierra el menu de agregar solicitud
   const handleCloseAddMenu = () => {
     setAnchorElAddButton(null);
   };
 
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down("md"));
-
+  //el fetch
   useEffect(() => {
     fetchSolicitudes();
   }, []);
@@ -268,6 +267,7 @@ const CotizacionesList = () => {
     }
   };
 
+  //filtro de datos
   const filtered = useMemo(() => {
     return solicitudes
       .filter((s) => {
@@ -298,6 +298,7 @@ const CotizacionesList = () => {
       });
   }, [solicitudes, search, estadoFiltro, ordenFecha]);
 
+  //funcion para borrar datos
   const handleDelete = async (id) => {
     if (!window.confirm("¿Eliminar solicitud?")) return;
     try {
@@ -318,9 +319,8 @@ const CotizacionesList = () => {
     }
   };
 
-  // Modificación en handleOpenModal (para solicitud de cotización)
+  //funcion para abrir el modal
   const handleOpenModal = (item, mode, type = "Cliente") => {
-    // Al abrir el modal
     let productsForModal;
     if (mode === "new") {
       productsForModal = [{ detalle: "", cantidad: "", precioUnitario: "" }];
@@ -341,9 +341,9 @@ const CotizacionesList = () => {
       direccion: "",
       detalle: "",
       estado: "Pendiente",
-      tipo: type, // Asigna el tipo directamente al crear
-      productos: productsForModal, // <-- CAMBIO AQUÍ
-      fechaSolicitud: new Date().toISOString(), // Añade fecha por defecto
+      tipo: type,
+      productos: productsForModal,
+      fechaSolicitud: new Date().toISOString(),
     };
 
     setSelected(
@@ -351,21 +351,22 @@ const CotizacionesList = () => {
     );
     setModalMode(mode);
     setOpenModal(true);
-    setSelectedRequestType(type); // Guarda el tipo para el título del modal
+    setSelectedRequestType(type);
   };
 
+  //funcion para cerrar el modal
   const handleCloseModal = () => {
     setOpenModal(false);
     setSelected(null);
     setSelectedRequestType(null);
   };
 
-  // handleChange para el modal de solicitud de cotización (selected)
+  //funcion para manejar los cambios en el modal
   const handleChangeSolicitud = (e) => {
     setSelected((prev) => ({ ...prev, [e.target.name]: e.target.value }));
   };
 
-  // handleProductChange para el modal de solicitud de cotización (productosSolicitados)
+  //funcion para manejar los cambios en el listado de productos del modal
   const handleProductChangeSolicitud = (index, e) => {
     const { name, value } = e.target;
     const newProducts = [...(selected.productos || [])];
@@ -376,6 +377,7 @@ const CotizacionesList = () => {
     setSelected((prev) => ({ ...prev, productos: newProducts }));
   };
 
+  //funciones para agregar productos en el modal
   const handleAddProductSolicitud = () => {
     setSelected((prev) => ({
       ...prev,
@@ -386,12 +388,14 @@ const CotizacionesList = () => {
     }));
   };
 
+  //funciones para eliminar productos en el modal
   const handleRemoveProductSolicitud = (index) => {
     const newProducts = [...(selected.productos || [])];
     newProducts.splice(index, 1);
     setSelected((prev) => ({ ...prev, productos: newProducts }));
   };
 
+  //funcion para guardar
   const handleSave = async () => {
     try {
       const token = localStorage.getItem("jwtToken");
@@ -401,14 +405,13 @@ const CotizacionesList = () => {
           : `${BASE_URL}/api/solicitudes-cotizacion/${selected.id}`;
       const method = modalMode === "new" ? "POST" : "PUT";
 
-      // Validar productosSolicitados antes de enviar
       const invalidProducts = selected.productos.some(
         (p) =>
           !p.detalle ||
           p.cantidad === "" ||
           parseFloat(p.cantidad) <= 0 ||
           (modalMode !== "view" &&
-            (p.precioUnitario === "" || parseFloat(p.precioUnitario) <= 0)) // Validar precioUnitario solo si no es vista
+            (p.precioUnitario === "" || parseFloat(p.precioUnitario) <= 0))
       );
 
       if (invalidProducts) {
@@ -428,7 +431,6 @@ const CotizacionesList = () => {
         },
         body: JSON.stringify({
           ...selected,
-          // Al guardar la solicitud, se envía detalle, cantidad y precioUnitario
           productos: selected.productos.map((p) => ({
             detalle: p.detalle,
             cantidad: parseFloat(p.cantidad),
@@ -450,12 +452,11 @@ const CotizacionesList = () => {
     }
   };
 
-  // --- LÓGICA DEL MODAL DE ORDEN DE COMPRA ---
+  //funcion para crear orden de compra, esto toma los datos de la tabla y los prepara para crear una orden de compra
   const handleCrearOrden = (item) => {
-    // Usar productos guardados en el objeto (item.productos)
     const productsForOrder = Array.isArray(item.productos)
       ? item.productos.map((prod) => ({
-          nombre: prod.detalle || prod.nombre || "", // usa detalle o nombre
+          nombre: prod.detalle || prod.nombre || "",
           cantidad: prod.cantidad || 0,
           precioUnitario: prod.precioUnitario || 0,
         }))
@@ -478,7 +479,6 @@ const CotizacionesList = () => {
       detalle: item.detalle || "",
     };
 
-    // Extraer el prefijo del teléfono si existe
     let currentTelefonoSinPrefijo = item.telefono || "";
     let currentPrefijo = "+56";
     const prefixes = Object.keys(phonePrefixes).sort(
@@ -501,14 +501,16 @@ const CotizacionesList = () => {
     setOpenOrdenModal(true);
   };
 
+  //funciones para manejar los cambios en el modal de orden de compra
   const handleOrdenChange = (e) => {
     const { name, value } = e.target;
     setOrdenData((prev) => ({ ...prev, [name]: value }));
   };
 
+  //funciones para manejar los cambios en el listado de productos del modal de orden de compra
   const handleProductOrdenChange = (index, event) => {
     const { name, value } = event.target;
-    const list = [...(ordenData.productos || [])]; // Asegurar que sea un array
+    const list = [...(ordenData.productos || [])];
     const parsedValue =
       name === "nombre" ? value : parseFloat(value) || (value === "" ? "" : 0);
     list[index][name] = parsedValue;
@@ -516,23 +518,24 @@ const CotizacionesList = () => {
     setOrdenData((prev) => ({ ...prev, productos: list }));
   };
 
+  //funciones para agregar productos en el modal de orden de compra
   const handleRemoveProductOrden = (index) => {
-    const list = [...(ordenData.productos || [])]; // Asegurar que sea un array
+    const list = [...(ordenData.productos || [])];
     list.splice(index, 1);
     setOrdenData((prev) => ({ ...prev, productos: list }));
   };
 
+  //funciones para agregar productos en el modal de orden de compra
   const handleAddProductOrden = () => {
     setOrdenData((prev) => ({
       ...prev,
       productos: [
-        ...(prev.productos || []), // Asegurar que sea un array
-        { nombre: "", cantidad: "", precioUnitario: "" }, // Inicializar para la orden
+        ...(prev.productos || []),
+        { nombre: "", cantidad: "", precioUnitario: "" },
       ],
     }));
   };
 
-  // Recalcular totales en el modal de orden al cambiar productos/descuento
   useEffect(() => {
     if (ordenData && ordenData.productos) {
       const totalConIva = ordenData.productos.reduce(
@@ -556,6 +559,7 @@ const CotizacionesList = () => {
     }
   }, [ordenData?.productos, ordenData?.descuento, ordenData?.iva]);
 
+  //funcion para validar los datos de la orden de compra
   const validateOrden = (orden) => {
     const tempErrors = {};
     const rutRegex = /^\d{7,8}-[\dkK]$/;
@@ -596,6 +600,7 @@ const CotizacionesList = () => {
     return Object.keys(tempErrors).length === 0;
   };
 
+  //funcion para guardar la orden de compra
   const handleSaveOrden = async () => {
     const telefonoFinal = ordenData.telefono
       ? `${codigoPais}${ordenData.telefono}`
@@ -644,19 +649,23 @@ const CotizacionesList = () => {
     }
   };
 
+  //funciones para manejar el prefijo del telefono
   const handlePhonePrefixClick = (event) => {
     setAnchorElPhonePrefix(event.currentTarget);
   };
 
+  //funcion para cerrar el menu de prefijos de telefono
   const handlePhonePrefixClose = () => {
     setAnchorElPhonePrefix(null);
   };
 
+  //funcion para seleccionar un prefijo de telefono
   const handleSelectPhonePrefix = (prefix) => {
     setCodigoPais(prefix);
     handlePhonePrefixClose();
   };
 
+  //funcion para manejar el cierre del snackbar
   const handleSnackbarClose = (event, reason) => {
     if (reason === "clickaway") {
       return;
@@ -691,6 +700,7 @@ const CotizacionesList = () => {
     }
   };
 
+  //la funcion con los botones de acciones
   const renderActions = (item) => (
     <Box
       sx={{
@@ -730,6 +740,7 @@ const CotizacionesList = () => {
     [filtered, page, rowsPerPage]
   );
 
+  //aca ya se renderiza todo
   return (
     <Box>
       <Box
@@ -782,7 +793,6 @@ const CotizacionesList = () => {
             <MenuItem value="recientes">Más recientes</MenuItem>
             <MenuItem value="antiguos">Más antiguos</MenuItem>
           </TextField>
-          {/* Nuevo botón "Agregar" con menú desplegable */}
           <Button
             variant="contained"
             color="primary"
@@ -850,7 +860,7 @@ const CotizacionesList = () => {
                 <strong>{s.nombreSolicitante}</strong> ({s.rutSolicitante})
               </Typography>
               <Typography variant="body2" color="text.secondary">
-                Tipo: {s.tipo || "N/A"} {/* Muestra el tipo */}
+                Tipo: {s.tipo || "N/A"}
               </Typography>
               <Typography variant="body2" color="text.secondary">
                 Fecha: {formatFecha(s.fechaSolicitud)}
@@ -866,9 +876,8 @@ const CotizacionesList = () => {
           <Table>
             <TableHead>
               <TableRow>
-                {/* Definir las columnas explícitamente para mayor control y legibilidad */}
                 <TableCell>ID</TableCell>
-                <TableCell>Tipo</TableCell> {/* Nueva columna para el tipo */}
+                <TableCell>Tipo</TableCell>
                 <TableCell>Nombre Solicitante</TableCell>
                 <TableCell>RUT Solicitante</TableCell>
                 <TableCell>Correo</TableCell>
@@ -891,7 +900,7 @@ const CotizacionesList = () => {
                 >
                   <TableCell>{s.id}</TableCell>
                   <TableCell>{s.tipo || "N/A"}</TableCell>
-                  {/* Muestra el tipo */}
+
                   <TableCell>{s.nombreSolicitante}</TableCell>
                   <TableCell>{s.rutSolicitante}</TableCell>
                   <TableCell>{s.correo}</TableCell>
@@ -924,7 +933,6 @@ const CotizacionesList = () => {
         }
       />
 
-      {/* Modal para ver/editar/crear Solicitudes de Cotización */}
       <Modal open={openModal} onClose={handleCloseModal}>
         <Box sx={modalStyle}>
           <Typography variant="h6" mb={2}>
@@ -1005,7 +1013,7 @@ const CotizacionesList = () => {
                 rows={3}
                 InputProps={{ readOnly: modalMode === "view" }}
               />
-              {/* SECCIÓN DE PRODUCTOS SOLICITADOS EN EL MODAL DE SOLICITUD DE COTIZACIÓN */}
+
               <Typography variant="subtitle1" mt={2} mb={1}>
                 Productos Solicitados
               </Typography>
@@ -1109,7 +1117,6 @@ const CotizacionesList = () => {
 
               {modalMode === "view" && (
                 <Box mt={2} sx={{ textAlign: "right" }}>
-                  {/* Alineado a la derecha */}
                   <Button variant="contained" onClick={handleCloseModal}>
                     Cerrar
                   </Button>
@@ -1127,7 +1134,6 @@ const CotizacionesList = () => {
         </Box>
       </Modal>
 
-      {/* Modal para crear Orden de Compra desde Solicitud (copiado de OrdenesCompraList.jsx) */}
       <Modal open={openOrdenModal} onClose={() => setOpenOrdenModal(false)}>
         <Box sx={modalStyle}>
           <Typography variant="h6" mb={2}>
@@ -1432,7 +1438,6 @@ const CotizacionesList = () => {
         </Box>
       </Modal>
 
-      {/* Snackbar para notificaciones, se mantiene si es parte del flujo de UX */}
       <Snackbar
         open={snackbarOpen}
         autoHideDuration={6000}

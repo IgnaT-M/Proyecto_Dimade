@@ -12,6 +12,7 @@ import ContactoList from "../../componentes/DataList/ContactoList";
 import RegistrosList from "../../componentes/DataList/RegistrosList";
 import OrdenCompraList from "../../componentes/DataList/OrdenCompraList.jsx";
 
+//pagina de backoffice que contiene el panel de administracion y los datalists
 const Backoffice = () => {
   const [selectedSection, setSelectedSection] = useState("clientes");
   const [usuarioLogeado, setUsuarioLogeado] = useState(null);
@@ -47,6 +48,7 @@ const Backoffice = () => {
     navigate("/");
   };
 
+  // Función para renderizar el componente correspondiente según la sección seleccionada
   const renderSection = () => {
     switch (selectedSection) {
       case "clientes":

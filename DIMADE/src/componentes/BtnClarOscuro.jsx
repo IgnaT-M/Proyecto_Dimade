@@ -1,8 +1,8 @@
-// BtnClarOscuro.jsx (Código Final con Modo Oscuro Corregido)
-
 import React, { useState, useMemo, createContext, useContext } from "react";
 import { ThemeProvider, createTheme } from "@mui/material/styles";
 import { CssBaseline } from "@mui/material";
+
+//este es el contexto para el modo de color entre claro y oscuro
 
 const ColorModeContext = createContext({ toggleColorMode: () => {} });
 
@@ -26,9 +26,8 @@ export const CustomThemeProvider = ({ children }) => {
 
           ...(mode === "light"
             ? {
-                // ============== PALETA PARA MODO CLARO (SIN CAMBIOS) ==============
-                primary: { main: "#D95830" /* ... */ },
-                secondary: { main: "#10567E" /* ... */ },
+                primary: { main: "#D95830" },
+                secondary: { main: "#10567E" },
                 background: { default: "#f4f6f8", paper: "#ffffff" },
                 text: { primary: "#000000", secondary: "#555555" },
                 divider: "#cccccc",
@@ -46,12 +45,10 @@ export const CustomThemeProvider = ({ children }) => {
                 modalBg: "#fff",
               }
             : {
-                // ============== PALETA PARA MODO OSCURO (CON CAMBIOS) ==============
-                primary: { main: "#D95830" /* ... */ },
+                primary: { main: "#D95830" },
 
-                // === CAMBIO 1: El color secundario ahora es un gris muy oscuro ===
                 secondary: {
-                  main: "#1a1a1a", // Antes era #10567E
+                  main: "#1a1a1a",
                   dark: "#0a3a54",
                   light: "#30749C",
                 },
@@ -65,8 +62,7 @@ export const CustomThemeProvider = ({ children }) => {
                 navButtonHoverBg: "rgba(30, 30, 30, 0.9)",
                 navButtonHoverText: "#ffffff",
 
-                // === CAMBIO 2: El fondo del menú lateral ahora también es oscuro ===
-                categoryMenuBg: "#1a1a1a", // Antes era #10567E
+                categoryMenuBg: "#1a1a1a",
 
                 categoryMenuText: "#ffffff",
                 categoryMenuSelectedBg: "#30759C",

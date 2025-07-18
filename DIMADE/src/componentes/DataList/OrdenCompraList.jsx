@@ -22,7 +22,7 @@ import {
   Chip,
   useMediaQuery,
   useTheme,
-  Menu, // Importar Menu para el selector de país
+  Menu,
   Snackbar,
   Alert,
 } from "@mui/material";
@@ -43,6 +43,7 @@ import autoTable from "jspdf-autotable";
 import BASE_URL from "../../config/apiConfig";
 import logoDimade from "../../../public/imagenes/logo_dimade.png";
 
+//formateo de fecha aesthetic
 const formatFecha = (dateString) => {
   if (!dateString) return "N/A";
   return new Date(dateString).toLocaleString("es-CL", {
@@ -52,6 +53,7 @@ const formatFecha = (dateString) => {
   });
 };
 
+//formateo de moneda aesthetic
 const formatTotal = (amount) => {
   const numberAmount = typeof amount === "number" ? amount : 0;
   return new Intl.NumberFormat("es-CL", {
@@ -78,9 +80,8 @@ const OrdenCompraList = () => {
   const [snackbarMessage, setSnackbarMessage] = useState("");
   const [snackbarSeverity, setSnackbarSeverity] = useState("info");
 
-  // Estado para el código de país del teléfono y para el menú de selección
-  const [codigoPais, setCodigoPais] = useState("+56"); // Valor predeterminado para Chile
-  const [anchorElPhonePrefix, setAnchorElPhonePrefix] = useState(null); // Para el menú de prefijos
+  const [codigoPais, setCodigoPais] = useState("+56");
+  const [anchorElPhonePrefix, setAnchorElPhonePrefix] = useState(null);
 
   const openMenu = Boolean(anchorEl);
   const theme = useTheme();
@@ -90,6 +91,7 @@ const OrdenCompraList = () => {
     fetchOrdenes();
   }, []);
 
+  //il fetch
   const fetchOrdenes = async () => {
     try {
       const token = localStorage.getItem("jwtToken");
@@ -103,6 +105,7 @@ const OrdenCompraList = () => {
     }
   };
 
+  //filtro de datos
   const filteredOrdenes = useMemo(() => {
     return ordenes
       .filter((orden) => {
@@ -116,7 +119,7 @@ const OrdenCompraList = () => {
           orden.email,
           orden.direccion,
           orden.telefono,
-          orden.nombre, // Incluir nombre en la búsqueda
+          orden.nombre,
           formatTotal(orden.total),
           formatFecha(orden.fechaOrden),
         ]
@@ -144,11 +147,13 @@ const OrdenCompraList = () => {
 
   const handleMenuClose = () => setAnchorEl(null);
 
+  //agregar nueva orden
   const handleAddNew = (orderType) => {
     handleMenuClose();
     handleOpenModal(null, "new", orderType);
   };
 
+  // subir archivo PDF
   const handleUpload = async (file, ordenId) => {
     try {
       const formData = new FormData();
@@ -203,7 +208,7 @@ const OrdenCompraList = () => {
     }
   };
 
-  // DESCARGAR PDF
+  // descargar PDF subido
   const handleDownload = async (pdfId) => {
     if (!pdfId) {
       alert("Esta orden no tiene un PDF asociado.");
@@ -235,7 +240,7 @@ const OrdenCompraList = () => {
     link.click();
   };
 
-  // GENERAR PDF DESDE DATOS
+  //transforma los datos de una orden a pdf, hay que cambiar aca en caso de querer que el pdf resultante tenga un aspecto distinto
   const generarPDFOrden = (orden) => {
     if (!orden) {
       console.error(
@@ -298,10 +303,9 @@ const OrdenCompraList = () => {
     doc.setFont("helvetica", "bold");
     doc.text("SEÑORES:", 14, 75);
 
-    // Ajuste: Usa orden.nombre para el campo de nombre de la empresa/contacto
     doc.setFont("helvetica", "normal");
     doc.text(orden.nombre || "N/A", 16, 82);
-    // Eliminado el campo de contacto duplicado que causaba la línea vacía
+
     doc.text(orden.direccion || "N/A", 16, 87);
     doc.text(`Rut: ${orden.rutCliente || orden.rutProveedor || "N/A"}`, 16, 92);
     doc.text(`Teléfono: ${orden.telefono || "N/A"}`, 16, 97);
@@ -332,7 +336,6 @@ const OrdenCompraList = () => {
       },
     });
 
-    // Calcular totales para el PDF, incluyendo el descuento
     const currentTableBottomY = doc.lastAutoTable.finalY;
     let currentY = currentTableBottomY + 10;
     const startX = pageWidth - 84;
@@ -374,20 +377,21 @@ const OrdenCompraList = () => {
     currentY += 7;
     drawTotalRow(currentY, "IVA 19%", iva);
     currentY += 7;
-    // Agregar fila de Descuento si aplica
+
     if (descuentoMonto > 0) {
       drawTotalRow(
         currentY,
         `Descuento (${descuentoPorcentaje}%)`,
         -descuentoMonto
-      ); // Muestra el descuento como negativo
+      );
       currentY += 7;
     }
-    drawTotalRow(currentY, "TOTAL", totalAPagarConDescuento, true); // Usar el total con descuento
+    drawTotalRow(currentY, "TOTAL", totalAPagarConDescuento, true);
 
     doc.save(`orden-${orden.id || "sin-id"}.pdf`);
   };
 
+  //borrar orden de compra
   const handleDelete = async (id) => {
     if (!window.confirm("¿Eliminar orden de compra?")) return;
     try {
@@ -406,6 +410,7 @@ const OrdenCompraList = () => {
     }
   };
 
+  //abrir modal de orden de compra
   const handleOpenModal = (orden, mode, orderType) => {
     let dataForModal;
     if (mode === "new") {
@@ -428,7 +433,7 @@ const OrdenCompraList = () => {
       } else {
         dataForModal = { rutProveedor: "", ...baseData, tipo: "Proveedor" };
       }
-      setCodigoPais("+56"); // Establece el código de país predeterminado al crear una nueva orden
+      setCodigoPais("+56");
     } else {
       const ordenCorregida = {
         ...orden,
@@ -436,9 +441,8 @@ const OrdenCompraList = () => {
         direccion: orden.direccion || "",
         nombre: orden.nombre || "",
       };
-      // --- CORRECCIÓN: Normaliza productos ---
+
       if (!Array.isArray(ordenCorregida.productos)) {
-        // Si es string, conviértelo a array de objetos
         let items = [];
         if (typeof ordenCorregida.productos === "string") {
           items = ordenCorregida.productos.includes(",")
@@ -446,7 +450,6 @@ const OrdenCompraList = () => {
             : [ordenCorregida.productos];
         }
         ordenCorregida.productos = items.map((item) => {
-          // Ejemplo: "madera * 2 : $3000"
           const match = item.match(/^(.*?)\s*\*\s*(\d+)\s*:\s*\$(\d+)/);
           if (!match)
             return { nombre: item.trim(), cantidad: "", precioUnitario: "" };
@@ -458,14 +461,13 @@ const OrdenCompraList = () => {
           };
         });
       } else {
-        // Si ya es array, asegúrate de que todos los campos sean string o número válidos
         ordenCorregida.productos = ordenCorregida.productos.map((prod) => ({
           nombre: prod.nombre || "",
           cantidad: prod.cantidad || "",
           precioUnitario: prod.precioUnitario || "",
         }));
       }
-      // Extrae el código de país si existe en el teléfono
+
       const telefonoCompleto = ordenCorregida.telefono || "";
       let foundPrefix = "+56";
       const prefixes = Object.keys(phonePrefixes).sort(
@@ -486,13 +488,13 @@ const OrdenCompraList = () => {
     setModalMode(mode);
     setOpenModal(true);
   };
-
+  // cerrar modal de orden de compra
   const handleCloseModal = () => {
     setSelectedOrden(null);
     setOpenModal(false);
     setErrors({});
   };
-
+  // manejar cambios en el formulario de edición
   const handleEditChange = (e) => {
     const { name, value } = e.target;
     let newValue = value;
@@ -518,7 +520,16 @@ const OrdenCompraList = () => {
     }));
   };
 
+  //guardar cambios en la orden de compra
   const handleSave = async () => {
+    const validationError = validate(selectedOrden);
+    if (validationError) {
+      setSnackbarMessage(validationError);
+      setSnackbarSeverity("error");
+      setSnackbarOpen(true);
+      return;
+    }
+
     try {
       const token = localStorage.getItem("jwtToken");
       const url =
@@ -537,19 +548,25 @@ const OrdenCompraList = () => {
       if (res.ok) {
         await fetchOrdenes();
         handleCloseModal();
+        setSnackbarMessage("Orden guardada correctamente");
+        setSnackbarSeverity("success");
+        setSnackbarOpen(true);
       }
     } catch (err) {
       console.error("Error al guardar orden:", err);
+      setSnackbarMessage("Error al guardar orden");
+      setSnackbarSeverity("error");
+      setSnackbarOpen(true);
     }
   };
 
+  // manejar cambios en los productos de la orden de compra
   const handleProductChange = (index, event) => {
     const { name, value } = event.target;
     const list = [...selectedOrden.productos];
-    // Si es cantidad o precioUnitario, convierte a número
+
     list[index][name] = name === "nombre" ? value : parseFloat(value) || 0;
 
-    // Calcula totales dinámicamente
     const totalConIva = list.reduce(
       (acc, curr) => acc + (curr.cantidad || 0) * (curr.precioUnitario || 0),
       0
@@ -567,12 +584,14 @@ const OrdenCompraList = () => {
     }));
   };
 
+  //borrar productos de la lista
   const handleRemoveProduct = (index) => {
     const list = [...selectedOrden.productos];
     list.splice(index, 1);
     setSelectedOrden((prev) => ({ ...prev, productos: list }));
   };
 
+  //agregar productos a la lista
   const handleAddProduct = () => {
     setSelectedOrden((prev) => ({
       ...prev,
@@ -583,6 +602,7 @@ const OrdenCompraList = () => {
     }));
   };
 
+  //calculo del total de la orden de compra
   useEffect(() => {
     if (selectedOrden && selectedOrden.productos) {
       const totalConIva = selectedOrden.productos.reduce(
@@ -602,6 +622,7 @@ const OrdenCompraList = () => {
     }
   }, [selectedOrden?.productos, selectedOrden?.descuento]);
 
+  //esto tampoco lo hice yo esta horrendo, son los codigos de cada pais en caso de que llegue un numero de zimbabwe💀💀💀
   const phonePrefixes = {
     "+1": "Estados Unidos / Canadá",
     "+7": "Rusia",
@@ -753,10 +774,9 @@ const OrdenCompraList = () => {
     "+690": "Tokelau",
     "+691": "Micronesia",
     "+692": "Islas Marshall",
-    // Agrega más países y sus códigos si es necesario.
-    // Esta lista es bastante exhaustiva, pero si necesitas un país específico que falte, puedes añadirlo.
   };
 
+  //funciones que tienen que ver con los prefijos de telefono
   const handlePhonePrefixClick = (event) => {
     setAnchorElPhonePrefix(event.currentTarget);
   };
@@ -770,6 +790,7 @@ const OrdenCompraList = () => {
     handlePhonePrefixClose();
   };
 
+  //cierra el snackbar
   const handleSnackbarClose = (event, reason) => {
     if (reason === "clickaway") return;
     setSnackbarOpen(false);
@@ -788,6 +809,7 @@ const OrdenCompraList = () => {
     }
   };
 
+  //renderiza los botones de acción para cada orden
   const renderActions = (orden) => (
     <Box sx={{ display: "flex", justifyContent: "flex-end", flexWrap: "wrap" }}>
       <Tooltip title="Ver">
@@ -832,6 +854,7 @@ const OrdenCompraList = () => {
     </Box>
   );
 
+  //validacion de campos
   const validate = (orden) => {
     const tempErrors = {};
     const mailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
@@ -840,15 +863,6 @@ const OrdenCompraList = () => {
       : "";
     const telefonoRegex = /^\+\d{1,4}\d{6,14}$/;
 
-    // Elimina la validación de RUT:
-    // if (orden.rutCliente && !rutRegex.test(orden.rutCliente)) {
-    //   tempErrors.rutCliente = "RUT Cliente: Formato incorrecto. Ej: 12345678-9";
-    // }
-    // if (orden.rutProveedor && !rutRegex.test(orden.rutProveedor)) {
-    //   tempErrors.rutProveedor =
-    //     "RUT Proveedor: Formato incorrecto. Ej: 12345678-9";
-    // }
-
     if (orden.email && !mailRegex.test(orden.email)) {
       tempErrors.email = "Email: El formato del correo es inválido.";
     }
@@ -856,7 +870,6 @@ const OrdenCompraList = () => {
       tempErrors.telefono = "Teléfono: Formato incorrecto. Ej: +56912345678";
     }
 
-    // Validación de productos
     if (!orden.productos || !orden.productos.length) {
       tempErrors.productos = "Debe agregar al menos un producto.";
     } else {
@@ -889,7 +902,6 @@ const OrdenCompraList = () => {
 
     setErrors(tempErrors);
 
-    // Devuelve el primer mensaje de error, o null si no hay errores
     const firstError = Object.values(tempErrors)[0] || null;
     return firstError;
   };
@@ -908,10 +920,9 @@ const OrdenCompraList = () => {
     overflowY: "auto",
   };
 
-  // Actualización: Añadida columna para el nombre del solicitante
   const tableColumns = [
     { id: "id", label: "ID" },
-    { id: "nombre", label: "Nombre" }, // <-- Cambia a "nombre"
+    { id: "nombre", label: "Nombre" },
     { id: "tipo", label: "Tipo" },
     { id: "rut", label: "RUT" },
     { id: "email", label: "Email" },
@@ -920,9 +931,9 @@ const OrdenCompraList = () => {
     { id: "totalAPagar", label: "Total" },
   ];
 
-  // Justo antes del return principal:
   const isEditable = modalMode === "edit" || modalMode === "new";
 
+  //renderizador principal del componente
   return (
     <Box>
       <Box
@@ -1117,7 +1128,7 @@ const OrdenCompraList = () => {
                           ? orden.rutProveedor
                           : orden.rutCliente;
                     } else if (column.id === "nombre") {
-                      value = orden.nombre || orden.nombreSolicitante || ""; // <-- Muestra correctamente el nombre
+                      value = orden.nombre || orden.nombreSolicitante || "";
                     } else {
                       value = orden[column.id];
                     }

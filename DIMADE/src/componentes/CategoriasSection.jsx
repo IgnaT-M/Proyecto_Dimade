@@ -18,6 +18,7 @@ import Fade from "@mui/material/Fade";
 import Backdrop from "@mui/material/Backdrop";
 import CotizaForm from "../componentes/CotizaForm.jsx";
 
+//aca se cambia el contenido de la seccion de categorias
 const categorias = [
   {
     titulo: "Construcción",
@@ -304,6 +305,7 @@ const categorias = [
   },
 ];
 
+//seccion de categorias que muestra las categorias y productos destacados
 const CategoriasSection = () => {
   const [categoriaSeleccionada, setCategoriaSeleccionada] = useState(
     categorias[0]
@@ -444,7 +446,6 @@ const CategoriasSection = () => {
                   {categoriaSeleccionada.descripcion}
                 </Typography>
 
-                {/* ✅ Sección de productos destacados en 2 columnas */}
                 {categoriaSeleccionada.productosDestacados && (
                   <>
                     <Box sx={{ mt: { xs: 3, md: 6 }, mb: { xs: 3, md: 6 } }}>

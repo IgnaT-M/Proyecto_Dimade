@@ -19,27 +19,25 @@ import { useNavigate } from "react-router-dom";
 import { jwtDecode } from "jwt-decode";
 import BASE_URL from "../config/apiConfig";
 
+// Componente de formulario de inicio de sesión para el panel administrativo
 const LoginForm = () => {
   const [form, setForm] = useState({ email: "", password: "" });
   const [showPassword, setShowPassword] = useState(false);
   const [openSnackbar, setOpenSnackbar] = useState(false);
   const [errorMessage, setErrorMessage] = useState("");
-  // --- 1. NUEVO ESTADO PARA ERRORES ---
+
   const [errors, setErrors] = useState({ email: false, password: false });
   const navigate = useNavigate();
 
-  // --- 2. MANEJO DE CAMBIOS ACTUALIZADO ---
   const handleChange = (e) => {
     const { name, value } = e.target;
     setForm({ ...form, [name]: value });
 
-    // Limpia el error del campo en cuanto el usuario empieza a escribir
     if (value) {
       setErrors((prevErrors) => ({ ...prevErrors, [name]: false }));
     }
   };
 
-  // --- 3. MANEJO DE SUBMIT ACTUALIZADO ---
   const handleSubmit = async (e) => {
     e.preventDefault();
 
@@ -56,7 +54,6 @@ const LoginForm = () => {
       return;
     }
 
-    // El resto de la lógica de submit permanece igual
     try {
       const response = await fetch(`${BASE_URL}/api/auth/login`, {
         method: "POST",
@@ -111,7 +108,6 @@ const LoginForm = () => {
         </Typography>
 
         <Box component="form" onSubmit={handleSubmit} noValidate>
-          {/* --- 4. TEXTFIELD DE EMAIL MODIFICADO --- */}
           <TextField
             fullWidth
             name="email"
@@ -120,7 +116,6 @@ const LoginForm = () => {
             value={form.email}
             onChange={handleChange}
             margin="normal"
-            // Props para la validación visual
             error={errors.email}
             helperText={errors.email ? "Este campo es requerido" : ""}
             color={errors.email ? "warning" : "primary"}
@@ -133,7 +128,6 @@ const LoginForm = () => {
             }}
           />
 
-          {/* --- 5. TEXTFIELD DE CONTRASEÑA MODIFICADO --- */}
           <TextField
             fullWidth
             name="password"
@@ -142,7 +136,6 @@ const LoginForm = () => {
             value={form.password}
             onChange={handleChange}
             margin="normal"
-            // Props para la validación visual
             error={errors.password}
             helperText={errors.password ? "Este campo es requerido" : ""}
             color={errors.password ? "warning" : "primary"}
@@ -177,7 +170,7 @@ const LoginForm = () => {
                 fontSize: "0.875rem",
                 padding: 0,
                 minWidth: "auto",
-                color: "secondary", // azul tipo enlace
+                color: "secondary",
                 "&:hover": {
                   textDecoration: "underline",
                   backgroundColor: "transparent",
@@ -208,7 +201,6 @@ const LoginForm = () => {
             Entrar
           </Button>
 
-          {/* El resto del componente permanece igual... */}
           <Box textAlign="center">
             <Box
               display="flex"

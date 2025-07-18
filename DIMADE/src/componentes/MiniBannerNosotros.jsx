@@ -2,6 +2,7 @@ import React, { useState } from "react";
 import { Box, Typography } from "@mui/material";
 import { useNavigate } from "react-router-dom";
 
+//aca van el contenido y las imagenes del mini banner de la seccion nosotros
 const sections = [
   {
     key: "nosotros",
@@ -9,7 +10,6 @@ const sections = [
     background: "/nosotros.jpg",
     description:
       "En DIMADE, conectamos proveedores y clientes del rubro de la construcción con eficiencia, confianza y tecnología.",
-    
   },
   {
     key: "mision",
@@ -17,7 +17,6 @@ const sections = [
     background: "/nosotros1.jpg",
     description:
       "Brindar una plataforma eficiente que facilite la conexión directa entre proveedores y clientes del área de la construcción.",
-    
   },
   {
     key: "vision",
@@ -25,10 +24,10 @@ const sections = [
     background: "/nosotros2.jpg",
     description:
       "Ser líderes en soluciones digitales para el abastecimiento y gestión de proyectos constructivos en Latinoamérica.",
-    
   },
 ];
 
+// Componente que muestra un mini banner con secciones de "Nosotros", "Misión" y "Visión"
 const MiniBannerNosotros = () => {
   const navigate = useNavigate();
   const [hovered, setHovered] = useState(null);
@@ -39,7 +38,7 @@ const MiniBannerNosotros = () => {
         display: "flex",
         width: "100%",
         height: 200,
-        overflow: "hidden", // importante para evitar desbordes
+        overflow: "hidden",
       }}
     >
       {sections.map((section) => {
@@ -67,7 +66,6 @@ const MiniBannerNosotros = () => {
               cursor: "pointer",
             }}
           >
-            {/* Overlay oscuro */}
             <Box
               sx={{
                 position: "absolute",
@@ -76,7 +74,6 @@ const MiniBannerNosotros = () => {
               }}
             />
 
-            {/* Título inicial */}
             <Typography
               variant="h5"
               fontWeight="bold"
@@ -92,7 +89,6 @@ const MiniBannerNosotros = () => {
               {section.title}
             </Typography>
 
-            {/* Contenido extendido */}
             <Box
               sx={{
                 position: "absolute",

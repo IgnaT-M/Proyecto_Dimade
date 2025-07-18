@@ -2,6 +2,8 @@ import React, { useState, useEffect } from "react";
 import { Button } from "@mui/material";
 import KeyboardArrowUpIcon from "@mui/icons-material/KeyboardArrowUp";
 
+// Componente que muestra un botón para volver al inicio de la página
+
 const BtnInicio = () => {
   const [showButton, setShowButton] = useState(false);
 
@@ -21,7 +23,7 @@ const BtnInicio = () => {
   const handleClick = () => {
     window.scrollTo({
       top: 0,
-      behavior: "smooth", // Scroll suave
+      behavior: "smooth",
     });
   };
   if (!showButton) {
@@ -34,7 +36,7 @@ const BtnInicio = () => {
       color={"secondary"}
       onClick={handleClick}
       sx={(theme) => ({
-        position: "fixed", // Esto lo hace flotar
+        position: "fixed",
         bottom: 80,
         right: 20,
         borderRadius: "50%",
@@ -42,22 +44,21 @@ const BtnInicio = () => {
         height: 56,
         minWidth: 0,
         boxShadow: 3,
-        zIndex: 1000, // Asegura que esté por encima de otros elementos
-        display: "flex", // Para centrar el ícono
+        zIndex: 1000,
+        display: "flex",
         justifyContent: "center",
         alignItems: "center",
-        opacity: showButton ? 1 : 0, // Controla la opacidad para animación de aparición
-        transition: "opacity 0.3s ease-in-out", // Transición de opacidad
-        backgroundColor: "#D95830", // Color de fondo
+        opacity: showButton ? 1 : 0,
+        transition: "opacity 0.3s ease-in-out",
+        backgroundColor: "#D95830",
         "&:hover": {
-          backgroundColor: theme.palette.primary.dark, // Efecto hover usando el dark de primary
-          backdropFilter: "blur(5px)", // Efecto de desenfoque
-          WebkitBackdropFilter: "blur(5px)", // Compatibilidad con Safari
-          color: "#fff", // Cambia el color del ícono al blanco al hacer hover
+          backgroundColor: theme.palette.primary.dark,
+          backdropFilter: "blur(5px)",
+          WebkitBackdropFilter: "blur(5px)",
+          color: "#fff",
         },
       })}
     >
-      {/* Icono de flecha hacia arriba (más común para este tipo de botón) */}
       <KeyboardArrowUpIcon sx={{ fontSize: 32 }} />
     </Button>
   );

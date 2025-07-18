@@ -37,7 +37,7 @@ const ClientesList = () => {
   const [rowsPerPage, setRowsPerPage] = useState(10);
   const [selectedCliente, setSelectedCliente] = useState(null);
   const [modalMode, setModalMode] = useState("view");
-  const [openModal, setOpenModal] = useState(false); // La variable está aquí
+  const [openModal, setOpenModal] = useState(false);
   const [estadoFiltro, setEstadoFiltro] = useState("todos");
 
   const theme = useTheme();
@@ -47,30 +47,32 @@ const ClientesList = () => {
     fetchClientes();
   }, []);
 
+  //fetch de clientes para mostrar todos los clientes en la lista
+
   const fetchClientes = async () => {
     try {
       const token = localStorage.getItem("jwtToken");
       const res = await fetch(`${BASE_URL}/api/clientes`, {
         headers: { Authorization: `Bearer ${token}` },
       });
-      // SOLUCIÓN PARCIAL AL ERROR JSON: Manejar respuestas no exitosas
       if (!res.ok) {
-        // Si la respuesta no es 2xx, no intentes parsear JSON.
         console.error(
           "Respuesta no exitosa de la API:",
           res.status,
           res.statusText
         );
-        setClientes([]); // Poner un array vacío para que la UI no se rompa
+        setClientes([]);
         return;
       }
       const data = await res.json();
       setClientes(Array.isArray(data) ? data : []);
     } catch (err) {
       console.error("Error cargando clientes:", err);
-      setClientes([]); // En caso de error de red o parseo, limpiar los datos.
+      setClientes([]);
     }
   };
+
+  // Filtrado de datos
 
   const filteredClientes = useMemo(() => {
     return clientes.filter((cliente) => {
@@ -85,10 +87,14 @@ const ClientesList = () => {
     });
   }, [clientes, search, estadoFiltro]);
 
+  // Paginación
+
   const paginatedClientes = useMemo(() => {
     const start = page * rowsPerPage;
     return filteredClientes.slice(start, start + rowsPerPage);
   }, [filteredClientes, page, rowsPerPage]);
+
+  //funcion para borrar
 
   const handleDelete = async (id) => {
     if (!window.confirm("¿Eliminar cliente?")) return;
@@ -105,6 +111,8 @@ const ClientesList = () => {
       console.error("Error al eliminar cliente:", err);
     }
   };
+
+  //funcion para cambiar el estado activo
 
   const handleToggleActivo = async (cliente) => {
     try {
@@ -128,8 +136,9 @@ const ClientesList = () => {
     }
   };
 
+  // aca esta el modal para agregar, editar y ver
+
   const handleOpenModal = (cliente, mode) => {
-    // CORRECCIÓN PARA EL WARNING: Asegurar que todos los campos tienen un valor inicial
     const initialData = {
       id: null,
       rut: "",
@@ -146,20 +155,26 @@ const ClientesList = () => {
     setOpenModal(true);
   };
 
+  //funcion para cerrar el modal
+
   const handleCloseModal = () => {
     setSelectedCliente(null);
     setOpenModal(false);
   };
 
+  //funcion para manejar los cambios en el modal
+
   const handleEditChange = (e) => {
     const { name, value } = e.target;
-    // CORRECCIÓN PARA EL WARNING: Manejar explícitamente el booleano
+
     const isBoolean = name === "activo";
     setSelectedCliente((prev) => ({
       ...prev,
       [name]: isBoolean ? value === "true" : value,
     }));
   };
+
+  //funcion para guardar los cambios en el modal
 
   const handleSave = async () => {
     try {
@@ -200,6 +215,8 @@ const ClientesList = () => {
     overflowY: "auto",
   };
 
+  // aca se renderizan los botones de acciones
+
   const renderActions = (cliente) => (
     <Box sx={{ display: "flex", justifyContent: "flex-end", flexWrap: "wrap" }}>
       <Tooltip title="Ver">
@@ -231,10 +248,10 @@ const ClientesList = () => {
     </Box>
   );
 
+  // Renderizado del componente
+
   return (
     <Box>
-      {/* El resto del JSX es idéntico al que te pasé antes, la lógica de presentación responsiva está correcta. */}
-      {/* ... (Cabecera, Lógica de Tabla vs Tarjetas, Paginación, etc.) ... */}
       <Box
         sx={{
           display: "flex",

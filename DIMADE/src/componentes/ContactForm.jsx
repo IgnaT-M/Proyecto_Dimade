@@ -10,6 +10,7 @@ import {
 } from "@mui/material";
 import BASE_URL from "../config/apiConfig";
 
+//formulario de contacto para enviar mensajes al administrador del sitio web
 const ContactForm = () => {
   const [formData, setFormData] = useState({
     nombre: "",
@@ -85,13 +86,7 @@ const ContactForm = () => {
     }
   };
 
-  const asuntos = [
-    "Cotización",
-    "Consulta General",
-    "Problemas con Pedido",
-    "Sugerencia",
-    "Otro",
-  ];
+  const asuntos = ["Consulta", "Reclamo", "Sugerencia", "Otro"];
 
   return (
     <Box sx={{ maxWidth: 600, mx: "auto", py: 2 }}>

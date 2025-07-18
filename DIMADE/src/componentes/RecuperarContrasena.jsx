@@ -13,6 +13,7 @@ import EmailIcon from "@mui/icons-material/Email";
 import { useNavigate } from "react-router-dom";
 import BASE_URL from "../config/apiConfig";
 
+// Componente para recuperar la contraseña del usuario, esto le pega al endpoint de recuperación de contraseña
 const RecuperarContrasena = () => {
   const [email, setEmail] = useState("");
   const [openSnackbar, setOpenSnackbar] = useState(false);
@@ -105,7 +106,6 @@ const RecuperarContrasena = () => {
         </Typography>
 
         <Box component="form" onSubmit={handleSubmit} noValidate>
-          {/* --- 4. TEXTFIELD MODIFICADO CON VALIDACIÓN --- */}
           <TextField
             fullWidth
             name="email"

@@ -29,7 +29,7 @@ import {
 } from "@mui/icons-material";
 import BASE_URL from "../../config/apiConfig";
 
-// Helper para formatear fechas de manera consistente
+//esto formatea la fecha para que sea mas bonita, la belleza es subjetiva
 const formatFecha = (dateString) => {
   if (!dateString) return "N/A";
   return new Date(dateString).toLocaleString("es-CL", {
@@ -61,6 +61,7 @@ const ContactoList = () => {
     fetchSolicitudes();
   }, []);
 
+  // este hace el fetch jaja
   const fetchSolicitudes = async () => {
     try {
       const token = localStorage.getItem("jwtToken");
@@ -74,6 +75,7 @@ const ContactoList = () => {
     }
   };
 
+  // filtro de datos
   const filtered = useMemo(() => {
     return solicitudes
       .filter((s) => {
@@ -91,11 +93,13 @@ const ContactoList = () => {
       });
   }, [solicitudes, search, asuntoFiltro, estadoFiltro, orden]);
 
+  // paginacion de los datos
   const paginated = useMemo(() => {
     const start = page * rowsPerPage;
     return filtered.slice(start, start + rowsPerPage);
   }, [filtered, page, rowsPerPage]);
 
+  // funcion para abrir el modal
   const handleOpenModal = (item, mode) => {
     const inicial = {
       nombre: "",
@@ -107,7 +111,6 @@ const ContactoList = () => {
       fechaEnvio: new Date().toISOString(),
     };
 
-    // Esto asegura que si item viene incompleto, se rellena
     const datosCompletos = mode === "new" ? inicial : { ...inicial, ...item };
 
     setSelected(datosCompletos);
@@ -115,16 +118,19 @@ const ContactoList = () => {
     setOpenModal(true);
   };
 
+  // funcion para cerrar el modal
   const handleCloseModal = () => {
     setSelected(null);
     setOpenModal(false);
   };
 
+  // funcion para manejar los cambios en el modal
   const handleChange = (e) => {
     const { name, value } = e.target;
     setSelected((prev) => ({ ...prev, [name]: value }));
   };
 
+  // funcion para guardar los cambios en el modal
   const handleSave = async () => {
     try {
       const token = localStorage.getItem("jwtToken");
@@ -159,6 +165,7 @@ const ContactoList = () => {
     }
   };
 
+  // funcion para eliminar una solicitud
   const handleDelete = async () => {
     if (!deleteId) return;
     try {
@@ -179,6 +186,7 @@ const ContactoList = () => {
     }
   };
 
+  // esto cambia el color del campo estado segun el estado del estado
   const getEstadoColor = (estado) => {
     switch (estado) {
       case "Revisado":
@@ -206,6 +214,7 @@ const ContactoList = () => {
     overflowY: "auto",
   };
 
+  //renderizado
   const renderActions = (s) => (
     <Box>
       <Tooltip title="Ver">
@@ -509,7 +518,6 @@ const ContactoList = () => {
         </Box>
       </Modal>
 
-      {/* Modal de eliminación igual que antes */}
       <Modal open={!!deleteId} onClose={() => setDeleteId(null)}>
         <Box
           sx={{
