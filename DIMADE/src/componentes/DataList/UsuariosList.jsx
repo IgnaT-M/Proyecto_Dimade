@@ -43,16 +43,17 @@ const UsuariosList = () => {
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down("md"));
 
+  // Formatea el nombre del usuario para mostrarlo correctamente
   const formatUserName = (name) => {
     if (!name) return "";
-    // Asume que el nombre de usuario puede ser 'nombre.apellido' o 'nombre_apellido'
-    // y lo convierte a 'Nombre Apellido'.
+
     return name
-      .split(/[\._-]/) // Divide por punto, guion bajo o guion
+      .split(/[\._-]/)
       .map((part) => part.charAt(0).toUpperCase() + part.slice(1))
       .join(" ");
   };
 
+  // fetch
   const fetchUsuarios = async () => {
     try {
       const token = localStorage.getItem("jwtToken");
@@ -72,6 +73,7 @@ const UsuariosList = () => {
     fetchUsuarios();
   }, []);
 
+  //filtro
   const filteredUsuarios = useMemo(() => {
     return usuarios.filter((usuario) => {
       const matchSearch = Object.values(usuario).some((val) =>
@@ -89,11 +91,13 @@ const UsuariosList = () => {
     });
   }, [usuarios, search, estadoFiltro, rolFiltro]);
 
+  //paginado
   const paginatedUsuarios = useMemo(() => {
     const start = page * rowsPerPage;
     return filteredUsuarios.slice(start, start + rowsPerPage);
   }, [filteredUsuarios, page, rowsPerPage]);
 
+  //funcion de eliminar usuario
   const handleDelete = async (id) => {
     if (!window.confirm("¿Eliminar usuario?")) return;
     try {
@@ -112,6 +116,7 @@ const UsuariosList = () => {
     }
   };
 
+  // Cambia el estado activo/inactivo del usuario
   const handleToggleActivo = async (usuario) => {
     try {
       const token = localStorage.getItem("jwtToken");
@@ -134,6 +139,7 @@ const UsuariosList = () => {
     }
   };
 
+  // Abre el modal para ver, editar o crear un usuario
   const handleOpenModal = (usuario, mode) => {
     if (mode === "new") {
       setSelectedUsuario({
@@ -150,11 +156,13 @@ const UsuariosList = () => {
     setOpenModal(true);
   };
 
+  // Cierra el modal
   const handleCloseModal = () => {
     setSelectedUsuario(null);
     setOpenModal(false);
   };
 
+  // Maneja los cambios en los campos del formulario
   const handleEditChange = (e) => {
     const { name, value } = e.target;
     setSelectedUsuario((prev) => ({
@@ -163,6 +171,7 @@ const UsuariosList = () => {
     }));
   };
 
+  // Guarda los cambios del usuario
   const handleSave = async () => {
     try {
       const token = localStorage.getItem("jwtToken");
@@ -204,6 +213,7 @@ const UsuariosList = () => {
     overflowY: "auto",
   };
 
+  // Botones de acciones
   const renderActions = (usuario) => (
     <Box sx={{ display: "flex", justifyContent: "flex-end", flexWrap: "wrap" }}>
       <Tooltip title="Ver">
@@ -235,6 +245,7 @@ const UsuariosList = () => {
     </Box>
   );
 
+  // Renderizado principal del componente
   return (
     <Box>
       <Box

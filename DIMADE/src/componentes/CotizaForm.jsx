@@ -15,6 +15,7 @@ import DeleteOutlineIcon from "@mui/icons-material/DeleteOutline";
 
 import BASE_URL from "../config/apiConfig";
 
+// Componente para solicitar cotización de productos desde el front
 const CotizaForm = () => {
   const [formData, setFormData] = useState({
     rut: "",
@@ -42,7 +43,6 @@ const CotizaForm = () => {
   const handleProductChange = (index, e) => {
     const { name, value } = e.target;
     const newProducts = [...formData.productos];
-    // Solo 'cantidad' se convierte a número
     newProducts[index][name] =
       name === "cantidad" ? parseInt(value) || "" : value;
     setFormData((prev) => ({ ...prev, productos: newProducts }));
@@ -66,12 +66,12 @@ const CotizaForm = () => {
     (touched[`producto-${index}-${fieldName}`] || submitAttempted) &&
     (formData.productos[index][fieldName] === "" ||
       (fieldName === "cantidad" &&
-        parseFloat(formData.productos[index].cantidad) <= 0)); // Validar cantidad > 0
+        parseFloat(formData.productos[index].cantidad) <= 0));
 
   const handleAddProduct = () => {
     setFormData((prev) => ({
       ...prev,
-      // SIN precioUnitario al agregar nuevo producto
+
       productos: [...prev.productos, { detalle: "", cantidad: "", valor: 0 }],
     }));
   };
@@ -94,8 +94,6 @@ const CotizaForm = () => {
         !formData[campo]
     );
 
-    // Validar que al menos un producto esté especificado y sus campos no estén vacíos
-    // SIN validación de precioUnitario aquí
     const productosVacios = formData.productos.some(
       (prod) =>
         !prod.detalle || prod.cantidad === "" || parseFloat(prod.cantidad) <= 0
@@ -117,7 +115,7 @@ const CotizaForm = () => {
       direccion: formData.direccion,
 
       fechaSolicitud: new Date(),
-      productos: formData.productos, // Los productos se envían sin precio unitario
+      productos: formData.productos,
       estado: "Pendiente",
       detalle: formData.mensaje,
       tipo: formData.tipo,
@@ -225,7 +223,6 @@ const CotizaForm = () => {
           placeholder="Ej: Avenida Providencia 200, Conchalí"
         />
 
-        {/* Sección de Productos Solicitados */}
         <Typography variant="h5" gutterBottom sx={{ mt: 3, mb: 1 }}>
           Productos
         </Typography>
@@ -282,7 +279,7 @@ const CotizaForm = () => {
                 minWidth: "80px",
               }}
             />
-            {/* <--- ELIMINADO: Campo Precio Unitario */}
+
             {formData.productos.length > 1 && (
               <Tooltip title="Eliminar Producto">
                 <IconButton
@@ -298,7 +295,6 @@ const CotizaForm = () => {
           </Box>
         ))}
 
-        {/* Botón "AGREGAR PRODUCTO" */}
         <Button
           variant="outlined"
           fullWidth

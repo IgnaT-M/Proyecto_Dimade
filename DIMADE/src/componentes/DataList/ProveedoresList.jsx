@@ -29,7 +29,7 @@ import ToggleOffIcon from "@mui/icons-material/ToggleOff";
 import AddIcon from "@mui/icons-material/Add";
 import BASE_URL from "../../config/apiConfig";
 
-// Se mantiene la función helper para validación
+// Validación de correo electrónico
 const isValidEmail = (correo) => /\S+@\S+\.\S+/.test(correo);
 
 const ProveedoresList = () => {
@@ -49,6 +49,7 @@ const ProveedoresList = () => {
     fetchProveedores();
   }, []);
 
+  //fetch
   const fetchProveedores = async () => {
     try {
       const token = localStorage.getItem("jwtToken");
@@ -57,7 +58,6 @@ const ProveedoresList = () => {
         headers: {
           Authorization: `Bearer ${token}`,
         },
-
       });
       if (!res.ok) {
         console.error(
@@ -76,6 +76,7 @@ const ProveedoresList = () => {
     }
   };
 
+  //filtro de datos
   const filteredProveedores = useMemo(() => {
     return proveedores.filter((p) => {
       const matchSearch = Object.values(p).some((val) =>
@@ -89,11 +90,13 @@ const ProveedoresList = () => {
     });
   }, [proveedores, search, estadoFiltro]);
 
+  //paginacion
   const paginatedProveedores = useMemo(() => {
     const start = page * rowsPerPage;
     return filteredProveedores.slice(start, start + rowsPerPage);
   }, [filteredProveedores, page, rowsPerPage]);
 
+  //funcion de borrar datos
   const handleDelete = async (id) => {
     if (!window.confirm("¿Eliminar proveedor?")) return;
     try {
@@ -110,6 +113,7 @@ const ProveedoresList = () => {
     }
   };
 
+  //funcion de guardar datos
   const handleSave = async () => {
     if (!selectedProveedor.nombre || !selectedProveedor.correo) {
       alert("Por favor completa el nombre y el correo.");
@@ -145,6 +149,7 @@ const ProveedoresList = () => {
     }
   };
 
+  // Cambia el estado activo/inactivo del proveedor
   const handleToggleActivo = async (proveedor) => {
     try {
       const token = localStorage.getItem("jwtToken");
@@ -167,6 +172,7 @@ const ProveedoresList = () => {
     }
   };
 
+  // Abre el modal para ver, editar o crear un proveedor
   const handleOpenModal = (proveedor, mode) => {
     if (mode === "new") {
       setSelectedProveedor({
@@ -185,11 +191,13 @@ const ProveedoresList = () => {
     setOpenModal(true);
   };
 
+  // Cierra el modal
   const handleCloseModal = () => {
     setOpenModal(false);
     setSelectedProveedor(null);
   };
 
+  // Maneja los cambios en los campos del formulario
   const handleEditChange = (e) => {
     const { name, value } = e.target;
     setSelectedProveedor((prev) => ({
@@ -198,6 +206,7 @@ const ProveedoresList = () => {
     }));
   };
 
+  //botones de acciones
   const renderActions = (proveedor) => (
     <Box sx={{ display: "flex", justifyContent: "flex-end", flexWrap: "wrap" }}>
       <Tooltip title="Ver">
@@ -243,6 +252,7 @@ const ProveedoresList = () => {
     overflowY: "auto",
   };
 
+  //renderizado principal del componente
   return (
     <Box>
       <Box

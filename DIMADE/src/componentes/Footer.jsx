@@ -7,14 +7,14 @@ import {
   Link,
   Stack,
   useTheme,
-  Button, // CAMBIO: Import para el botón
+  Button,
 } from "@mui/material";
 import EmailIcon from "@mui/icons-material/Email";
 import PhoneIcon from "@mui/icons-material/Phone";
-import LoginIcon from "@mui/icons-material/Login"; // CAMBIO: Import para el ícono del botón
+import LoginIcon from "@mui/icons-material/Login";
 
 import { Link as RouterLink } from "react-router-dom";
-import logoDimade from "/imagenes/logo_dimade_nav2.png"; // Asegúrate que esta ruta es correcta
+import logoDimade from "/imagenes/logo_dimade_nav2.png";
 
 const Footer = () => {
   const theme = useTheme();
@@ -29,7 +29,7 @@ const Footer = () => {
         pt: { xs: 4, md: 6 },
         pb: { xs: 4, md: 3 },
         mt: "auto",
-        position: "relative", // Esencial para posicionar el botón de forma absoluta
+        position: "relative",
       }}
     >
       <Container maxWidth="lg">
@@ -39,7 +39,6 @@ const Footer = () => {
           alignItems="center"
           justifyContent={{ xs: "center", md: "center" }}
         >
-          {/* --- COLUMNA 1: LOGO --- */}
           <Grid
             item
             xs={12}
@@ -60,7 +59,6 @@ const Footer = () => {
             />
           </Grid>
 
-          {/* --- COLUMNA 2: ENLACES LEGALES (TÉRMINOS Y POLÍTICA) --- */}
           <Grid
             item
             xs={12}
@@ -89,7 +87,6 @@ const Footer = () => {
             </Box>
           </Grid>
 
-          {/* --- COLUMNA 3: CONTACTO (TELÉFONO Y CORREO) --- */}
           <Grid
             item
             xs={12}
@@ -124,7 +121,6 @@ const Footer = () => {
           </Grid>
         </Grid>
 
-        {/* --- Línea divisoria y derechos --- */}
         <Box mt={4} borderTop={1} borderColor="rgba(255, 255, 255, 0.2)" pt={2}>
           <Typography variant="body2" align="center" color="inherit">
             © {new Date().getFullYear()} dimade.cl – Todos los derechos
@@ -132,7 +128,6 @@ const Footer = () => {
           </Typography>
         </Box>
 
-        {/* CAMBIO: Botón de Backoffice recuperado y añadido aquí */}
         <Box
           sx={{
             position: "absolute",
@@ -142,7 +137,7 @@ const Footer = () => {
         >
           <Button
             variant="contained"
-            color="primary" // Asumo que es el color naranja de tu tema
+            color="primary"
             component={RouterLink}
             to="/login"
             sx={{

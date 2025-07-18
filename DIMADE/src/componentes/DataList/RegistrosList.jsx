@@ -50,15 +50,16 @@ const RegistrosList = () => {
   const [modalMode, setModalMode] = useState("view");
 
   const theme = useTheme();
-  // Media query para cambiar a vista de tarjetas en tablets y móviles
+
   const isMobileLayout = useMediaQuery(theme.breakpoints.down("md"));
-  // Media query para hacer el Dialog a pantalla completa solo en móviles
+
   const isFullScreenDialog = useMediaQuery(theme.breakpoints.down("sm"));
 
   useEffect(() => {
     fetchRegistros();
   }, []);
 
+  // Fetch lol
   const fetchRegistros = async () => {
     try {
       const token = localStorage.getItem("jwtToken");
@@ -75,6 +76,7 @@ const RegistrosList = () => {
     }
   };
 
+  //filtro de datos
   const filteredRegistros = useMemo(() => {
     return registros
       .filter((r) =>
@@ -92,11 +94,13 @@ const RegistrosList = () => {
       });
   }, [registros, search, tipoFiltro, fechaOrden]);
 
+  //paginado
   const paginatedRegistros = useMemo(() => {
     const start = page * rowsPerPage;
     return filteredRegistros.slice(start, start + rowsPerPage);
   }, [filteredRegistros, page, rowsPerPage]);
 
+  //funcion de borrar
   const handleDelete = async (id) => {
     if (!window.confirm("¿Eliminar registro financiero?")) return;
     try {
@@ -113,16 +117,15 @@ const RegistrosList = () => {
     }
   };
 
+  //funcion de guardar cambios
   const handleGuardarCambios = async () => {
     try {
       const token = localStorage.getItem("jwtToken");
       const method = modalMode === "new" ? "POST" : "PUT";
       const url =
-
         modalMode === "edit"
           ? `${BASE_URL}/api/registros-financieros/${modalRegistro.datos.id}`
           : `${BASE_URL}/api/registros-financieros`;
-
 
       const res = await fetch(url, {
         method,
@@ -142,6 +145,7 @@ const RegistrosList = () => {
     }
   };
 
+  // Abre el modal para ver, editar o crear un registro
   const handleOpenModal = (registro, mode) => {
     setModalRegistro({
       open: true,
@@ -158,8 +162,10 @@ const RegistrosList = () => {
     setModalMode(mode);
   };
 
+  // Cierra el modal
   const handleCloseModal = () => setModalRegistro({ open: false, datos: null });
 
+  // Maneja los cambios en los campos del formulario del modal
   const handleModalChange = (e) => {
     const { name, value } = e.target;
     setModalRegistro((prev) => ({
@@ -168,6 +174,7 @@ const RegistrosList = () => {
     }));
   };
 
+  // Formatea la fecha
   const formatDate = (dateString) =>
     new Date(dateString).toLocaleDateString("es-CL", {
       day: "2-digit",
@@ -175,12 +182,14 @@ const RegistrosList = () => {
       year: "numeric",
     });
 
+  // Formatea el monto a moneda chilena
   const formatCurrency = (amount) =>
     new Intl.NumberFormat("es-CL", {
       style: "currency",
       currency: "CLP",
     }).format(amount);
 
+  // Renderiza los botones de acción para cada registro
   const renderActions = (registro) => (
     <Box>
       <Tooltip title="Ver">
@@ -201,6 +210,7 @@ const RegistrosList = () => {
     </Box>
   );
 
+  // Renderiza el componente principal
   return (
     <Box>
       <Box

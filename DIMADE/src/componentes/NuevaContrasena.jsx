@@ -17,6 +17,7 @@ import { useNavigate } from "react-router-dom";
 import { useLocation } from "react-router-dom";
 import BASE_URL from "../config/apiConfig";
 
+// Componente para ingresar una nueva contraseña después de un enlace de recuperación
 const ResetearContrasena = () => {
   const location = useLocation();
   const searchParams = new URLSearchParams(location.search);
@@ -62,7 +63,6 @@ const ResetearContrasena = () => {
       newErrors.confirmPassword = "Debes confirmar la contraseña.";
     } else if (passwords.password !== passwords.confirmPassword) {
       newErrors.confirmPassword = "Las contraseñas no coinciden.";
-      // --- NUEVO: Toast para error de contraseñas no coincidentes ---
       setNotificacion({
         open: true,
         mensaje: "Error: Las contraseñas no coinciden.",
@@ -95,14 +95,12 @@ const ResetearContrasena = () => {
         );
       }
 
-      // Toast de éxito (ya estaba implementado)
       setNotificacion({
         open: true,
         mensaje: "¡Contraseña actualizada con éxito! Redirigiendo...",
         severidad: "success",
       });
 
-      // --- MODIFICADO: Redirección después de 1 segundo ---
       setTimeout(() => {
         navigate("/Login");
       }, 1000);

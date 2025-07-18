@@ -6,6 +6,8 @@ import { ArrowBackIos, ArrowForwardIos } from "@mui/icons-material";
 import IconButton from "@mui/material/IconButton";
 import { Link } from "react-router-dom";
 
+// Componente de carrusel que muestra imágenes con texto superpuesto al inicio de la página
+
 const slides = [
   {
     title: "Soluciones eficientes para tu proyecto",
@@ -92,7 +94,7 @@ function Carousel() {
         width: "100%",
         margin: "0 auto",
         height: { xs: "auto", sm: "auto", md: "40vh", lg: "60vh" },
-        minHeight: { xs: "180px", sm: "250px", md: "450px" }, // ← 🔧 MÁS PEQUEÑO EN MOBILE
+        minHeight: { xs: "180px", sm: "250px", md: "450px" },
         position: "relative",
         overflow: "hidden",
         pb: 0,
@@ -137,7 +139,7 @@ function Carousel() {
               <Box
                 sx={{
                   position: "absolute",
-                  top: { xs: "50%", sm: "35%" }, // ✅ texto mejor centrado en móvil
+                  top: { xs: "50%", sm: "35%" },
                   left: "10%",
                   transform: "translateY(-50%)",
                   zIndex: 2,

@@ -17,6 +17,7 @@ import { Link as RouterLink, useNavigate } from "react-router-dom";
 import { useState, useEffect, useRef } from "react";
 import ThemeToggleButton from "./ToggleButtonDiaNoche.jsx";
 
+//componente navbar que contiene el logo y los botones de navegacion
 const Navbar = () => {
   const theme = useTheme();
   const navigate = useNavigate();
@@ -75,7 +76,6 @@ const Navbar = () => {
                 textAlign: "center",
                 color: item.isSpecial ? "#fff" : theme.palette.navFooterText,
                 ...(item.isSpecial && {
-                  // El botón especial en el Drawer usará el color primary (naranja)
                   backgroundColor: theme.palette.primary.main,
                   "&:hover": {
                     backgroundColor: theme.palette.primary.dark,
@@ -100,7 +100,6 @@ const Navbar = () => {
     <AppBar
       position="static"
       sx={{
-        // Aplica el gradiente para Navbar definido en el tema
         background: `linear-gradient(180deg, ${theme.palette.navFooterBgGradientStart} 20%, ${theme.palette.navFooterBgGradientEnd} 90%)`,
         boxShadow: "0 2px 10px rgba(0, 0, 0, 0.1)",
         paddingX: { xs: 2, sm: 4 },
@@ -132,7 +131,7 @@ const Navbar = () => {
         </Box>
 
         <IconButton
-          color="inherit" // Hereda el color definido en MuiIconButton en el tema (que es navFooterText)
+          color="inherit"
           aria-label="open drawer"
           edge="end"
           onClick={handleDrawerToggle}
@@ -159,14 +158,14 @@ const Navbar = () => {
               sx={{
                 color: item.isSpecial ? "#fff" : theme.palette.navFooterText,
                 borderRadius: "9px",
-                // ¡Aquí el botón "Cotizar" usa primary.main (naranja) como tú quieres!
+
                 backgroundColor: item.isSpecial
                   ? theme.palette.primary.main
                   : "transparent",
                 "&:hover": {
                   ...(item.isSpecial
                     ? {
-                        backgroundColor: theme.palette.primary.dark, // Hover del botón "Cotizar" usa primary.dark
+                        backgroundColor: theme.palette.primary.dark,
                       }
                     : {
                         backgroundColor: theme.palette.navButtonHoverBg,

@@ -22,7 +22,7 @@ import { alpha } from "@mui/material/styles";
 import MenuIcon from "@mui/icons-material/Menu";
 import Brightness4Icon from "@mui/icons-material/Brightness4";
 import Brightness7Icon from "@mui/icons-material/Brightness7";
-import { useColorMode } from "./BtnClarOscuro"; // Revisa que la ruta a tu hook sea correcta
+import { useColorMode } from "./BtnClarOscuro";
 
 import DashboardIcon from "@mui/icons-material/Dashboard";
 import ShoppingCartIcon from "@mui/icons-material/ShoppingCart";
@@ -34,6 +34,7 @@ import RequestQuoteIcon from "@mui/icons-material/RequestQuote";
 import ReceiptLongIcon from "@mui/icons-material/ReceiptLong";
 import LogoutIcon from "@mui/icons-material/Logout";
 
+//este es el panel de navegacion del backoffice, en esta parte se selecciona el datalist que se renderiza
 const menuItems = [
   { key: "inicio", label: "Inicio", icon: <DashboardIcon /> },
   {
@@ -85,7 +86,6 @@ const PanelAdministracion = ({
   }
 
   const drawerContent = (
-    // === CAMBIO 1: Convertimos el div en un Box para usar flexbox y ocupar toda la altura ===
     <Box sx={{ display: "flex", flexDirection: "column", height: "100%" }}>
       <Toolbar />
       <Box sx={{ px: 2, py: 3, textAlign: "center" }}>
@@ -93,7 +93,7 @@ const PanelAdministracion = ({
           DIMADE
         </Typography>
       </Box>
-      {/* === CAMBIO 2: Hacemos que la lista crezca para empujar el botón hacia abajo === */}
+
       <List sx={{ flexGrow: 1 }}>
         {menuItems.map((item) => (
           <ListItem key={item.key} disablePadding>
@@ -126,7 +126,7 @@ const PanelAdministracion = ({
           </ListItem>
         ))}
       </List>
-      {/* === CAMBIO 3: Añadimos el botón de modo oscuro/claro SOLO en la vista móvil === */}
+
       {isMobile && (
         <Box sx={{ p: 2, display: "flex", justifyContent: "flex-end" }}>
           <Tooltip
@@ -190,7 +190,6 @@ const PanelAdministracion = ({
             <Avatar sx={{ bgcolor: "primary.main" }}>
               {usuario.nombre.charAt(0).toUpperCase()}
             </Avatar>
-            {/* Este botón se mantiene para la vista de escritorio */}
             <Tooltip
               title={
                 theme.palette.mode === "dark" ? "Modo claro" : "Modo oscuro"

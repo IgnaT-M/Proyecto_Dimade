@@ -1,6 +1,7 @@
 import React from "react";
 import { Box, Typography, useTheme } from "@mui/material";
 
+//aca se cambia el contenido de la seccion de marcas
 const logos = [
   { src: "/imagenes/marcas/cerecita.png", alt: "Cerecita" },
   { src: "/imagenes/marcas/kolor.png", alt: "Kolor" },
@@ -19,6 +20,7 @@ const scrollAnimation = {
   },
 };
 
+//este es el slider con todas las marcas
 const SliderMarcas = () => {
   const theme = useTheme();
 

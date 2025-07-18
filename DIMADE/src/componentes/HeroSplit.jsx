@@ -8,21 +8,21 @@ import {
   Fade,
 } from "@mui/material";
 import { useState } from "react";
-import { useTheme } from "@mui/material/styles"; // Importa el theme
+import { useTheme } from "@mui/material/styles";
 import ContactForm from "../componentes/ContactForm.jsx";
 import CotizaForm from "../componentes/CotizaForm.jsx";
 
+//esta es la seccion al medio de la pagina con las partes de cotizar y contacto
+
 export default function ResponsiveBoxes() {
-  const theme = useTheme(); // Usar el theme actual
+  const theme = useTheme();
   const [openCotizar, setOpenCotizar] = useState(false);
   const [openContacto, setOpenContacto] = useState(false);
 
-  // Estados cotización
   const [producto, setProducto] = useState("");
   const [cantidad, setCantidad] = useState("");
   const [listaProductos, setListaProductos] = useState([]);
 
-  // Estados contacto
   const [asunto, setAsunto] = useState("");
 
   const handleAddProducto = () => {
@@ -33,7 +33,6 @@ export default function ResponsiveBoxes() {
     }
   };
 
-  // Estilos del modal que se adaptan al tema
   const styleModal = {
     position: "absolute",
     top: "50%",
@@ -57,7 +56,6 @@ export default function ResponsiveBoxes() {
         width="100%"
         mt={4}
       >
-        {/* Cotizar */}
         <Box
           id="cotizar"
           sx={{
@@ -93,7 +91,6 @@ export default function ResponsiveBoxes() {
           </Button>
         </Box>
 
-        {/* Contactar */}
         <Box
           id="contacto"
           sx={{
@@ -128,7 +125,6 @@ export default function ResponsiveBoxes() {
         </Box>
       </Box>
 
-      {/* Modal Cotizar */}
       <Modal
         open={openCotizar}
         onClose={() => setOpenCotizar(false)}
@@ -143,7 +139,6 @@ export default function ResponsiveBoxes() {
         </Fade>
       </Modal>
 
-      {/* Modal Contacto */}
       <Modal
         open={openContacto}
         onClose={() => setOpenContacto(false)}
