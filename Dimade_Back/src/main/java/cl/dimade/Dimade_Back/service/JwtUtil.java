@@ -16,15 +16,18 @@ import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.security.Keys;
 import jakarta.annotation.PostConstruct;
 
+// Clase para manejar la generación y validación de tokens JWT
+// Utiliza una clave secreta para firmar los tokens y verificar su validez
+//el token dura 24 horas 
 @Service
 public class JwtUtil {
 
-    @Value("${jwt.secret}") // Se leerá desde application.properties
+    @Value("${jwt.secret}")
     private String secret;
 
     private SecretKey secretKey;
 
-    private final long EXPIRATION_TIME = 86400000; // 24 horas
+    private final long EXPIRATION_TIME = 86400000;
 
     @PostConstruct
     public void init() {
@@ -33,7 +36,7 @@ public class JwtUtil {
 
     public String generateToken(String email, String rol) {
         Map<String, Object> claims = new HashMap<>();
-        claims.put("rol", "ROLE_" + rol); // ✅ Prefijo obligatorio para Spring Security
+        claims.put("rol", "ROLE_" + rol);
 
         return Jwts.builder().setClaims(claims).setSubject(email).setIssuedAt(new Date())
                 .setExpiration(new Date(System.currentTimeMillis() + EXPIRATION_TIME)).signWith(secretKey).compact();
@@ -44,8 +47,7 @@ public class JwtUtil {
     }
 
     public Claims extractAllClaims(String token) {
-        return Jwts.parserBuilder().setSigningKey(secretKey) // Usa tu key real aquí
-                .build().parseClaimsJws(token).getBody();
+        return Jwts.parserBuilder().setSigningKey(secretKey).build().parseClaimsJws(token).getBody();
     }
 
     public String extractRol(String token) {

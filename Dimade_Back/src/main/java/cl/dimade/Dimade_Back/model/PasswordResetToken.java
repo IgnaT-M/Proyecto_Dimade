@@ -10,6 +10,7 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+// Clase que representa un token de restablecimiento de contraseña
 @Document(collection = "password_reset_tokens")
 @Data
 @NoArgsConstructor

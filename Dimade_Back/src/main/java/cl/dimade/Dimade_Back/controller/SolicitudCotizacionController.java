@@ -21,6 +21,7 @@ import org.springframework.web.bind.annotation.RestController;
 import cl.dimade.Dimade_Back.model.SolicitudCotizacion;
 import cl.dimade.Dimade_Back.service.SolicitudCotizacionService;
 
+// Controlador para gestionar solicitudes de cotización
 @RestController
 @RequestMapping("/api/solicitudes-cotizacion")
 @CrossOrigin(origins = "${frontend.url}")

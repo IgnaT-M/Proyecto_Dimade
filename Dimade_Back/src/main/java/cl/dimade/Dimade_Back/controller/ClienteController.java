@@ -19,6 +19,7 @@ import org.springframework.web.bind.annotation.RestController;
 import cl.dimade.Dimade_Back.model.Cliente;
 import cl.dimade.Dimade_Back.service.ClienteService;
 
+// Controlador para gestionar clientes
 @RestController
 @RequestMapping("/api/clientes")
 @CrossOrigin(origins = "${frontend.url}")

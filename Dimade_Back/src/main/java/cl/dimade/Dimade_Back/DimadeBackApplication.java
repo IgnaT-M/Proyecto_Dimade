@@ -5,6 +5,8 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.data.mongodb.repository.config.EnableMongoRepositories;
 
+//archivo principal de la aplicación Spring Boot
+// Aquí se configura el escaneo de componentes y repositorios de MongoDB
 @SpringBootApplication
 @EnableMongoRepositories(basePackages = "cl.dimade.Dimade_Back.repository")
 @ComponentScan(basePackages = "cl.dimade.Dimade_Back")

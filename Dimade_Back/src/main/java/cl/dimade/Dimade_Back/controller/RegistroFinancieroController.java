@@ -21,6 +21,7 @@ import org.springframework.web.bind.annotation.RestController;
 import cl.dimade.Dimade_Back.model.RegistroFinanciero;
 import cl.dimade.Dimade_Back.service.RegistroFinancieroService;
 
+// Controlador para gestionar registros financieros
 @RestController
 @RequestMapping("/api/registros-financieros")
 @CrossOrigin(origins = "${frontend.url}")

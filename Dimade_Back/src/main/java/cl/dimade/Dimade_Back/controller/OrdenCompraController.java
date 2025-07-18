@@ -19,6 +19,7 @@ import org.springframework.web.bind.annotation.RestController;
 import cl.dimade.Dimade_Back.model.OrdenCompra;
 import cl.dimade.Dimade_Back.service.OrdenCompraService;
 
+// Controlador para gestionar órdenes de compra
 @RestController
 @RequestMapping("/api/ordenes-compra")
 @CrossOrigin(origins = "${frontend.url}")

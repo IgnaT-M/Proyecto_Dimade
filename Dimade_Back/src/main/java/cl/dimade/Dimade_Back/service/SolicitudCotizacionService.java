@@ -30,14 +30,14 @@ public class SolicitudCotizacionService {
     public SolicitudCotizacion guardar(SolicitudCotizacion solicitud) {
         if (solicitud.getId() == null || solicitud.getId().isBlank()) {
             String idGenerado = sequenceGenerator.generateStringSequence("solicitudes_cotizacion_sequence", "SCZ");
-            solicitud.setId(idGenerado); // Ej: "SC001"
+            solicitud.setId(idGenerado);
         }
         return repository.save(solicitud);
     }
 
     public Optional<SolicitudCotizacion> actualizar(String id, SolicitudCotizacion actualizada) {
         return repository.findById(id).map(existente -> {
-            actualizada.setId(id); // Reutiliza el mismo ID
+            actualizada.setId(id);
             return repository.save(actualizada);
         });
     }

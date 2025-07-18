@@ -35,7 +35,6 @@ public class UsuarioService {
             usuario.setId(sequenceGenerator.generateStringSequence("usuario_sequence", "US"));
         }
 
-        // Hashear si viene en texto plano
         if (usuario.getPassword() != null && !usuario.getPassword().startsWith("$2")) {
             usuario.setPassword(passwordEncoder.encode(usuario.getPassword()));
         }
@@ -55,7 +54,6 @@ public class UsuarioService {
         return repository.findById(id).map(usuarioExistente -> {
             usuarioActualizado.setId(id);
 
-            // Solo hashear si la password fue cambiada (y no ya codificada)
             if (usuarioActualizado.getPassword() != null && !usuarioActualizado.getPassword().startsWith("$2")) {
                 usuarioActualizado.setPassword(passwordEncoder.encode(usuarioActualizado.getPassword()));
             }
