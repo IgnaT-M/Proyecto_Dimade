@@ -19,6 +19,7 @@ import org.springframework.web.bind.annotation.RestController;
 import cl.dimade.Dimade_Back.model.Proveedor;
 import cl.dimade.Dimade_Back.service.ProveedorService;
 
+// Controlador para gestionar proveedores
 @RestController
 @RequestMapping("/api/proveedores")
 @CrossOrigin(origins = "${frontend.url}")

@@ -19,6 +19,7 @@ import org.springframework.web.bind.annotation.RestController;
 import cl.dimade.Dimade_Back.model.Usuario;
 import cl.dimade.Dimade_Back.service.UsuarioService;
 
+// Controlador para gestionar usuarios
 @RestController
 @RequestMapping("/api/usuarios")
 @CrossOrigin(origins = "${frontend.url}")

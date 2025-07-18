@@ -30,7 +30,7 @@ public class RegistroFinancieroService {
     public RegistroFinanciero guardar(RegistroFinanciero registro) {
         if (registro.getId() == null || registro.getId().isBlank()) {
             String idGenerado = sequenceGeneratorService.generateStringSequence("registros_financieros_sequence", "RF");
-            registro.setId(idGenerado); // Ej: "RF001"
+            registro.setId(idGenerado);
         }
         return repository.save(registro);
     }

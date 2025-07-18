@@ -21,6 +21,11 @@ import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 
+/**
+ * filtro JWT para autenticar solicitudes HTTP. estp te checkea si el usuario
+ * tiene un token JWT válido y lo usa para establecer el contexto de seguridad
+ * de Spring.
+ */
 @Component
 public class JwtFilter extends OncePerRequestFilter {
 
@@ -33,9 +38,7 @@ public class JwtFilter extends OncePerRequestFilter {
     }
 
     @Override
-    protected void doFilterInternal(HttpServletRequest request,
-            HttpServletResponse response,
-            FilterChain filterChain)
+    protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain)
             throws ServletException, IOException {
 
         String path = request.getRequestURI();
@@ -54,7 +57,7 @@ public class JwtFilter extends OncePerRequestFilter {
             try {
                 email = jwtUtil.extractUsername(token);
             } catch (Exception e) {
-                System.out.println("❌ Error al extraer usuario del token: " + e.getMessage());
+                System.out.println(" Error al extraer usuario del token: " + e.getMessage());
             }
         }
 
@@ -67,18 +70,17 @@ public class JwtFilter extends OncePerRequestFilter {
 
                 List<GrantedAuthority> authorities = Collections.singletonList(new SimpleGrantedAuthority(rol));
 
-                // 🧪 Diagnóstico
-                System.out.println("🎯 Token válido para: " + email);
-                System.out.println("🔐 Rol extraído del token: " + rol);
-                System.out.println("✔ Autoridades construidas: " + authorities);
+                System.out.println(" Token válido para: " + email);
+                System.out.println(" Rol extraído del token: " + rol);
+                System.out.println(" Autoridades construidas: " + authorities);
 
-                UsernamePasswordAuthenticationToken authToken = new UsernamePasswordAuthenticationToken(
-                        userDetails, null, authorities);
+                UsernamePasswordAuthenticationToken authToken = new UsernamePasswordAuthenticationToken(userDetails,
+                        null, authorities);
 
                 authToken.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
                 SecurityContextHolder.getContext().setAuthentication(authToken);
             } else {
-                System.out.println("❌ Token inválido para: " + email);
+                System.out.println("Token inválido para: " + email);
             }
         }
 

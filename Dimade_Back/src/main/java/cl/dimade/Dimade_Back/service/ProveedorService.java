@@ -33,7 +33,7 @@ public class ProveedorService {
     public Proveedor guardar(Proveedor proveedor) {
         if (proveedor.getId() == null || proveedor.getId().isBlank()) {
             String idGenerado = sequenceGeneratorService.generateStringSequence("proveedores_sequence", "PR");
-            proveedor.setId(idGenerado); // Ej: "PR001"
+            proveedor.setId(idGenerado);
         }
         return repository.save(proveedor);
     }
@@ -44,7 +44,7 @@ public class ProveedorService {
 
     public Optional<Proveedor> actualizar(String id, Proveedor proveedorActualizado) {
         return repository.findById(id).map(proveedorExistente -> {
-            proveedorActualizado.setId(id); // Mantenemos el mismo ID
+            proveedorActualizado.setId(id);
             return repository.save(proveedorActualizado);
         });
     }

@@ -17,6 +17,8 @@ import com.mongodb.BasicDBObject;
 import com.mongodb.DBObject;
 import com.mongodb.client.gridfs.model.GridFSFile;
 
+// Servicio para manejar la subida y descarga de archivos PDF
+// Utiliza GridFS de MongoDB para almacenar los archivos y permite operaciones de búsqueda y recuperación
 @Service
 public class PdfService {
 
@@ -30,20 +32,18 @@ public class PdfService {
     private GridFsOperations gridFsOperations;
 
     public String guardarPdf(MultipartFile archivo, String nombreOrden) throws IOException {
-        // ID amigable
+
         String idSeq = sequenceGeneratorService.generateStringSequence("pdf_sequence", "PDF");
 
         DBObject metadata = new BasicDBObject();
         metadata.put("nombreOrden", nombreOrden);
         metadata.put("idSeq", idSeq);
 
-        // Guarda usando el ID amigable como filename
         gridFsTemplate.store(archivo.getInputStream(), idSeq + ".pdf", "application/pdf", metadata);
 
         return idSeq;
     }
 
-    // 👉 Método 2: descargar archivo
     public InputStreamResource descargarPdf(String id) throws IOException {
         GridFSFile archivo = gridFsTemplate.findOne(Query.query(Criteria.where("_id").is(new ObjectId(id))));
         GridFsResource resource = gridFsOperations.getResource(archivo);

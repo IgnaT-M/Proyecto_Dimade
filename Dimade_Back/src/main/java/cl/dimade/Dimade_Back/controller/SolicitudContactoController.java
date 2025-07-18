@@ -21,6 +21,7 @@ import org.springframework.web.bind.annotation.RestController;
 import cl.dimade.Dimade_Back.model.SolicitudContacto;
 import cl.dimade.Dimade_Back.service.SolicitudContactoService;
 
+// Controlador para gestionar solicitudes de contacto
 @RestController
 @RequestMapping("/api/solicitudes-contacto")
 @CrossOrigin(origins = "${frontend.url}")

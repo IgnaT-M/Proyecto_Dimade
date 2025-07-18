@@ -10,6 +10,7 @@ import org.springframework.stereotype.Service;
 import cl.dimade.Dimade_Back.model.Usuario;
 import cl.dimade.Dimade_Back.repository.UsuarioRepository;
 
+// Servicio personalizado para cargar detalles del usuario
 @Service
 public class CustomUserDetailsService implements UserDetailsService {
 
@@ -20,19 +21,14 @@ public class CustomUserDetailsService implements UserDetailsService {
     public UserDetails loadUserByUsername(String email) throws UsernameNotFoundException {
         System.out.println("Buscando usuario con email: " + email);
 
-        Usuario usuario = usuarioRepository.findByEmail(email)
-            .orElseThrow(() -> {
-                System.out.println("Usuario no encontrado.");
-                return new UsernameNotFoundException("Usuario no encontrado");
-            });
+        Usuario usuario = usuarioRepository.findByEmail(email).orElseThrow(() -> {
+            System.out.println("Usuario no encontrado.");
+            return new UsernameNotFoundException("Usuario no encontrado");
+        });
 
         System.out.println("Usuario encontrado. Email: " + usuario.getEmail());
 
-        // Agrega el rol como autoridad (con prefijo ROLE_)
-        return new User(
-            usuario.getEmail(),
-            usuario.getPassword(),
-            Collections.singletonList(new SimpleGrantedAuthority("ROLE_" + usuario.getRol()))
-        );
+        return new User(usuario.getEmail(), usuario.getPassword(),
+                Collections.singletonList(new SimpleGrantedAuthority("ROLE_" + usuario.getRol())));
     }
 }

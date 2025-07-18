@@ -26,6 +26,8 @@ import cl.dimade.Dimade_Back.model.OrdenCompra;
 import cl.dimade.Dimade_Back.repository.OrdenCompraRepository;
 import cl.dimade.Dimade_Back.service.PdfService;
 
+// Controlador para gestionar la subida y descarga de archivos PDF relacionados con órdenes de compra
+// Permite subir un PDF, descargarlo por ID y actualizar el ID del PDF en una orden de compra
 @RestController
 @RequestMapping("/api/ordenes-compra")
 public class OrdenCompraPdfController {

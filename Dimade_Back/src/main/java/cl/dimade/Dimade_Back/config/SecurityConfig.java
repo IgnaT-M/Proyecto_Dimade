@@ -3,6 +3,7 @@ package cl.dimade.Dimade_Back.config;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpMethod;
@@ -21,8 +22,8 @@ import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 
 import cl.dimade.Dimade_Back.service.CustomUserDetailsService;
 import cl.dimade.Dimade_Back.service.JwtUtil;
-import org.springframework.beans.factory.annotation.Value;
 
+// Configuración de seguridad de Spring para la aplicación
 @Configuration
 public class SecurityConfig {
 
@@ -66,6 +67,7 @@ public class SecurityConfig {
         return http.build();
     }
 
+    // Configuración CORS
     @Bean
     CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration configuration = new CorsConfiguration();

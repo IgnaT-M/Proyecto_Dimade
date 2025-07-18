@@ -30,6 +30,8 @@ import cl.dimade.Dimade_Back.service.UsuarioService;
 
 @RestController
 
+// Controlador para autenticación y gestión de usuarios
+// Maneja el registro, inicio de sesión y recuperación de contraseña
 @RequestMapping("/api/auth")
 public class AuthController {
 
@@ -59,6 +61,8 @@ public class AuthController {
     @Value("${frontend.url}")
     private String frontendUrl;
 
+    // Endpoint para iniciar sesión
+    // Verifica las credenciales del usuario y devuelve un token JWT si son válidas
     @PostMapping("/login")
     public ResponseEntity<?> login(@RequestBody Map<String, String> loginData) {
         String email = loginData.get("email");
@@ -78,6 +82,8 @@ public class AuthController {
         return ResponseEntity.ok(Map.of("token", token));
     }
 
+    // Endpoint para registrar un nuevo usuario
+    // Verifica si el correo ya está registrado, si no, crea un nuevo usuario
     @PostMapping("/register")
     public ResponseEntity<?> register(@RequestBody Map<String, String> request) {
         String email = request.get("email");
@@ -91,34 +97,36 @@ public class AuthController {
 
         Usuario nuevoUsuario = new Usuario();
         nuevoUsuario.setEmail(email);
-        nuevoUsuario.setPassword(password); // Se codifica dentro de UsuarioService
+        nuevoUsuario.setPassword(password);
         nuevoUsuario.setNombre(nombre);
         nuevoUsuario.setRol(rol);
         nuevoUsuario.setActivo(true);
 
-        usuarioService.guardar(nuevoUsuario); // Aquí aplica la secuencia y codifica si es necesario
+        usuarioService.guardar(nuevoUsuario);
 
         return ResponseEntity.status(HttpStatus.CREATED).body("Usuario registrado exitosamente");
     }
 
+    // Endpoint para solicitar restablecimiento de contraseña
+    // Envía un enlace al correo del usuario con un token único de 15 minutos
     @PostMapping("/forgot-password")
     public ResponseEntity<?> forgotPassword(@RequestBody Map<String, String> request) {
         String email = request.get("email");
         Optional<Usuario> usuarioOpt = usuarioRepository.findByEmail(email);
 
         if (usuarioOpt.isEmpty()) {
-            // Para evitar exponer si el correo existe, devolvemos OK igual
+
             return ResponseEntity.ok("Si el correo está registrado, se enviará un enlace.");
         }
 
         Usuario usuario = usuarioOpt.get();
         String token = UUID.randomUUID().toString();
-        Date expiry = new Date(System.currentTimeMillis() + 1000 * 60 * 15); // 15 minutos
+        Date expiry = new Date(System.currentTimeMillis() + 1000 * 60 * 15);
 
         PasswordResetToken resetToken = new PasswordResetToken(token, usuario, expiry);
         passwordResetTokenRepository.save(resetToken);
 
-        String link = frontendUrl + "/reset-password?token=" + token; // Cambia por tu frontend
+        String link = frontendUrl + "/reset-password?token=" + token;
         String mensaje = "Haz clic en este enlace para restablecer tu contraseña:\n" + link;
 
         emailService.enviarCorreo(email, "Recupera tu contraseña", mensaje);
@@ -126,6 +134,10 @@ public class AuthController {
         return ResponseEntity.ok("Si el correo está registrado, se enviará un enlace.");
     }
 
+    // Endpoint para restablecer la contraseña usando el token enviado por correo
+    // Verifica el token, si es válido y no ha expirado, actualiza la contraseña del
+    // usuario
+    // Elimina el token después de usarlo para que no se pueda reutilizar
     @PostMapping("/reset-password")
     public ResponseEntity<?> resetPassword(@RequestBody ResetPasswordRequest request) {
         Optional<PasswordResetToken> tokenOpt = passwordResetTokenRepository.findByToken(request.getToken());
@@ -136,7 +148,6 @@ public class AuthController {
 
         PasswordResetToken resetToken = tokenOpt.get();
 
-        // Verificar si el token está vencido
         if (resetToken.getExpiryDate().before(new Date())) {
             return ResponseEntity.badRequest().body("El token ha expirado");
         }
@@ -144,8 +155,6 @@ public class AuthController {
         Usuario usuario = resetToken.getUsuario();
         usuario.setPassword(passwordEncoder.encode(request.getNuevaPassword()));
         usuarioRepository.save(usuario);
-
-        // Eliminar el token para que no se reutilice
         passwordResetTokenRepository.delete(resetToken);
 
         return ResponseEntity.ok("Contraseña actualizada correctamente");
